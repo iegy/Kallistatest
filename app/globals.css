@@ -80,7 +80,7 @@ h1, h2, h3 { font-family: "Noto Naskh Arabic", serif; font-weight: 500; line-hei
 .album-card strong { grid-column: 1; font: 29px "Noto Naskh Arabic", serif; }
 .album-card em { grid-area: 1 / 2 / span 2; align-self: center; font-style: normal; font-size: 11px; }
 .empty-gallery { background: var(--sand); display: grid; grid-template-columns: 1.2fr 1fr; min-height: 460px; align-items: center; }
-.empty-frame { height: 100%; min-height: 460px; background: linear-gradient(135deg, rgba(175,187,156,.65), rgba(198,165,133,.5)), url("/ronadisa.jpg") center 43%/cover; background-blend-mode: color; filter: grayscale(.3); }
+.empty-frame { height: 100%; min-height: 460px; background-position: center 43%; background-size: cover; background-blend-mode: color; filter: grayscale(.3); }
 .empty-gallery > div:last-child { padding: 60px; }
 .empty-gallery h3 { font-size: 42px; }
 .empty-gallery p { line-height: 2; }

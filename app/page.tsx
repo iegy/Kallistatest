@@ -32,6 +32,7 @@ type Service = { id: string; titleAr: string; titleEn: string; description: stri
 type Album = { id: string; title: string; category: string; description: string; coverUrl: string; published: boolean; eventDate?: string };
 type Photo = { id: string; albumId: string; url: string; alt: string; order: number; published: boolean };
 type Review = { id: string; name: string; rating: number; text: string; approved: boolean };
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 type Settings = {
   brandName: string;
   heroHeadline: string;
@@ -139,7 +140,7 @@ export default function Home() {
   return (
     <main>
       <header className="site-header">
-        <a className="brand" href="#home" aria-label="Kallista home"><img src="/kallista-logo.jpg" alt="Kallista" /></a>
+        <a className="brand" href="#home" aria-label="Kallista home"><img src={`${basePath}/kallista-logo.jpg`} alt="Kallista" /></a>
         <nav className={menu ? "nav open" : "nav"} aria-label="التنقل الرئيسي">
           <a href="#home" onClick={() => setMenu(false)}>الرئيسية</a>
           <a href="#services" onClick={() => setMenu(false)}>الخدمات</a>
@@ -163,7 +164,7 @@ export default function Home() {
           <p>{settings.heroCopy}</p>
           <div className="hero-actions"><a className="button" href="#portfolio">استكشف الأعمال</a><button className="button ghost" onClick={() => setBookingOpen(true)}>احجز جلستك</button></div>
         </div>
-        <div className="hero-image"><img src="/ronadisa.jpg" alt="روناديسا، المصورة المؤسسة لـ Kallista" /></div>
+        <div className="hero-image"><img src={`${basePath}/ronadisa.jpg`} alt="روناديسا، المصورة المؤسسة لـ Kallista" /></div>
         <a className="scroll-cue" href="#intro">اكتشف <span>↓</span></a>
       </section>
 
@@ -183,7 +184,7 @@ export default function Home() {
 
       <section id="portfolio" className="section portfolio">
         <div className="section-heading"><div><p className="eyebrow">THE WORK</p><h2>{settings.portfolioHeadline}</h2></div><p>{settings.portfolioCopy}</p></div>
-        {albums.length ? <div className="album-grid">{albums.map((album, index) => <button className={`album-card album-${index % 3}`} key={album.id} onClick={() => setAlbumOpen(album)}><img src={album.coverUrl} alt={album.title} loading="lazy" /><span><small>{album.category}</small><strong>{album.title}</strong><em>عرض الألبوم ↙</em></span></button>)}</div> : <div className="empty-gallery"><div className="empty-frame" /><div><p className="eyebrow">YOUR STORIES LIVE HERE</p><h3>الألبومات جاهزة لاستقبال أعمال Kallista.</h3><p>من لوحة التحكم يمكنك إنشاء المناسبة، رفع صورها كاملة، اختيار صورة الغلاف، وترتيب ظهورها.</p></div></div>}
+        {albums.length ? <div className="album-grid">{albums.map((album, index) => <button className={`album-card album-${index % 3}`} key={album.id} onClick={() => setAlbumOpen(album)}><img src={album.coverUrl} alt={album.title} loading="lazy" /><span><small>{album.category}</small><strong>{album.title}</strong><em>عرض الألبوم ↙</em></span></button>)}</div> : <div className="empty-gallery"><div className="empty-frame" style={{ backgroundImage: `linear-gradient(135deg, rgba(175,187,156,.65), rgba(198,165,133,.5)), url("${basePath}/ronadisa.jpg")` }} /><div><p className="eyebrow">YOUR STORIES LIVE HERE</p><h3>الألبومات جاهزة لاستقبال أعمال Kallista.</h3><p>من لوحة التحكم يمكنك إنشاء المناسبة، رفع صورها كاملة، اختيار صورة الغلاف، وترتيب ظهورها.</p></div></div>}
       </section>
 
       <section id="experience" className="section experience">
@@ -191,7 +192,7 @@ export default function Home() {
         <div className="steps"><article><span>01 / BEFORE</span><h3>قبل الجلسة</h3><p>نتعرف عليك، نفهم ما تريده وطبيعة المناسبة والمشاعر التي تريد الاحتفاظ بها.</p></article><article><span>02 / DURING</span><h3>أثناء التصوير</h3><p>توجيه واضح عندما تحتاج إليه، ومساحة للعفوية عندما تبدأ اللحظات الحقيقية.</p></article><article><span>03 / AFTER</span><h3>بعد الجلسة</h3><p>اختيار ومعالجة الصور بعناية، مع اهتمام بالتفاصيل النهائية وطريقة التسليم.</p></article></div>
       </section>
 
-      <section id="about" className="section about"><div className="about-photo"><img src="/ronadisa.jpg" alt="Ronadisa behind Kallista" loading="lazy" /></div><div className="about-copy"><p className="eyebrow">MEET THE EYE BEHIND KALLISTA</p><h2>{settings.aboutHeadline}</h2><p>{settings.aboutCopy}</p><blockquote>I don&apos;t just photograph what I see.<br />I photograph what I feel is worth remembering.</blockquote></div></section>
+      <section id="about" className="section about"><div className="about-photo"><img src={`${basePath}/ronadisa.jpg`} alt="Ronadisa behind Kallista" loading="lazy" /></div><div className="about-copy"><p className="eyebrow">MEET THE EYE BEHIND KALLISTA</p><h2>{settings.aboutHeadline}</h2><p>{settings.aboutCopy}</p><blockquote>I don&apos;t just photograph what I see.<br />I photograph what I feel is worth remembering.</blockquote></div></section>
 
       <section className="section reviews"><div className="section-heading"><div><p className="eyebrow">WORDS FROM THOSE WHO TRUSTED US</p><h2>قالوا عن التجربة.</h2></div><button className="text-link" onClick={() => user ? document.getElementById("review-form")?.scrollIntoView({ behavior: "smooth" }) : setAuthOpen(true)}>أضف تقييمك ↙</button></div>{reviews.length ? <div className="review-grid">{reviews.map((r) => <article key={r.id}><div className="stars">{"★".repeat(r.rating)}{"☆".repeat(5-r.rating)}</div><p>“{r.text}”</p><strong>{r.name}</strong></article>)}</div> : <p className="soft-note">يظهر هذا القسم تلقائيًا بعد اعتماد أول تقييم حقيقي من لوحة التحكم.</p>}<ReviewForm user={user} onNeedAuth={() => setAuthOpen(true)} /></section>
 
@@ -201,7 +202,7 @@ export default function Home() {
 
       <Newsletter settings={settings} />
 
-      <footer><div className="footer-brand"><img src="/kallista-logo.jpg" alt="Kallista" /><p>{settings.heroLine}</p></div><div className="footer-links"><a href={settings.instagram}>Instagram</a><a href={settings.facebook}>Facebook</a><a href={settings.tiktok}>TikTok</a><a href={wa}>WhatsApp</a></div><div className="footer-bottom"><span>© 2026 Kallista by Ronadisa. All rights reserved.</span><a href="https://iegy.net" target="_blank">Designed &amp; Developed by Mohammed Hussein · iegy.net ©</a><Link href="/admin">الإدارة</Link></div></footer>
+      <footer><div className="footer-brand"><img src={`${basePath}/kallista-logo.jpg`} alt="Kallista" /><p>{settings.heroLine}</p></div><div className="footer-links"><a href={settings.instagram}>Instagram</a><a href={settings.facebook}>Facebook</a><a href={settings.tiktok}>TikTok</a><a href={wa}>WhatsApp</a></div><div className="footer-bottom"><span>© 2026 Kallista by Ronadisa. All rights reserved.</span><a href="https://iegy.net" target="_blank">Designed &amp; Developed by Mohammed Hussein · iegy.net ©</a><Link href="/admin">الإدارة</Link></div></footer>
 
       <a className="whatsapp-float" href={wa} target="_blank" aria-label="تواصل عبر واتساب">WA</a>
       {authOpen && <AuthDialog onClose={() => setAuthOpen(false)} />}

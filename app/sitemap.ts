@@ -3,6 +3,6 @@ import type { MetadataRoute } from "next";
 export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
+  const base = process.env.NEXT_PUBLIC_SITE_URL || "https://iegy.net/Kallista";
   return [{ url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1 }];
 }

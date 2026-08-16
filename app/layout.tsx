@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://example.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://iegy.net/Kallista"),
   title: "Kallista by Ronadisa | Photography in Egypt",
   description:
     "Kallista by Ronadisa — wedding, children, fashion and personal photography in Egypt, with editorial elegance and authentic emotion.",

@@ -60,12 +60,13 @@ export const FooterSection: React.FC<FooterSectionProps> = ({
 
       {/* MINIMAL FOOTER */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
+        <div className="grid grid-cols-1 items-start gap-10 md:grid-cols-12">
           
           {/* Brand Info */}
-          <div className="md:col-span-5 text-right space-y-4">
-            <div className="flex items-center justify-end">
+          <div className="order-1 space-y-4 text-center md:order-2 md:col-span-4">
+            <div className="flex items-center justify-center">
               <KallistaLogo
+                className="w-full max-w-[290px]"
                 size="md"
                 customImageUrl={
                   brand.footerLogoType === 'image'
@@ -80,12 +81,12 @@ export const FooterSection: React.FC<FooterSectionProps> = ({
               />
             </div>
             
-            {language === 'en' && <p className="font-serif italic text-sm text-[#e6e1d6]/80 pt-2">{brand.taglineEn}</p>}
-            <p className="text-xs text-[#afbb9c] font-arabic-editorial">{brand.taglineAr}</p>
+            {language === 'en' && <p className="mx-auto max-w-sm pt-2 font-serif text-sm italic text-[#e6e1d6]/80">{brand.taglineEn}</p>}
+            <p className="mx-auto max-w-sm font-arabic-editorial text-xs leading-relaxed text-[#afbb9c]">{brand.taglineAr}</p>
           </div>
 
           {/* Navigation Links */}
-          <div className="md:col-span-4 text-right">
+          <div className="order-2 text-right md:order-1 md:col-span-4">
             <span className="font-serif text-xs uppercase tracking-widest text-[#c6a585] block mb-4">
               {t('الروابط', 'Navigation')}
             </span>
@@ -130,7 +131,7 @@ export const FooterSection: React.FC<FooterSectionProps> = ({
           </div>
 
           {/* Social Channels & Admin */}
-          <div className="md:col-span-3 text-right space-y-4">
+          <div className="order-3 space-y-4 text-right md:col-span-4">
             <span className="font-serif text-xs uppercase tracking-widest text-[#c6a585] block">
               {t('تواصلوا معنا', 'Connect')}
             </span>

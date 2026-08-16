@@ -230,4 +230,6 @@ export interface SiteSettings {
   firebaseMessagingSenderId: string;
   firebaseAppId: string;
   currency: string;
+  bodyFontKey: string;
+  headingFontKey: string;
 }

@@ -12,6 +12,7 @@ import {
   getSiteContent,
   getUpcomingBirthdayAlerts,
   mergeSiteContent,
+  mergeSettings,
   saveAlbums,
   saveBookings,
   saveClients,
@@ -54,6 +55,7 @@ import { BookingModal } from './components/BookingModal';
 import { AccountModal } from './components/AccountModal';
 import { AppearanceControls } from './components/AppearanceControls';
 import { Language, LanguageProvider, localizeAlbums, localizeCategories, localizeContent } from './i18n';
+import { ensureSiteFontsLoaded, getBodyFontOption, getHeadingFontOption } from './themeFonts';
 
 interface UserProfileRecord {
   id: string;
@@ -132,8 +134,9 @@ export default function App() {
       }),
       watchDocument<SiteSettings>(FIRESTORE_COLLECTIONS.SETTINGS, 'public', (value) => {
         if (!value) return;
-        setSettings(value);
-        saveSettings(value);
+        const normalizedSettings = mergeSettings(value);
+        setSettings(normalizedSettings);
+        saveSettings(normalizedSettings);
       }),
     ];
     if (!isAdmin) {
@@ -154,6 +157,16 @@ export default function App() {
     }
     return () => unsubscribers.forEach((unsubscribe) => unsubscribe());
   }, [isAdmin]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const bodyFont = getBodyFontOption(settings.bodyFontKey);
+    const headingFont = getHeadingFontOption(settings.headingFontKey);
+
+    ensureSiteFontsLoaded(bodyFont.key, headingFont.key);
+    root.style.setProperty('--font-arabic-sans', bodyFont.stack);
+    root.style.setProperty('--font-arabic-serif', headingFont.stack);
+  }, [settings.bodyFontKey, settings.headingFontKey]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -267,11 +280,12 @@ export default function App() {
   };
 
   const handleUpdateSettings = async (newSettings: SiteSettings) => {
+    const normalizedSettings = mergeSettings(newSettings);
     await commitSave(
-      () => saveDocument(FIRESTORE_COLLECTIONS.SETTINGS, 'public', newSettings),
+      () => saveDocument(FIRESTORE_COLLECTIONS.SETTINGS, 'public', normalizedSettings),
       () => {
-        setSettings(newSettings);
-        saveSettings(newSettings);
+        setSettings(normalizedSettings);
+        saveSettings(normalizedSettings);
       },
     );
   };
@@ -397,6 +411,13 @@ export default function App() {
   // Birthday alerts count
   const birthdayAlerts = getUpcomingBirthdayAlerts(clients);
 
+  const preventPublicImageAction = (event: React.SyntheticEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement | null;
+    if (!target?.closest('img')) return;
+    if (target.closest('#kallista-admin-dashboard')) return;
+    event.preventDefault();
+  };
+
   return (
     <LanguageProvider value={{
       language,
@@ -404,7 +425,13 @@ export default function App() {
       toggleLanguage: () => setLanguage(language === 'ar' ? 'en' : 'ar'),
       t: (arabic, english) => language === 'ar' ? arabic : english,
     }}>
-    <div id="kallista-app-root" dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-[#fffefb] text-[#24211e] flex flex-col selection:bg-[#c6a585]/30">
+    <div
+      id="kallista-app-root"
+      dir={language === 'ar' ? 'rtl' : 'ltr'}
+      className="min-h-screen bg-[#fffefb] text-[#24211e] flex flex-col selection:bg-[#c6a585]/30"
+      onContextMenu={preventPublicImageAction}
+      onDragStart={preventPublicImageAction}
+    >
       
       {/* 03 — HEADER / NAVIGATION */}
       <Navbar

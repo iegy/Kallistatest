@@ -1,5 +1,6 @@
 import React, { FormEvent, useState } from 'react';
-import { Loader2, LogIn, UserPlus, X } from 'lucide-react';
+import type { User } from 'firebase/auth';
+import { Loader2, LogIn, LogOut, UserPlus, UserRound, X } from 'lucide-react';
 import {
   loginWithFirebase,
   loginWithGoogle,
@@ -10,9 +11,11 @@ import {
 interface AccountModalProps {
   isOpen: boolean;
   onClose: () => void;
+  user: User | null;
+  onLogout: () => Promise<void>;
 }
 
-export const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose }) => {
+export const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose, user, onLogout }) => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -22,6 +25,32 @@ export const AccountModal: React.FC<AccountModalProps> = ({ isOpen, onClose }) =
   const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
+
+  if (user) {
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 px-4" dir="rtl">
+        <div className="relative w-full max-w-md rounded-3xl bg-[#fffefb] p-6 text-center shadow-2xl sm:p-8">
+          <button onClick={onClose} className="absolute left-5 top-5 rounded-full p-2 hover:bg-[#efe9e0]" aria-label="إغلاق">
+            <X className="h-5 w-5" />
+          </button>
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#efe9e0] text-[#755130]">
+            <UserRound className="h-8 w-8" />
+          </div>
+          <p className="text-xs tracking-[0.25em] text-[#936942]">KALLISTA ACCOUNT</p>
+          <h2 className="mt-2 text-2xl font-semibold text-[#1a1715]">{user.displayName || 'حسابي'}</h2>
+          <p className="mt-2 text-sm text-[#6c635b]">{user.email}</p>
+          <p className="mt-5 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">تم تسجيل الدخول بنجاح، ويمكنك الآن إرسال الحجوزات والتقييمات.</p>
+          <button
+            onClick={async () => { await onLogout(); onClose(); }}
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 px-4 py-3 text-sm font-medium text-red-700 hover:bg-red-50"
+          >
+            <LogOut className="h-4 w-4" />
+            تسجيل الخروج
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();

@@ -247,7 +247,6 @@ export default function App() {
         onOpenBooking={() => handleOpenQuickBooking('weddings')}
         onOpenAdmin={() => setIsAdminOpen(true)}
         onOpenAccount={() => setIsAccountOpen(true)}
-        onLogout={() => void logoutFirebase()}
         userLabel={user?.displayName || user?.email || undefined}
         birthdayAlertCount={birthdayAlerts.length}
       />
@@ -367,7 +366,12 @@ export default function App() {
         onSaveBooking={handleSaveBooking}
       />
 
-      <AccountModal isOpen={isAccountOpen} onClose={() => setIsAccountOpen(false)} />
+      <AccountModal
+        isOpen={isAccountOpen}
+        onClose={() => setIsAccountOpen(false)}
+        user={user}
+        onLogout={logoutFirebase}
+      />
 
       {/* 4. Full Admin Management Dashboard Modal */}
       <AdminDashboardModal

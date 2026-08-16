@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Lock, Calendar, UserRound, LogOut } from 'lucide-react';
+import { Menu, X, Lock, Calendar, UserRound } from 'lucide-react';
 import { SiteSettings, SiteContent, PortfolioCategory } from '../types';
 import { KallistaLogo } from './KallistaLogo';
 
@@ -12,7 +12,6 @@ interface NavbarProps {
   onOpenBooking: () => void;
   onOpenAdmin: () => void;
   onOpenAccount: () => void;
-  onLogout: () => void;
   userLabel?: string;
   birthdayAlertCount: number;
 }
@@ -26,7 +25,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenBooking,
   onOpenAdmin,
   onOpenAccount,
-  onLogout,
   userLabel,
   birthdayAlertCount,
 }) => {
@@ -118,11 +116,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* CTA & Admin Control actions */}
           <div className="hidden sm:flex items-center gap-3">
             <button
-              onClick={userLabel ? onLogout : onOpenAccount}
+              onClick={onOpenAccount}
               className="flex items-center gap-1.5 rounded-full px-3 py-2 text-xs text-[#6c635b] hover:bg-[#efe9e0]/70 hover:text-[#1a1715]"
-              title={userLabel ? `تسجيل خروج ${userLabel}` : 'تسجيل الدخول أو إنشاء حساب'}
+              title={userLabel ? 'عرض وإدارة الحساب' : 'تسجيل الدخول أو إنشاء حساب'}
             >
-              {userLabel ? <LogOut className="h-4 w-4" /> : <UserRound className="h-4 w-4" />}
+              <UserRound className="h-4 w-4" />
               <span className="hidden xl:inline">{userLabel || 'حسابي'}</span>
             </button>
             {/* Admin Dashboard Access */}
@@ -158,11 +156,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Mobile Menu Button */}
           <div className="flex lg:hidden items-center gap-2">
             <button
-              onClick={userLabel ? onLogout : onOpenAccount}
+              onClick={onOpenAccount}
               className="p-2 text-[#7C7167] hover:text-[#1A1715] focus:outline-none"
-              aria-label={userLabel ? 'تسجيل الخروج' : 'حسابي'}
+              aria-label="حسابي"
             >
-              {userLabel ? <LogOut className="h-4 w-4" /> : <UserRound className="h-4 w-4" />}
+              <UserRound className="h-4 w-4" />
             </button>
             <button
               id="mobile-admin-btn"

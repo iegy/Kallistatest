@@ -55,7 +55,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 }) => {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loginEmail, setLoginEmail] = useState(import.meta.env.VITE_ADMIN_EMAIL || settings.adminUsername || '');
+  const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -622,11 +622,13 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                     البريد الإلكتروني / اسم المستخدم (Email)
                   </label>
                   <input
-                    type="text"
+                    type="email"
                     required
+                    autoComplete="off"
+                    name="kallista-admin-email"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
-                    placeholder="admin@kallista.com"
+                    placeholder="أدخل البريد الإلكتروني"
                     className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-sm text-[#24211e]"
                   />
                 </div>
@@ -638,6 +640,8 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                   <input
                     type="password"
                     required
+                    autoComplete="off"
+                    name="kallista-admin-password"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="••••••••"

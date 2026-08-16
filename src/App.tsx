@@ -98,7 +98,15 @@ export default function App() {
     return () => unsubscribers.forEach((unsubscribe) => unsubscribe());
   }, [isAdmin]);
 
-  const reportSaveError = () => alert('تعذر حفظ التغيير في Firebase. تأكد من نشر قواعد Firestore ثم حاول مرة أخرى.');
+  const reportSaveError = (error: unknown) => {
+    console.error('Firebase save failed:', error);
+    const code = (error as { code?: string })?.code || '';
+    if (code.includes('permission-denied')) {
+      alert('رفض Firestore الحفظ لأن قواعد الصلاحيات المنشورة لا تتعرف على حساب المدير. انشر ملف firestore.rules المحدّث ثم سجّل الخروج والدخول مرة أخرى.');
+      return;
+    }
+    alert(`تعذر حفظ التغيير في Firebase${code ? ` (${code})` : ''}. حاول مرة أخرى.`);
+  };
 
   const handleUpdateCategories = (newCategories: PortfolioCategory[]) => {
     setCategories(newCategories);

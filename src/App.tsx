@@ -44,6 +44,7 @@ import { AlbumLightboxModal } from './components/AlbumLightboxModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { BookingModal } from './components/BookingModal';
 import { AccountModal } from './components/AccountModal';
+import { AppearanceControls } from './components/AppearanceControls';
 import { Language, LanguageProvider, localizeAlbums, localizeCategories, localizeContent } from './i18n';
 
 interface UserProfileRecord {
@@ -455,6 +456,8 @@ export default function App() {
         onUpdateReviews={handleUpdateReviews}
         onUpdateSettings={handleUpdateSettings}
       />
+
+      <AppearanceControls controlsHidden={isAdminOpen} />
 
     </div>
     </LanguageProvider>

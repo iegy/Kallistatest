@@ -12,6 +12,13 @@
     --color-gray-green: #afbb9c;
     --color-gray-orange: #c6a585;
     --color-dark: #24211e;
+    --site-brightness: 1;
+    --site-temperature-tint: rgba(198, 165, 133, 0.02);
+  }
+
+  html {
+    color-scheme: light;
+    background: var(--color-offwhite);
   }
 
   body {
@@ -19,6 +26,7 @@
     color: #24211e;
     background-color: #fffefb;
     overflow-x: hidden;
+    transition: background-color 280ms ease, color 280ms ease;
   }
 
   h1, h2, h3, .font-serif-luxury {
@@ -31,6 +39,212 @@
 
   .font-sans-modern {
     font-family: var(--font-arabic-sans);
+  }
+}
+
+#kallista-app-root {
+  background-image:
+    radial-gradient(circle at 8% 12%, rgba(175, 187, 156, 0.13), transparent 28rem),
+    radial-gradient(circle at 92% 28%, rgba(198, 165, 133, 0.12), transparent 32rem);
+  background-color: var(--color-offwhite);
+}
+
+#kallista-app-root > main > section:nth-of-type(even) {
+  background-color: color-mix(in srgb, var(--color-light-warm) 24%, var(--color-offwhite)) !important;
+}
+
+#kallista-app-root > main > section:nth-of-type(odd) {
+  background-color: color-mix(in srgb, var(--color-offwhite) 96%, var(--color-gray-green)) !important;
+}
+
+header,
+section,
+footer,
+[role='dialog'] {
+  transition: background-color 280ms ease, border-color 280ms ease, color 280ms ease;
+}
+
+.site-visual-filter {
+  position: fixed;
+  inset: 0;
+  z-index: 190;
+  pointer-events: none;
+  background: var(--site-temperature-tint);
+  backdrop-filter: brightness(var(--site-brightness));
+  -webkit-backdrop-filter: brightness(var(--site-brightness));
+}
+
+.appearance-panel,
+.appearance-trigger {
+  isolation: isolate;
+}
+
+.appearance-range {
+  height: 4px;
+  appearance: none;
+  border-radius: 9999px;
+  outline: none;
+  background: linear-gradient(90deg, #afbb9c, #e6e1d6 48%, #c6a585);
+  accent-color: #c6a585;
+}
+
+.appearance-range::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  appearance: none;
+  cursor: pointer;
+  border: 3px solid #fffefb;
+  border-radius: 9999px;
+  background: #738262;
+  box-shadow: 0 2px 8px rgba(36, 33, 30, 0.25);
+}
+
+.appearance-range::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
+  border: 3px solid #fffefb;
+  border-radius: 9999px;
+  background: #738262;
+  box-shadow: 0 2px 8px rgba(36, 33, 30, 0.25);
+}
+
+.appearance-temperature {
+  background: linear-gradient(90deg, #afbb9c, #e6e1d6 50%, #c6a585);
+}
+
+/* Dark mode keeps the original sage and warm-copper identity. */
+html[data-theme='dark'] {
+  color-scheme: dark;
+  background: #151713;
+}
+
+html[data-theme='dark'] body,
+html[data-theme='dark'] #kallista-app-root {
+  color: #f4efe6;
+  background-color: #181a16 !important;
+}
+
+html[data-theme='dark'] #kallista-app-root {
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(175, 187, 156, 0.1), transparent 30rem),
+    radial-gradient(circle at 90% 30%, rgba(198, 165, 133, 0.11), transparent 34rem);
+}
+
+html[data-theme='dark'] #kallista-app-root > main > section:nth-of-type(odd) {
+  background-color: #181a16 !important;
+}
+
+html[data-theme='dark'] #kallista-app-root > main > section:nth-of-type(even) {
+  background-color: #20231d !important;
+}
+
+html[data-theme='dark'] #kallista-app-root [class*='bg-[#fffefb]'],
+html[data-theme='dark'] #kallista-app-root [class*='bg-[#FAF8F5]'],
+html[data-theme='dark'] #kallista-app-root [class*='bg-[#faf8f5]'],
+html[data-theme='dark'] #kallista-app-root [class*='bg-[#faf7f2]'],
+html[data-theme='dark'] #kallista-app-root [class*='bg-[#fdfaf6]'],
+html[data-theme='dark'] #kallista-app-root [class*='bg-[#f8f4ee]'],
+html[data-theme='dark'] #kallista-app-root [class*='bg-[#F7F3EE]'],
+html[data-theme='dark'] #kallista-app-root [class*='bg-[#f2ede4]'],
+html[data-theme='dark'] #kallista-app-root [class*='bg-[#efe9e0]'],
+html[data-theme='dark'] #kallista-app-root [class*='bg-[#EFE9E0]'],
+html[data-theme='dark'] #kallista-app-root [class*='bg-white'] {
+  background-color: #20231d !important;
+}
+
+html[data-theme='dark'] #kallista-app-root [class*='bg-[#e6e1d6]'],
+html[data-theme='dark'] #kallista-app-root [class*='bg-[#EAE3DA]'] {
+  background-color: rgba(175, 187, 156, 0.13) !important;
+}
+
+html[data-theme='dark'] #kallista-app-root [class*='text-[#1A1715]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#1a1715]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#24211e]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#302a25]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#38312b]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#3d342d]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#3d362f]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#403831]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#423d38]'] {
+  color: #f5f0e7 !important;
+}
+
+html[data-theme='dark'] #kallista-app-root [class*='text-[#445636]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#453d36]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#465738]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#495b3a]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#4a4038]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#4d443b]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#4e5e40]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#4e633d]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#524940]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#524941]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#594f45]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#595046]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#5C534C]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#5a4f44]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#5c5248]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#5e4b3c]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#5e4e3e]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#5e4f40]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#5e5348]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#5f554c]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#61574d]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#665a4e]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#6C635B]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#6c6258]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#6c635b]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#6e6359]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#70655a]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#73685d]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#786d62]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#7C7167]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#7d7266]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#85796f]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#8a8075]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#8c7b6f]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#8c7e72]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#8c7f73]'],
+html[data-theme='dark'] #kallista-app-root [class*='text-[#9b9188]'] {
+  color: #c8c1b4 !important;
+}
+
+html[data-theme='dark'] #kallista-app-root [class*='border-[#e6e1d6]'],
+html[data-theme='dark'] #kallista-app-root [class*='border-[#EAE3DA]'],
+html[data-theme='dark'] #kallista-app-root [class*='border-[#ded5c7]'],
+html[data-theme='dark'] #kallista-app-root [class*='border-[#c6a585]'] {
+  border-color: rgba(175, 187, 156, 0.28) !important;
+}
+
+html[data-theme='dark'] .glass-panel,
+html[data-theme='dark'] .appearance-panel {
+  background: rgba(31, 34, 28, 0.94) !important;
+  border-color: rgba(175, 187, 156, 0.28) !important;
+}
+
+html[data-theme='dark'] #kallista-app-root input,
+html[data-theme='dark'] #kallista-app-root textarea,
+html[data-theme='dark'] #kallista-app-root select {
+  color: #f4efe6;
+  background-color: #242720;
+  border-color: rgba(175, 187, 156, 0.3);
+}
+
+html[data-theme='dark'] ::-webkit-scrollbar-track {
+  background: #181a16;
+}
+
+html[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: #4e5e40;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  header,
+  section,
+  footer,
+  [role='dialog'] {
+    transition: none;
   }
 }
 
@@ -91,4 +305,3 @@
 #kallista-app-root :dir(ltr) select {
   text-align: left;
 }
-

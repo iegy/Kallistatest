@@ -401,6 +401,43 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     setTimeout(() => setContentSavedSuccess(false), 3000);
   };
 
+  const handleAddServicePackage = () => {
+    const newServiceId = `srv-${Date.now()}`;
+    const defaultCategory = categories.find((category) => category.slug === 'weddings')?.slug
+      || categories.find((category) => category.slug !== 'all' && category.active !== false)?.slug
+      || 'weddings';
+    const newService: ServiceItem = {
+      id: newServiceId,
+      titleAr: 'باقة تصوير جديدة',
+      titleEn: 'New Photography Package',
+      categorySlug: defaultCategory,
+      descriptionAr: 'اكتب هنا وصف الباقة والخدمة المقدمة للعميل.',
+      descriptionEn: 'Add the English package description here.',
+      inclusions: [],
+      priceStarting: '',
+      showPrice: true,
+      badge: '',
+      featured: false,
+    };
+
+    setEditableContent((current) => ({
+      ...current,
+      services: [...current.services, newService],
+    }));
+
+    setTimeout(() => {
+      document.getElementById(`service-editor-${newServiceId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
+  };
+
+  const handleDeleteServicePackage = (service: ServiceItem) => {
+    if (!confirm(`هل تريد حذف باقة "${service.titleAr}"؟\n\nلن يتم الحذف النهائي إلا بعد الضغط على حفظ تغييرات المحتوى.`)) return;
+    setEditableContent((current) => ({
+      ...current,
+      services: current.services.filter((item) => item.id !== service.id),
+    }));
+  };
+
   // Album Save / Delete Handlers
   const handleSaveAlbum = () => {
     if (!albumFormData.title || !albumFormData.coverImage) {
@@ -1321,9 +1358,19 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                             التحكم في إظهار أو إخفاء الأسعار، مع تحويل العميل للواتساب عند الإخفاء
                           </p>
                         </div>
-                        <span className="text-xs text-[#73685d]">
-                          {editableContent.services.length} باقات مفعّلة
-                        </span>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-xs text-[#73685d]">
+                            {editableContent.services.length} باقات مفعّلة
+                          </span>
+                          <button
+                            type="button"
+                            onClick={handleAddServicePackage}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-[#24211e] px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#3d3833]"
+                          >
+                            <Plus className="h-4 w-4 text-[#c6a585]" />
+                            إضافة باقة جديدة
+                          </button>
+                        </div>
                       </div>
 
                       {/* Global Price Display Settings */}
@@ -1380,8 +1427,30 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                         </div>
                       </div>
 
+                      {editableContent.services.length === 0 && (
+                        <div className="rounded-2xl border border-dashed border-[#c6a585] bg-white p-8 text-center">
+                          <p className="text-sm font-bold text-[#403831]">لا توجد باقات حاليًا</p>
+                          <p className="mt-1 text-xs text-[#73685d]">اضغط «إضافة باقة جديدة» لإنشاء أول باقة تصوير.</p>
+                        </div>
+                      )}
+
                       {editableContent.services.map((srv, idx) => (
-                        <div key={srv.id} className="p-4 bg-white rounded-xl border border-[#e6e1d6] space-y-3">
+                        <div id={`service-editor-${srv.id}`} key={srv.id} className="space-y-3 rounded-xl border border-[#e6e1d6] bg-white p-4">
+                          <div className="flex items-center justify-between gap-3 border-b border-[#e6e1d6] pb-3">
+                            <div>
+                              <span className="text-[10px] font-semibold text-[#8c7f73]">الباقة رقم {idx + 1}</span>
+                              <p className="text-xs font-bold text-[#403831]">{srv.titleAr || 'باقة بدون اسم'}</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteServicePackage(srv)}
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] font-semibold text-red-700 transition-colors hover:bg-red-100"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              حذف الباقة
+                            </button>
+                          </div>
+
                           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                             <div>
                               <label className="block text-[11px] text-[#594f45] mb-0.5">اسم الباقة (عربي) *</label>
@@ -1439,6 +1508,23 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                                 <span>عرض سعر هذه الباقة</span>
                               </label>
                             </div>
+                          </div>
+
+                          <div>
+                            <label className="mb-0.5 block text-[11px] text-[#594f45]">التصنيف المرتبط بالباقة *</label>
+                            <select
+                              value={srv.categorySlug}
+                              onChange={(e) => {
+                                const updated = [...editableContent.services];
+                                updated[idx].categorySlug = e.target.value;
+                                setEditableContent({ ...editableContent, services: updated });
+                              }}
+                              className="w-full rounded-lg border border-[#e6e1d6] bg-[#FAF8F5] px-2.5 py-1.5 text-xs text-[#24211e] sm:max-w-xs"
+                            >
+                              {categories.filter((category) => category.slug !== 'all' && category.active !== false).map((category) => (
+                                <option key={category.id} value={category.slug}>{category.nameAr}</option>
+                              ))}
+                            </select>
                           </div>
 
                           <div>

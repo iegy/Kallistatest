@@ -73,7 +73,7 @@ export const AppearanceControls: React.FC<AppearanceControlsProps> = ({ controls
       <div className="site-visual-filter" aria-hidden="true" />
 
       {!controlsHidden && (
-        <div className="appearance-controls fixed bottom-5 left-4 z-[220] sm:bottom-6 sm:left-6" dir="rtl">
+        <div className="appearance-controls fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-4 z-[220] xl:bottom-6 xl:left-6" dir="rtl">
           {isOpen && (
             <section
               className="appearance-panel mb-3 w-[min(21rem,calc(100vw-2rem))] rounded-[1.75rem] border border-[#c6a585]/45 bg-[#fffefb]/95 p-4 shadow-[0_22px_70px_rgba(36,33,30,0.2)] backdrop-blur-xl sm:p-5"
@@ -167,13 +167,13 @@ export const AppearanceControls: React.FC<AppearanceControlsProps> = ({ controls
           <button
             type="button"
             onClick={() => setIsOpen((current) => !current)}
-            className="appearance-trigger flex h-12 items-center gap-2 rounded-full border border-[#c6a585]/45 bg-[#24211e] px-4 text-[#fffefb] shadow-[0_12px_35px_rgba(36,33,30,0.24)] transition-all hover:-translate-y-0.5 hover:bg-[#3d342d] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c6a585] focus-visible:ring-offset-2 sm:h-13"
+            className="appearance-trigger flex h-12 w-12 items-center justify-center rounded-full border border-[#c6a585]/45 bg-[#24211e] p-0 text-[#fffefb] shadow-[0_12px_35px_rgba(36,33,30,0.24)] transition-all hover:-translate-y-0.5 hover:bg-[#3d342d] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c6a585] focus-visible:ring-offset-2 xl:h-13 xl:w-auto xl:gap-2 xl:px-4"
             aria-expanded={isOpen}
             aria-label={t('تخصيص مظهر الموقع', 'Customize site appearance')}
             title={t('الإضاءة والمظهر', 'Lighting and appearance')}
           >
             <SlidersHorizontal className="h-4 w-4 text-[#c6a585]" />
-            <span className="text-xs font-semibold">{t('المظهر', 'Appearance')}</span>
+            <span className="hidden text-xs font-semibold xl:inline">{t('المظهر', 'Appearance')}</span>
           </button>
         </div>
       )}

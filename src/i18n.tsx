@@ -202,8 +202,19 @@ const englishAlbumStories: Record<string, { location: string; story: string }> =
   'album-child-1': { location: 'Alexandria gardens', story: 'A relaxed family session preserving childhood laughter, maternal warmth and the quiet beauty of everyday connection.' },
 };
 
+const arabicAlbumLocations: Record<string, string> = {
+  'album-wed-flagship': 'حدائق قصر تاريخي — الإسكندرية',
+  'album-fash-1': 'ستوديو كاليستا — المساحة الإبداعية بالإسكندرية',
+  'album-child-1': 'جلسة خارجية — حدائق الإسكندرية الهادئة',
+};
+
 export function localizeAlbums(albums: Album[], language: Language): Album[] {
-  if (language === 'ar') return albums;
+  if (language === 'ar') {
+    return albums.map((album) => ({
+      ...album,
+      location: arabicAlbumLocations[album.id] || album.location,
+    }));
+  }
   return albums.map((album) => {
     const copy = englishAlbumStories[album.id];
     return {

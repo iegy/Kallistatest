@@ -3,7 +3,7 @@ import {
   Lock, Key, Image as ImageIcon, Upload, Plus, Trash2, Edit3, CheckCircle2,
   Calendar, Users, Star, Settings, Download, RefreshCw, MessageCircle, AlertCircle,
   Sparkles, Gift, Eye, Filter, ArrowUpRight, Phone, Mail, Check, Layers, FileText,
-  Sliders, Shield, Database, Globe, HelpCircle, UserCheck, ArrowRight
+  Sliders, Shield, Database, Globe, HelpCircle, UserCheck, ArrowRight, Type
 } from 'lucide-react';
 import {
   Album, Booking, ClientContact, Review, SiteSettings, PhotoItem,
@@ -16,6 +16,13 @@ import {
 } from '../services/storage';
 import { logoutFirebase } from '../services/firebase';
 import { SOCIAL_PLATFORM_OPTIONS, SocialPlatformIcon, inferSocialPlatform } from './SocialPlatformIcon';
+import {
+  BODY_FONT_OPTIONS,
+  HEADING_FONT_OPTIONS,
+  ensureSiteFontsLoaded,
+  getBodyFontOption,
+  getHeadingFontOption,
+} from '../themeFonts';
 
 interface RegisteredUserProfile {
   id: string;
@@ -162,6 +169,10 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   useEffect(() => {
     setTempSettings(settings);
   }, [settings]);
+
+  useEffect(() => {
+    ensureSiteFontsLoaded(tempSettings.bodyFontKey, tempSettings.headingFontKey);
+  }, [tempSettings.bodyFontKey, tempSettings.headingFontKey]);
   const editableSocialLinks: SocialLink[] = editableContent.contact.socialLinks ?? [
     ...(editableContent.contact.instagram ? [{ id: 'social-instagram', label: 'Instagram', icon: 'instagram', url: editableContent.contact.instagram }] : []),
     ...(editableContent.contact.facebook ? [{ id: 'social-facebook', label: 'Facebook', icon: 'facebook', url: editableContent.contact.facebook }] : []),
@@ -698,7 +709,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   };
 
   return (
-    <div dir="rtl" className="fixed inset-0 z-50 overflow-hidden bg-[#fffefb]">
+    <div id="kallista-admin-dashboard" dir="rtl" className="fixed inset-0 z-50 overflow-hidden bg-[#fffefb]">
       <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-[#fffefb] text-[#24211e]">
         
         {/* MODAL HEADER */}
@@ -3505,6 +3516,72 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                       تم حفظ الإعدادات بنجاح!
                     </div>
                   )}
+
+                  <div className="rounded-2xl border border-[#d8cfc4] bg-[#fffefb] p-5 sm:p-6">
+                    <div className="mb-5 flex items-start justify-between gap-4">
+                      <div>
+                        <h4 className="flex items-center gap-2 text-sm font-bold text-[#24211e]">
+                          <Type className="h-4 w-4 text-[#738262]" />
+                          خطوط الموقع
+                        </h4>
+                        <p className="mt-1 text-xs leading-5 text-[#73685d]">
+                          اختر خط النصوص وخط العناوين. يتم تحميل الخط المختار فقط للحفاظ على سرعة الموقع.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <label className="block">
+                        <span className="mb-1.5 block text-xs font-semibold text-[#594f45]">خط النصوص والمحتوى</span>
+                        <select
+                          value={tempSettings.bodyFontKey}
+                          onChange={(event) => setTempSettings({ ...tempSettings, bodyFontKey: event.target.value })}
+                          className="w-full rounded-xl border border-[#e6e1d6] bg-white px-3 py-2.5 text-xs text-[#24211e] outline-none focus:border-[#738262]"
+                        >
+                          {BODY_FONT_OPTIONS.map((font) => (
+                            <option key={font.key} value={font.key}>{font.labelAr}</option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <label className="block">
+                        <span className="mb-1.5 block text-xs font-semibold text-[#594f45]">خط العناوين التحريرية</span>
+                        <select
+                          value={tempSettings.headingFontKey}
+                          onChange={(event) => setTempSettings({ ...tempSettings, headingFontKey: event.target.value })}
+                          className="w-full rounded-xl border border-[#e6e1d6] bg-white px-3 py-2.5 text-xs text-[#24211e] outline-none focus:border-[#738262]"
+                        >
+                          {HEADING_FONT_OPTIONS.map((font) => (
+                            <option key={font.key} value={font.key}>{font.labelAr}</option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-1 gap-3 rounded-2xl bg-[#f4f0e9] p-4 sm:grid-cols-2">
+                      <p
+                        className="rounded-xl bg-white px-4 py-3 text-sm leading-7 text-[#4d443b]"
+                        style={{ fontFamily: getBodyFontOption(tempSettings.bodyFontKey).stack }}
+                      >
+                        نص تجريبي لعرض وضوح خط الموقع المختار.
+                      </p>
+                      <p
+                        className="rounded-xl bg-white px-4 py-3 text-xl font-bold leading-8 text-[#24211e]"
+                        style={{ fontFamily: getHeadingFontOption(tempSettings.headingFontKey).stack }}
+                      >
+                        لحظات تستحق أن تبقى
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleSaveSettings}
+                      disabled={isSavingSettings}
+                      className="mt-4 w-full rounded-xl bg-[#738262] px-5 py-3 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#5f6c50] disabled:cursor-wait disabled:opacity-60 sm:w-auto"
+                    >
+                      {isSavingSettings ? 'جاري حفظ الخطوط في Firebase...' : 'حفظ الخطوط وتطبيقها على الموقع'}
+                    </button>
+                  </div>
 
                   <div className="bg-[#FAF8F5] p-6 rounded-2xl border border-[#e6e1d6] space-y-4">
                     <h4 className="font-bold text-sm text-[#24211e]">حماية لوحة التحكم</h4>

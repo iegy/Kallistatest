@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar, MapPin, Layers, Download, Share2, ChevronLeft, ChevronRight, Eye, Sparkles } from 'lucide-react';
+import { X, Calendar, MapPin, Layers, Eye, Sparkles } from 'lucide-react';
 import { Album, PhotoItem } from '../types';
 import { useLanguage } from '../i18n';
 
@@ -109,6 +109,7 @@ export const AlbumDetailsModal: React.FC<AlbumDetailsModalProps> = ({
                   <img
                     src={img.url}
                     alt={img.title || `Photo ${idx + 1}`}
+                    draggable={false}
                     className="w-full h-full object-cover editorial-img"
                     loading="lazy"
                   />

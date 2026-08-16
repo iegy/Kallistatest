@@ -87,6 +87,7 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
                 <img
                   src={signature.imageUrl || veiledWeddingPhoto}
                   alt="Kallista Signature Veiled Wedding Moment"
+                  draggable={false}
                   className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#24211e]/90 via-transparent to-transparent" />

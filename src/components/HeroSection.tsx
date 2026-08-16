@@ -108,6 +108,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ content, onExplore, on
                   id="hero-featured-image"
                   src={hero.bgImageUrl || veiledWeddingPhoto}
                   alt={t('تصوير زفاف تحريري من كاليستا', 'Kallista editorial wedding photography')}
+                  draggable={false}
                   className="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-700"
                 />
                 

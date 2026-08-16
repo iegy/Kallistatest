@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, ChevronRight, ChevronLeft, Download, Share2, ZoomIn } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, ShieldCheck } from 'lucide-react';
 import { PhotoItem } from '../types';
 
 interface AlbumLightboxModalProps {
@@ -32,14 +32,6 @@ export const AlbumLightboxModal: React.FC<AlbumLightboxModalProps> = ({
 
   if (!isOpen || !photo) return null;
 
-  const handleDownload = () => {
-    const a = document.createElement('a');
-    a.href = photo.url;
-    a.download = `kallista-${photo.id || 'photo'}.jpg`;
-    a.target = '_blank';
-    a.click();
-  };
-
   return (
     <div
       id="lightbox-backdrop"
@@ -60,16 +52,13 @@ export const AlbumLightboxModal: React.FC<AlbumLightboxModalProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDownload();
-            }}
-            className="p-2.5 rounded-full bg-[#fffefb]/10 hover:bg-[#fffefb]/20 text-[#fffefb] transition-colors"
-            title="تحميل الصورة"
+          <div
+            className="protected-photo-notice hidden items-center gap-1.5 rounded-full border border-[#c6a585]/25 bg-[#24211e]/70 px-3 py-2 text-[10px] text-[#e6e1d6]/80 sm:flex"
+            title="الصور محمية بحقوق النشر ولا يتوفر تنزيل مباشر"
           >
-            <Download className="w-4 h-4" />
-          </button>
+            <ShieldCheck className="h-3.5 w-3.5 text-[#c6a585]" />
+            <span>صور محمية بحقوق النشر</span>
+          </div>
 
           <button
             id="close-lightbox-btn"
@@ -91,6 +80,7 @@ export const AlbumLightboxModal: React.FC<AlbumLightboxModalProps> = ({
           id="lightbox-active-img"
           src={photo.url}
           alt={photo.title || 'Kallista Photography'}
+          draggable={false}
           className="max-h-[80vh] max-w-full object-contain rounded-xl shadow-2xl border border-[#fffefb]/10"
         />
 

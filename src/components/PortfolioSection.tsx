@@ -96,6 +96,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                     <img
                       src={album.coverImage}
                       alt={album.title}
+                      draggable={false}
                       className="w-full h-full object-cover editorial-img"
                       loading="lazy"
                     />
@@ -173,6 +174,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                               <img
                                 src={img.thumbUrl || img.url}
                                 alt={img.title || 'Photo'}
+                                draggable={false}
                                 className="w-full h-full object-cover"
                               />
                             </button>

@@ -75,6 +75,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                     <img
                       src={getImageForCategory(srv.categorySlug, srv.coverImage)}
                       alt={srv.titleAr}
+                      draggable={false}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute top-4 right-4">

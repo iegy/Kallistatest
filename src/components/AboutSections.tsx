@@ -29,6 +29,7 @@ export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExplore
                 <img
                   src={aboutKallista.coverImage || veiledWeddingPhoto}
                   alt="Kallista Editorial Studio"
+                  draggable={false}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -155,6 +156,7 @@ export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExplore
                   id="ronadisa-founder-portrait"
                   src={aboutRonadisa.photoUrl || ronadisaPhoto}
                   alt="Ronadisa - Founder & Photographer of Kallista"
+                  draggable={false}
                   className="w-full h-full object-cover object-top"
                 />
                 

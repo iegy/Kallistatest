@@ -27,6 +27,7 @@ export const KallistaLogo: React.FC<KallistaLogoProps> = ({
         <img
           src={customImageUrl}
           alt="Kallista Logo"
+          draggable={false}
           className={`max-w-full object-contain transition-transform duration-300 ${
             size === 'sm' ? 'h-7' : size === 'md' ? 'h-10' : size === 'lg' ? 'h-16' : 'h-24'
           }`}

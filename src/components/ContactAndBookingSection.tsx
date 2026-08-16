@@ -130,53 +130,53 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
           
           {/* Left Info & Direct Channels */}
           <div className="lg:col-span-5 text-right space-y-8 order-2 lg:order-1">
-            <div className="bg-[#e6e1d6]/30 p-8 rounded-3xl border border-[#e6e1d6] space-y-6">
-              <h3 className="font-arabic-editorial text-2xl font-bold text-[#24211e] flex items-center justify-end gap-2">
+            <div className="space-y-5 rounded-3xl border border-[#e6e1d6] bg-[#e6e1d6]/30 p-5 sm:p-7">
+              <h3 className="flex items-center gap-2 font-arabic-editorial text-2xl font-bold leading-tight text-[#24211e]">
                 <span>{t('تواصل مباشر وسريع', 'Direct contact')}</span>
-                <Sparkles className="w-5 h-5 text-[#c6a585]" />
+                <Sparkles className="h-5 w-5 shrink-0 text-[#c6a585]" />
               </h3>
               
-              <p className="text-[#594f45] text-sm leading-relaxed font-light">
+              <p className="max-w-xl text-sm font-light leading-7 text-[#594f45]">
                 {t('نرحب بجميع استفساراتكم ومشاركتكم لتفاصيل مناسبتكم في أي وقت، ويسعدنا دائماً تقديم المشورة لاختيار أفضل وقت وإضاءة لجلسة التصوير.', 'Share your plans with us and we will help you choose the right service, setting and light for your session.')}
               </p>
 
-              <div className="space-y-4 pt-2 border-t border-[#e6e1d6]">
+              <div className="space-y-3 border-t border-[#d8cfc4]/80 pt-5">
                 {contact.whatsapp && <a
                   href={`https://wa.me/${contact.whatsapp.replace(/[^0-9+]/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 bg-[#fffefb] rounded-2xl border border-[#e6e1d6] hover:border-[#738262] hover:shadow-md transition-all group"
+                  className="group flex items-start gap-4 rounded-2xl border border-[#e6e1d6] bg-[#fffefb] p-4 transition-all hover:border-[#738262] hover:shadow-md"
                 >
-                  <span className="text-xs px-3 py-1 bg-[#738262]/20 text-[#4e633d] rounded-full font-serif font-semibold">
+                  <span className="min-w-[5.75rem] shrink-0 rounded-full bg-[#738262]/20 px-3 py-1.5 text-center font-serif text-[11px] font-semibold leading-5 text-[#4e633d]">
                     {t('محادثة واتساب', 'WhatsApp chat')}
                   </span>
-                  <div className="text-right">
-                    <span className="text-xs text-[#73685d] block">{t('واتساب مباشر', 'WhatsApp')}</span>
-                    <span className="text-sm font-semibold text-[#24211e] font-serif">
+                  <div className="min-w-0 flex-1 text-right">
+                    <span className="mb-1 block text-xs text-[#73685d]">{t('واتساب مباشر', 'WhatsApp')}</span>
+                    <span dir="ltr" className="block break-all text-right font-serif text-sm font-semibold leading-6 text-[#24211e]">
                       {contact.whatsapp}
                     </span>
                   </div>
                 </a>}
 
-                <div className="flex items-center justify-between p-4 bg-[#fffefb] rounded-2xl border border-[#e6e1d6]">
-                  <span className="text-xs px-3 py-1 bg-[#e6e1d6] text-[#5e4f40] rounded-full font-serif">
+                <div className="flex items-start gap-4 rounded-2xl border border-[#e6e1d6] bg-[#fffefb] p-4">
+                  <span className="min-w-[5.75rem] shrink-0 rounded-full bg-[#e6e1d6] px-3 py-1.5 text-center font-serif text-[11px] leading-5 text-[#5e4f40]">
                     {t('موقع الاستوديو', 'Studio location')}
                   </span>
-                  <div className="text-right">
-                    <span className="text-xs text-[#73685d] block">{t('المقر والمدينة', 'Studio location')}</span>
-                    <span className="text-sm font-semibold text-[#24211e]">
+                  <div className="min-w-0 flex-1 text-right">
+                    <span className="mb-1 block text-xs text-[#73685d]">{t('المقر والمدينة', 'Studio location')}</span>
+                    <span dir="auto" className="block break-words text-sm font-semibold leading-6 text-[#24211e] [unicode-bidi:plaintext]">
                       {contact.address || 'الإسكندرية، مصر'}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-[#fffefb] rounded-2xl border border-[#e6e1d6]">
-                  <span className="text-xs px-3 py-1 bg-[#c6a585]/20 text-[#8c6742] rounded-full font-serif">
+                <div className="flex items-start gap-4 rounded-2xl border border-[#e6e1d6] bg-[#fffefb] p-4">
+                  <span className="min-w-[5.75rem] shrink-0 rounded-full bg-[#c6a585]/20 px-3 py-1.5 text-center font-serif text-[11px] leading-5 text-[#8c6742]">
                     {t('البريد', 'Email')}
                   </span>
-                  <div className="text-right">
-                    <span className="text-xs text-[#73685d] block">{t('البريد الإلكتروني', 'Email')}</span>
-                    <span className="text-sm font-semibold text-[#24211e] font-serif">
+                  <div className="min-w-0 flex-1 text-right">
+                    <span className="mb-1 block text-xs text-[#73685d]">{t('البريد الإلكتروني', 'Email')}</span>
+                    <span dir="ltr" className="block break-all text-right font-serif text-sm font-semibold leading-6 text-[#24211e]">
                       {contact.email || 'hello@kallistaphoto.com'}
                     </span>
                   </div>
@@ -184,7 +184,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
               </div>
 
               {contact.socialLinks && contact.socialLinks.filter((link) => link.label && link.url).length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap justify-center gap-2 border-t border-[#d8cfc4]/70 pt-4">
                   {contact.socialLinks.filter((link) => link.label && link.url).map((link) => (
                     <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-[#d8cfc4] bg-[#fffefb] px-3 py-2 text-xs font-semibold text-[#5a4f44] hover:border-[#c6a585]">
                       <SocialPlatformIcon platform={link.icon} label={link.label} url={link.url} className="h-3.5 w-3.5" />
@@ -195,12 +195,12 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
               )}
 
               {/* VIP Perks */}
-              <div className="p-5 bg-[#738262]/15 rounded-2xl border border-[#738262]/30 text-right space-y-2">
-                <div className="flex items-center justify-end gap-2 text-[#445636]">
+              <div className="space-y-3 rounded-2xl border border-[#738262]/30 bg-[#738262]/15 p-4 text-right sm:p-5">
+                <div className="inline-flex items-center gap-2 rounded-full bg-[#fffefb]/55 px-3 py-1.5 text-[#445636]">
                   <span className="font-bold text-xs font-arabic-editorial">{t('ميزة كاليستا لعملائنا الكرام', 'A thoughtful Kallista touch')}</span>
-                  <Gift className="w-4 h-4 text-[#738262]" />
+                  <Gift className="h-4 w-4 shrink-0 text-[#738262]" />
                 </div>
-                <p className="text-xs text-[#4e5e40] leading-relaxed">
+                <p className="max-w-md text-xs leading-6 text-[#4e5e40]">
                   {t('عند تسجيل تاريخ ميلادكم أو ذكرى زواجكم، نرسل لكم تهنئة خاصة وهدية خصم مميزة في شهر مناسبتكم السعيدة!', 'Optionally share a birthday or anniversary to receive a personal greeting and seasonal client gift.')}
                 </p>
               </div>

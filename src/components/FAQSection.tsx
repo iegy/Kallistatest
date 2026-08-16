@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, HelpCircle, Sparkles, MessageCircle } from 'lucide-react';
 import { SiteContent } from '../types';
+import { useLanguage } from '../i18n';
 
 interface FAQSectionProps {
   content: SiteContent;
@@ -8,6 +9,7 @@ interface FAQSectionProps {
 }
 
 export const FAQSection: React.FC<FAQSectionProps> = ({ content, onContactClick }) => {
+  const { t } = useLanguage();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const { faq } = content;
 
@@ -22,16 +24,16 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ content, onContactClick 
         {/* Header */}
         <div className="text-center mb-16">
           <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block mb-3 font-semibold">
-            16 — Frequently Asked Questions
+            {t('16 — الأسئلة الشائعة', '16 — Frequently Asked Questions')}
           </span>
           <h2
             id="faq-headline"
             className="font-arabic-editorial text-3xl sm:text-4xl md:text-5xl font-bold text-[#24211e] mb-4"
           >
-            الأسئلة الشائعة
+            {t('الأسئلة الشائعة', 'Frequently asked questions')}
           </h2>
           <p className="text-[#524941] text-base font-light">
-            إجابات واضحة وشاملة حول أسلوب التصوير، الخصوصية، الباقات، ومواعيد التسليم.
+            {t('إجابات واضحة وشاملة حول أسلوب التصوير، الخصوصية، الباقات، ومواعيد التسليم.', 'Clear answers about our approach, privacy, collections and delivery.')}
           </p>
         </div>
 
@@ -81,13 +83,13 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ content, onContactClick 
         {/* Bottom Helper */}
         <div className="mt-12 text-center p-6 bg-[#738262]/15 rounded-2xl border border-[#738262]/30">
           <p className="text-sm text-[#465738] font-arabic-editorial">
-            لديكم أي استفسار آخر لم نذكره هنا؟ يسعدنا دائماً الإجابة على جميع أسئلتكم.
+            {t('لديكم أي استفسار آخر لم نذكره هنا؟ يسعدنا دائماً الإجابة على جميع أسئلتكم.', 'Have another question? We would be delighted to help.')}
           </p>
           <button
             onClick={onContactClick}
             className="mt-3 text-xs font-bold text-[#24211e] hover:text-[#c6a585] inline-flex items-center gap-1 border-b border-[#24211e] pb-0.5"
           >
-            <span>تواصلوا معنا مباشرة عبر الواتساب أو نموذج الحجز</span>
+            <span>{t('تواصلوا معنا مباشرة عبر الواتساب أو نموذج الحجز', 'Contact us on WhatsApp or through the enquiry form')}</span>
             <Sparkles className="w-3.5 h-3.5 text-[#c6a585]" />
           </button>
         </div>

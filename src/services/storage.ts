@@ -325,6 +325,11 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     instagram: 'https://instagram.com/kallista.photography',
     facebook: 'https://facebook.com/kallistaphotography',
     tiktok: 'https://tiktok.com/@kallista.photo',
+    socialLinks: [
+      { id: 'social-instagram', label: 'Instagram', url: 'https://instagram.com/kallista.photography' },
+      { id: 'social-facebook', label: 'Facebook', url: 'https://facebook.com/kallistaphotography' },
+      { id: 'social-tiktok', label: 'TikTok', url: 'https://tiktok.com/@kallista.photo' },
+    ],
     depositPolicy: 'يتم تأكيد الحجز النهائي بدفع عربون بنسبة 30% من قيمة الباقة المختارة، مع إمكانية تعديل الموعد بالتنسيق المسبق.',
     privacyNote: 'خصوصية بياناتكم وصوركم هي أولويتنا المطلقة دائماً وأبداً.',
   },

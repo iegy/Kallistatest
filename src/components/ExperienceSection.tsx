@@ -1,6 +1,7 @@
 import React from 'react';
 import { Eye, Heart, Sparkles, CheckCircle2, Shield, Compass, Smile, Clock } from 'lucide-react';
 import { SiteContent } from '../types';
+import { useLanguage } from '../i18n';
 
 interface ExperienceSectionProps {
   content: SiteContent;
@@ -8,6 +9,7 @@ interface ExperienceSectionProps {
 }
 
 export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ content, onInquire }) => {
+  const { t } = useLanguage();
   const { experience } = content;
 
   return (
@@ -18,7 +20,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ content, o
           
           <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
             <span className="font-serif text-sm tracking-[0.25em] text-[#c6a585] uppercase block mb-3 font-semibold">
-              13 — The Kallista Experience
+              {t('13 — تجربة كاليستا', '13 — The Kallista Experience')}
             </span>
             <h2
               id="experience-headline"
@@ -27,7 +29,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ content, o
               {experience.title}
             </h2>
             <div className="space-y-2 text-[#524941] text-base sm:text-lg leading-relaxed font-light">
-              <p>التصوير بالنسبة لنا لا يبدأ عندما تفتح الكاميرا، ولا ينتهي عند تسليم الصور.</p>
+              <p>{t('التصوير بالنسبة لنا لا يبدأ عندما تفتح الكاميرا، ولا ينتهي عند تسليم الصور.', 'For us, photography begins before the camera is raised and continues beyond final delivery.')}</p>
               <p className="text-[#24211e] font-medium">
                 {experience.subtitle || 'نريد أن تكون التجربة نفسها مريحة، واضحة، وممتعة لكم في كل مرحلة.'}
               </p>
@@ -87,10 +89,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ content, o
           {/* Experience Closing Statement */}
           <div className="mt-16 p-8 sm:p-10 bg-[#e6e1d6]/40 rounded-3xl border border-[#c6a585]/40 text-center max-w-4xl mx-auto space-y-3">
             <p className="font-serif text-xl sm:text-2xl text-[#24211e] italic">
-              "Beautiful photographs are important. Feeling comfortable enough to create them is just as important."
-            </p>
-            <p className="font-arabic-editorial text-base sm:text-lg text-[#5c4a3b] font-medium">
-              الصور الجميلة مهمة.. والشعور بالراحة الكافية لصنعها له نفس الأهمية.
+              “{t('الصور الجميلة مهمة، والشعور بالراحة الكافية لصنعها له نفس الأهمية.', 'Beautiful photographs matter. Feeling comfortable enough to create them matters just as much.')}”
             </p>
           </div>
 

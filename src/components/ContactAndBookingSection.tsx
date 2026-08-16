@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, Clock, MapPin, Send, Sparkles, CheckCircle2, User, Phone, Mail, Gift, Heart } from 'lucide-react';
+import { Send, Sparkles, CheckCircle2, Gift, ExternalLink } from 'lucide-react';
 import { Booking, ClientContact, SiteSettings, SiteContent, PortfolioCategory } from '../types';
 import { createBookingInquiryWhatsAppLink } from '../services/storage';
+import { useLanguage } from '../i18n';
 
 interface ContactAndBookingSectionProps {
   settings: SiteSettings;
@@ -18,6 +19,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
   onSaveBooking,
   preselectedService,
 }) => {
+  const { language, t } = useLanguage();
   const { contact } = content;
 
   const [formData, setFormData] = useState({
@@ -28,7 +30,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
     serviceType: preselectedService || 'weddings',
     date: '',
     timeSlot: '04:00 PM (Sunset Golden Hour)',
-    location: 'الإسكندرية (Alexandria)',
+    location: t('الإسكندرية', 'Alexandria'),
     storyNotes: '',
     budget: '',
     birthday: '',
@@ -50,7 +52,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
       !formData.location.trim() ||
       !formData.storyNotes.trim()
     ) {
-      alert('جميع الحقول المحددة بعلامة (*) إجبارية. يرجى استكمال كافة بيانات الحجز.');
+      alert(t('جميع الحقول المحددة بعلامة (*) إجبارية. يرجى استكمال كافة بيانات الحجز.', 'Please complete all required booking fields marked with (*).'));
       return;
     }
 
@@ -103,10 +105,10 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
           <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block mb-3 font-semibold">
-            17 — Contact & Booking Inquiry
+            {t('17 — التواصل وطلب الحجز', '17 — Contact & Booking Inquiry')}
           </span>
           <p className="font-serif text-2xl sm:text-3xl text-[#c6a585] italic mb-2">
-            Let's Preserve Something Beautiful.
+            {t('دعونا نوثّق شيئًا جميلًا.', "Let's preserve something beautiful.")}
           </p>
           <h2
             id="contact-main-headline"
@@ -129,12 +131,12 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
           <div className="lg:col-span-5 text-right space-y-8 order-2 lg:order-1">
             <div className="bg-[#e6e1d6]/30 p-8 rounded-3xl border border-[#e6e1d6] space-y-6">
               <h3 className="font-arabic-editorial text-2xl font-bold text-[#24211e] flex items-center justify-end gap-2">
-                <span>تواصل مباشر وسريع</span>
+                <span>{t('تواصل مباشر وسريع', 'Direct contact')}</span>
                 <Sparkles className="w-5 h-5 text-[#c6a585]" />
               </h3>
               
               <p className="text-[#594f45] text-sm leading-relaxed font-light">
-                نرحب بجميع استفساراتكم ومشاركتكم لتفاصيل مناسبتكم في أي وقت، ويسعدنا دائماً تقديم المشورة لاختيار أفضل وقت وإضاءة لجلسة التصوير.
+                {t('نرحب بجميع استفساراتكم ومشاركتكم لتفاصيل مناسبتكم في أي وقت، ويسعدنا دائماً تقديم المشورة لاختيار أفضل وقت وإضاءة لجلسة التصوير.', 'Share your plans with us and we will help you choose the right service, setting and light for your session.')}
               </p>
 
               <div className="space-y-4 pt-2 border-t border-[#e6e1d6]">
@@ -145,10 +147,10 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                   className="flex items-center justify-between p-4 bg-[#fffefb] rounded-2xl border border-[#e6e1d6] hover:border-[#738262] hover:shadow-md transition-all group"
                 >
                   <span className="text-xs px-3 py-1 bg-[#738262]/20 text-[#4e633d] rounded-full font-serif font-semibold">
-                    WhatsApp Chat
+                    {t('محادثة واتساب', 'WhatsApp chat')}
                   </span>
                   <div className="text-right">
-                    <span className="text-xs text-[#73685d] block">واتساب مباشر</span>
+                    <span className="text-xs text-[#73685d] block">{t('واتساب مباشر', 'WhatsApp')}</span>
                     <span className="text-sm font-semibold text-[#24211e] font-serif">
                       {contact.whatsapp}
                     </span>
@@ -157,10 +159,10 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
 
                 <div className="flex items-center justify-between p-4 bg-[#fffefb] rounded-2xl border border-[#e6e1d6]">
                   <span className="text-xs px-3 py-1 bg-[#e6e1d6] text-[#5e4f40] rounded-full font-serif">
-                    Studio Location
+                    {t('موقع الاستوديو', 'Studio location')}
                   </span>
                   <div className="text-right">
-                    <span className="text-xs text-[#73685d] block">المقر والمدينة</span>
+                    <span className="text-xs text-[#73685d] block">{t('المقر والمدينة', 'Studio location')}</span>
                     <span className="text-sm font-semibold text-[#24211e]">
                       {contact.address || 'الإسكندرية، مصر'}
                     </span>
@@ -169,10 +171,10 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
 
                 <div className="flex items-center justify-between p-4 bg-[#fffefb] rounded-2xl border border-[#e6e1d6]">
                   <span className="text-xs px-3 py-1 bg-[#c6a585]/20 text-[#8c6742] rounded-full font-serif">
-                    Email
+                    {t('البريد', 'Email')}
                   </span>
                   <div className="text-right">
-                    <span className="text-xs text-[#73685d] block">البريد الإلكتروني</span>
+                    <span className="text-xs text-[#73685d] block">{t('البريد الإلكتروني', 'Email')}</span>
                     <span className="text-sm font-semibold text-[#24211e] font-serif">
                       {contact.email || 'hello@kallistaphoto.com'}
                     </span>
@@ -180,14 +182,25 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                 </div>
               </div>
 
+              {contact.socialLinks && contact.socialLinks.filter((link) => link.label && link.url).length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {contact.socialLinks.filter((link) => link.label && link.url).map((link) => (
+                    <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-[#d8cfc4] bg-[#fffefb] px-3 py-2 text-xs font-semibold text-[#5a4f44] hover:border-[#c6a585]">
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+
               {/* VIP Perks */}
               <div className="p-5 bg-[#738262]/15 rounded-2xl border border-[#738262]/30 text-right space-y-2">
                 <div className="flex items-center justify-end gap-2 text-[#445636]">
-                  <span className="font-bold text-xs font-arabic-editorial">ميزة كاليستا لعملائنا الكرام</span>
+                  <span className="font-bold text-xs font-arabic-editorial">{t('ميزة كاليستا لعملائنا الكرام', 'A thoughtful Kallista touch')}</span>
                   <Gift className="w-4 h-4 text-[#738262]" />
                 </div>
                 <p className="text-xs text-[#4e5e40] leading-relaxed">
-                  عند تسجيل تاريخ ميلادكم أو ذكرى زواجكم، نرسل لكم تهنئة خاصة وهدية خصم مميزة في شهر مناسبتكم السعيدة!
+                  {t('عند تسجيل تاريخ ميلادكم أو ذكرى زواجكم، نرسل لكم تهنئة خاصة وهدية خصم مميزة في شهر مناسبتكم السعيدة!', 'Optionally share a birthday or anniversary to receive a personal greeting and seasonal client gift.')}
                 </p>
               </div>
             </div>
@@ -203,17 +216,17 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
 
                 <div className="space-y-2">
                   <h3 className="font-arabic-editorial text-3xl font-bold text-[#24211e]">
-                    تم استلام طلب حجزكم بنجاح!
+                    {t('تم استلام طلب حجزكم بنجاح!', 'Your enquiry has been received')}
                   </h3>
                   <p className="text-[#524941] text-base font-light max-w-md mx-auto">
-                    شكراً لكم <strong className="text-[#24211e]">{submittedBooking.clientName}</strong>. سنراجع الموعد ونتواصل معكم فوراً لتأكيد كافة التفاصيل.
+                    {t('شكراً لكم', 'Thank you')}{' '}<strong className="text-[#24211e]">{submittedBooking.clientName}</strong>. {t('سنراجع الموعد ونتواصل معكم فوراً لتأكيد كافة التفاصيل.', 'We will review the requested date and contact you to confirm the details.')}
                   </p>
                 </div>
 
                 {/* Optional email follow-up */}
                 <div className="p-6 bg-[#e6e1d6]/30 rounded-2xl border border-[#c6a585]/40 text-right space-y-4">
                   <p className="text-xs font-bold text-[#24211e] flex items-center justify-end gap-1.5">
-                    <span>يمكنكم أيضاً إرسال نسخة من التفاصيل عبر البريد:</span>
+                    <span>{t('يمكنكم أيضاً إرسال نسخة من التفاصيل عبر الواتساب:', 'You can also send the booking details through WhatsApp:')}</span>
                     <Sparkles className="w-4 h-4 text-[#c6a585]" />
                   </p>
                   
@@ -225,7 +238,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                     className="w-full bg-[#738262] hover:bg-[#5f6c50] text-[#fffefb] py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-md transition-all"
                   >
                     <Send className="w-5 h-5" />
-                    <span>إرسال تفاصيل الحجز بالبريد</span>
+                    <span>{t('إرسال تفاصيل الحجز', 'Send booking details')}</span>
                   </a>
                 </div>
 
@@ -233,7 +246,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                   onClick={handleReset}
                   className="text-xs text-[#73685d] hover:text-[#24211e] underline"
                 >
-                  إرسال طلب حجز آخر
+                  {t('إرسال طلب حجز آخر', 'Send another enquiry')}
                 </button>
               </div>
             ) : (
@@ -242,13 +255,18 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                 {/* Personal Information */}
                 <div className="space-y-4">
                   <h4 className="font-arabic-editorial text-lg font-bold text-[#24211e] border-b border-[#e6e1d6] pb-2">
-                    البيانات الشخصية والاتصال
+                    {t('البيانات الشخصية والاتصال', 'Personal and contact details')}
                   </h4>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-[#403831] mb-1.5">{t('الاسم بالكامل / اسما العروسين *', 'Full name / couple names *')}</label>
+                    <input type="text" required value={formData.clientName} onChange={(e) => setFormData({ ...formData, clientName: e.target.value })} placeholder={t('مثال: ياسمين وعمر', 'e.g. Jasmine & Omar')} className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] focus:bg-[#fffefb] outline-none text-sm text-[#24211e]" />
+                  </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-[#403831] mb-1.5">
-                        رقم الهاتف الأساسي (Phone Number) *
+                        {t('رقم الهاتف الأساسي *', 'Phone number *')}
                       </label>
                       <input
                         type="tel"
@@ -263,7 +281,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
 
                     <div>
                       <label className="block text-xs font-semibold text-[#403831] mb-1.5">
-                        رقم الواتساب للتواصل وتأكيد الحجز (WhatsApp) *
+                        {t('رقم الواتساب للتواصل وتأكيد الحجز *', 'WhatsApp number *')}
                       </label>
                       <input
                         type="tel"
@@ -280,7 +298,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-[#403831] mb-1.5">
-                        البريد الإلكتروني (Email Address) *
+                        {t('البريد الإلكتروني *', 'Email address *')}
                       </label>
                       <input
                         type="email"
@@ -295,7 +313,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
 
                     <div>
                       <label className="block text-xs font-semibold text-[#403831] mb-1.5">
-                        نوع الجلسة أو الباقة (Service Type) *
+                        {t('نوع الجلسة أو الباقة *', 'Session or service *')}
                       </label>
                       <select
                         id="booking-service-select"
@@ -306,7 +324,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                       >
                         {categories.filter((c) => c.slug !== 'all' && c.active !== false).map((cat) => (
                           <option key={cat.id} value={cat.slug}>
-                            {cat.nameAr} • {cat.nameEn}
+                            {cat.nameAr}{language === 'ar' ? ` • ${cat.nameEn}` : ''}
                           </option>
                         ))}
                       </select>
@@ -317,13 +335,13 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                 {/* Session Date & Timing */}
                 <div className="space-y-4 pt-2">
                   <h4 className="font-arabic-editorial text-lg font-bold text-[#24211e] border-b border-[#e6e1d6] pb-2">
-                    تاريخ المناسبة والمكان (Event Details)
+                    {t('تاريخ المناسبة والمكان', 'Event details')}
                   </h4>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-[#403831] mb-1.5">
-                        تاريخ المناسبة المفضل (Event Date) *
+                        {t('تاريخ المناسبة المفضل *', 'Preferred date *')}
                       </label>
                       <input
                         type="date"
@@ -338,7 +356,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
 
                     <div>
                       <label className="block text-xs font-semibold text-[#403831] mb-1.5">
-                        التوقيت المفضل (Time Slot) *
+                        {t('التوقيت المفضل *', 'Preferred time *')}
                       </label>
                       <select
                         required
@@ -346,23 +364,23 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                         onChange={(e) => setFormData({ ...formData, timeSlot: e.target.value })}
                         className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-xs text-[#24211e]"
                       >
-                        <option value="04:00 PM (Sunset Golden Hour)">ساعة الغروب الذهبية (04:00 م)</option>
-                        <option value="11:00 AM (Morning Natural Light)">الصباح والإضاءة الطبيعية (11:00 ص)</option>
-                        <option value="Full Wedding Day">يوم الزفاف كاملاً (Full Day)</option>
-                        <option value="Custom Flexible">توقيت مرن يتم تحديده لاحقاً</option>
+                        <option value="04:00 PM (Sunset Golden Hour)">{t('ساعة الغروب الذهبية (04:00 م)', 'Sunset golden hour (4:00 PM)')}</option>
+                        <option value="11:00 AM (Morning Natural Light)">{t('الصباح والإضاءة الطبيعية (11:00 ص)', 'Morning natural light (11:00 AM)')}</option>
+                        <option value="Full Wedding Day">{t('يوم الزفاف كاملاً', 'Full wedding day')}</option>
+                        <option value="Custom Flexible">{t('توقيت مرن يتم تحديده لاحقاً', 'Flexible timing')}</option>
                       </select>
                     </div>
 
                     <div>
                       <label className="block text-xs font-semibold text-[#403831] mb-1.5">
-                        مكان ومحافظة الجلسة (Location) *
+                        {t('مكان ومحافظة الجلسة *', 'Location *')}
                       </label>
                       <input
                         type="text"
                         required
                         value={formData.location}
                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        placeholder="الإسكندرية، الفندق، القاعة، إلخ"
+                        placeholder={t('الإسكندرية، الفندق، القاعة، إلخ', 'Alexandria, hotel, venue, etc.')}
                         className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-sm text-[#24211e]"
                       />
                     </div>
@@ -372,7 +390,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                 {/* Tell us about your story */}
                 <div>
                   <label className="block text-xs font-semibold text-[#403831] mb-1.5">
-                    أخبرونا عن حكايتكم وتفاصيل يومكم (Tell us about your story) *
+                    {t('أخبرونا عن حكايتكم وتفاصيل يومكم *', 'Tell us about your story and plans *')}
                   </label>
                   <textarea
                     rows={4}
@@ -380,7 +398,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                     id="booking-story-input"
                     value={formData.storyNotes}
                     onChange={(e) => setFormData({ ...formData, storyNotes: e.target.value })}
-                    placeholder="ما هي أكثر التفاصيل التي تتمنون توثيقها؟ هل هناك تفاصيل معينة تفضلونها، مثل فستان محتشم، زوايا معينة، أو حضور العائلة؟"
+                    placeholder={t('ما هي أكثر التفاصيل التي تتمنون توثيقها؟', 'What would you most like us to preserve? Share any important details or preferences.')}
                     className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] focus:bg-[#fffefb] outline-none text-sm text-[#24211e]"
                   />
                 </div>
@@ -390,15 +408,15 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-[#24211e] flex items-center gap-1">
                       <Gift className="w-3.5 h-3.5 text-[#c6a585]" />
-                      <span>تنبيه المناسبات وأعياد الميلاد والهدايا الحصرية (اختياري)</span>
+                      <span>{t('تنبيه المناسبات وأعياد الميلاد والهدايا الحصرية (اختياري)', 'Birthday and anniversary reminders (optional)')}</span>
                     </span>
-                    <span className="text-[10px] text-[#73685d]">خصومات وهدايا كاليستا</span>
+                    <span className="text-[10px] text-[#73685d]">{t('خصومات وهدايا كاليستا', 'Client gifts')}</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-[11px] text-[#594f45] mb-1">
-                        تاريخ ميلادكم (Birthday)
+                        {t('تاريخ ميلادكم', 'Birthday')}
                       </label>
                       <input
                         type="date"
@@ -410,7 +428,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
 
                     <div>
                       <label className="block text-[11px] text-[#594f45] mb-1">
-                        تاريخ ذكرى الزواج (Wedding Anniversary)
+                        {t('تاريخ ذكرى الزواج', 'Wedding anniversary')}
                       </label>
                       <input
                         type="date"
@@ -428,7 +446,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                       onChange={(e) => setFormData({ ...formData, subscribeUpdates: e.target.checked })}
                       className="rounded accent-[#c6a585]"
                     />
-                    <span>نود استلام تحديثات العروض الحصرية وجديد أعمال كاليستا</span>
+                    <span>{t('نود استلام تحديثات العروض الحصرية وجديد أعمال كاليستا', 'I would like to receive occasional Kallista updates')}</span>
                   </label>
                 </div>
 
@@ -440,7 +458,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                     className="w-full bg-[#24211e] hover:bg-[#3d3833] text-[#fffefb] py-4 rounded-full text-base font-medium tracking-wide shadow-lg transition-all duration-300 flex items-center justify-center gap-2 active:scale-98"
                   >
                     <Send className="w-4 h-4 text-[#c6a585]" />
-                    <span>Send Inquiry • إرسال طلب الحجز</span>
+                    <span>{t('إرسال طلب الحجز', 'Send enquiry')}</span>
                   </button>
                 </div>
 

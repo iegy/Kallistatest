@@ -77,4 +77,18 @@
   -webkit-backdrop-filter: blur(16px);
 }
 
+/* Direction-aware typography and alignment for the bilingual public site. */
+#kallista-app-root :dir(ltr).text-right {
+  text-align: left;
+}
+
+#kallista-app-root :dir(ltr).font-arabic-editorial {
+  font-family: var(--font-serif);
+}
+
+#kallista-app-root :dir(ltr) input,
+#kallista-app-root :dir(ltr) textarea,
+#kallista-app-root :dir(ltr) select {
+  text-align: left;
+}
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowLeft, Sparkles, Heart, Eye } from 'lucide-react';
 import { SiteContent } from '../types';
+import { useLanguage } from '../i18n';
 
 interface IntroductionSectionProps {
   content: SiteContent;
@@ -8,6 +9,7 @@ interface IntroductionSectionProps {
 }
 
 export const IntroductionSection: React.FC<IntroductionSectionProps> = ({ content, onDiscover }) => {
+  const { t } = useLanguage();
   const { intro } = content;
 
   return (
@@ -20,7 +22,7 @@ export const IntroductionSection: React.FC<IntroductionSectionProps> = ({ conten
         {/* Section Header Label */}
         <div className="inline-block">
           <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase font-semibold">
-            05 — Philosophy & Vision
+            {t('05 — الفلسفة والرؤية', '05 — Philosophy & Vision')}
           </span>
           <div className="w-12 h-[1px] bg-[#c6a585] mx-auto mt-2" />
         </div>
@@ -74,7 +76,7 @@ export const IntroductionSection: React.FC<IntroductionSectionProps> = ({ conten
             onClick={onDiscover}
             className="text-sm font-semibold text-[#24211e] hover:text-[#c6a585] inline-flex items-center gap-2 border-b border-[#24211e] pb-1 hover:border-[#c6a585] transition-all"
           >
-            <span>تعرفوا أكثر على قصة كاليستا وروناديسا</span>
+            <span>{t('تعرفوا أكثر على قصة كاليستا وروناديسا', 'Discover the Kallista & Ronadisa story')}</span>
             <ArrowLeft className="w-4 h-4" />
           </button>
         </div>

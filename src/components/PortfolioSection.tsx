@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Calendar, MapPin, Image as ImageIcon, ArrowLeft, Eye, Maximize2, Layers } from 'lucide-react';
 import { Album, PhotoItem, PortfolioCategory } from '../types';
+import { useLanguage } from '../i18n';
 
 interface PortfolioSectionProps {
   albums: Album[];
@@ -19,6 +20,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
   onOpenAlbumModal,
   onOpenLightbox,
 }) => {
+  const { language, t } = useLanguage();
   const [hoveredAlbumId, setHoveredAlbumId] = useState<string | null>(null);
 
   const activeCategories = categories.filter((c) => c.active !== false);
@@ -34,16 +36,16 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
           <span className="font-serif text-sm tracking-[0.25em] text-[#afbb9c] uppercase block mb-3 font-semibold">
-            12 — The Work / Portfolio
+            {t('12 — معرض الأعمال', '12 — The Work / Portfolio')}
           </span>
           <h2
             id="portfolio-headline"
             className="font-arabic-editorial text-3xl sm:text-4xl md:text-5xl font-bold text-[#24211e] mb-4"
           >
-            مجموعة من اللحظات التي اخترنا أن نحتفظ بها.
+            {t('مجموعة من اللحظات التي اخترنا أن نحتفظ بها.', 'A collection of moments chosen to endure.')}
           </h2>
           <p className="text-[#6c6258] text-base sm:text-lg font-light">
-            استكشفوا ألبومات المناسبات الكاملة، حيث تحظى كل جلسة بتوثيق سينمائي متكامل لجميع تفاصيلها ومشاعرها.
+            {t('استكشفوا ألبومات المناسبات الكاملة، حيث تحظى كل جلسة بتوثيق سينمائي متكامل لجميع تفاصيلها ومشاعرها.', 'Explore complete session stories, each documented with a cinematic eye for detail and emotion.')}
           </p>
         </div>
 
@@ -63,7 +65,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                 }`}
               >
                 <span>{tab.nameAr}</span>
-                {tab.nameEn && (
+                {language === 'ar' && tab.nameEn && (
                   <span className="text-[11px] opacity-70 font-serif">({tab.nameEn})</span>
                 )}
               </button>
@@ -76,7 +78,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
           <div className="text-center py-16 bg-[#e6e1d6]/30 rounded-2xl border border-dashed border-[#c6a585]/40">
             <ImageIcon className="w-12 h-12 text-[#c6a585] mx-auto mb-3 opacity-60" />
             <p className="text-[#61574d] text-base font-arabic-editorial">
-              لا توجد ألبومات في هذا القسم حالياً. يمكنك إضافة ألبومات جديدة وتعديل التصنيفات من لوحة التحكم.
+              {t('لا توجد ألبومات في هذا القسم حالياً.', 'There are no published albums in this collection yet.')}
             </p>
           </div>
         ) : (
@@ -113,24 +115,19 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                     {/* Photos count indicator */}
                     <div className="absolute top-4 left-4 bg-[#24211e]/80 backdrop-blur-md text-[#fffefb] px-3 py-1 rounded-full text-xs font-serif flex items-center gap-1.5">
                       <Layers className="w-3 h-3 text-[#c6a585]" />
-                      <span>{photoCount} صورة</span>
+                      <span>{photoCount} {t('صورة', 'photos')}</span>
                     </div>
 
                     {/* Overlay Action */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[#24211e]/40 backdrop-blur-[2px]">
                       <span className="bg-[#fffefb] text-[#24211e] px-4 py-2 rounded-full text-xs font-medium tracking-wide shadow-lg flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-transform">
                         <Eye className="w-3.5 h-3.5 text-[#c6a585]" />
-                        <span>فتح الألبوم بالكامل</span>
+                        <span>{t('فتح الألبوم بالكامل', 'Open full album')}</span>
                       </span>
                     </div>
 
                     {/* Bottom Metadata in Image */}
                     <div className="absolute bottom-4 right-4 left-4 text-right text-[#fffefb]">
-                      {album.titleEn && (
-                        <span className="text-[11px] font-serif tracking-widest text-[#e6e1d6] block mb-1">
-                          {album.titleEn}
-                        </span>
-                      )}
                       <h3 className="font-arabic-editorial text-xl font-bold leading-snug">
                         {album.title}
                       </h3>
@@ -168,7 +165,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                     {album.images && album.images.length > 1 && (
                       <div className="pt-2 border-t border-[#e6e1d6]/60">
                         <span className="text-[11px] text-[#85796f] block mb-2 font-arabic-editorial">
-                          صور من الجلسة:
+                          {t('صور من الجلسة:', 'Selected frames:')}
                         </span>
                         <div className="flex items-center gap-2 overflow-x-auto pb-1">
                           {album.images.slice(0, 4).map((img, i) => (
@@ -177,7 +174,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                               id={`thumb-preview-${album.id}-${i}`}
                               onClick={() => onOpenLightbox(img, album.title)}
                               className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#e6e1d6] hover:border-[#c6a585] flex-shrink-0 transition-transform hover:scale-105"
-                              title={img.title || 'عرض الصورة'}
+                              title={img.title || t('عرض الصورة', 'View photograph')}
                             >
                               <img
                                 src={img.thumbUrl || img.url}
@@ -205,7 +202,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                         onClick={() => onOpenAlbumModal(album)}
                         className="w-full bg-[#e6e1d6] hover:bg-[#c6a585] hover:text-white text-[#24211e] py-2.5 rounded-xl text-xs sm:text-sm font-medium tracking-wide transition-colors flex items-center justify-center gap-2"
                       >
-                        <span>مشاهدة الألبوم والمناسبة كاملة</span>
+                        <span>{t('مشاهدة الألبوم والمناسبة كاملة', 'View the complete story')}</span>
                         <ArrowLeft className="w-3.5 h-3.5" />
                       </button>
                     </div>

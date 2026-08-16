@@ -105,6 +105,12 @@ export interface FAQItem {
   category?: string;
 }
 
+export interface SocialLink {
+  id: string;
+  label: string;
+  url: string;
+}
+
 export interface SiteContent {
   brand: {
     studioName: string;
@@ -198,6 +204,7 @@ export interface SiteContent {
     instagram: string;
     facebook: string;
     tiktok?: string;
+    socialLinks?: SocialLink[];
     depositPolicy: string;
     privacyNote: string;
   };

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Calendar, Sparkles, Send, CheckCircle2 } from 'lucide-react';
 import { Booking, ClientContact, SiteSettings } from '../types';
 import { createBookingInquiryWhatsAppLink } from '../services/storage';
+import { useLanguage } from '../i18n';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   preselectedService,
   onSaveBooking,
 }) => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     clientName: '',
     phone: '',
@@ -26,7 +28,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     serviceType: preselectedService || 'weddings',
     date: '',
     timeSlot: '04:00 PM (Golden Hour)',
-    location: 'الإسكندرية',
+    location: t('الإسكندرية', 'Alexandria'),
     storyNotes: '',
     birthday: '',
   });
@@ -47,7 +49,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       !formData.location.trim() ||
       !formData.storyNotes.trim()
     ) {
-      alert('جميع الحقول المحددة بعلامة (*) إجبارية. يرجى استكمال كافة بيانات الحجز.');
+      alert(t('يرجى استكمال جميع بيانات الحجز المطلوبة.', 'Please complete all required booking details.'));
       return;
     }
 
@@ -97,10 +99,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         <div className="flex items-center justify-between border-b border-[#e6e1d6] pb-4 mb-6">
           <div>
             <h3 className="font-arabic-editorial text-2xl font-bold text-[#24211e]">
-              احجزوا موعدكم مع كاليستا
+              {t('احجزوا موعدكم مع كاليستا', 'Book a session with Kallista')}
             </h3>
             <p className="text-xs text-[#7d7266] font-serif">
-              Inquire & Book a Photography Session
+              {t('طلب وحجز جلسة تصوير', 'Enquire & book a photography session')}
             </p>
           </div>
           <button
@@ -115,10 +117,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
           <div className="text-center py-8 space-y-5">
             <CheckCircle2 className="w-14 h-14 text-[#738262] mx-auto animate-bounce" />
             <h4 className="font-arabic-editorial text-2xl font-bold text-[#24211e]">
-              تم تسجيل طلب الحجز بنجاح!
+              {t('تم تسجيل طلب الحجز بنجاح!', 'Your enquiry has been received')}
             </h4>
             <p className="text-xs text-[#594f45] leading-relaxed">
-              سنتواصل معكم في أقرب وقت لتأكيد الموعد وكافة التفاصيل.
+              {t('سنتواصل معكم في أقرب وقت لتأكيد الموعد وكافة التفاصيل.', 'We will contact you shortly to confirm the date and details.')}
             </p>
 
             <a
@@ -128,7 +130,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               className="w-full bg-[#738262] hover:bg-[#5e6b50] text-[#fffefb] py-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-all"
             >
               <Send className="w-4 h-4" />
-              <span>إرسال نسخة من التفاصيل بالبريد</span>
+              <span>{t('إرسال نسخة من التفاصيل', 'Send a copy of the details')}</span>
             </a>
 
             <button
@@ -138,21 +140,21 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               }}
               className="text-xs text-[#7d7266] hover:text-[#24211e] underline"
             >
-              إغلاق النافذة
+              {t('إغلاق النافذة', 'Close')}
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-[#403831] mb-1">
-                الاسم بالكامل / اسم العروسين *
+                {t('الاسم بالكامل / اسم العروسين *', 'Full name / couple names *')}
               </label>
               <input
                 type="text"
                 required
                 value={formData.clientName}
                 onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
-                placeholder="مثال: ياسمين وعمر"
+                placeholder={t('مثال: ياسمين وعمر', 'e.g. Jasmine & Omar')}
                 className="w-full px-4 py-2.5 rounded-xl bg-[#e6e1d6]/40 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-sm text-[#24211e]"
               />
             </div>
@@ -160,7 +162,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-semibold text-[#403831] mb-1">
-                  رقم الهاتف *
+                  {t('رقم الهاتف *', 'Phone number *')}
                 </label>
                 <input
                   type="tel"
@@ -174,7 +176,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-[#403831] mb-1">
-                  رقم الواتساب *
+                  {t('رقم الواتساب *', 'WhatsApp number *')}
                 </label>
                 <input
                   type="tel"
@@ -190,7 +192,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-semibold text-[#403831] mb-1">
-                  البريد الإلكتروني *
+                  {t('البريد الإلكتروني *', 'Email address *')}
                 </label>
                 <input
                   type="email"
@@ -204,7 +206,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-[#403831] mb-1">
-                  نوع الجلسة *
+                  {t('نوع الجلسة *', 'Session type *')}
                 </label>
                 <select
                   required
@@ -212,10 +214,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
                   className="w-full px-3 py-2.5 rounded-xl bg-[#e6e1d6]/40 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-xs text-[#24211e]"
                 >
-                  <option value="weddings">Wedding • زفاف</option>
-                  <option value="children">Children • أطفال وعائلة</option>
-                  <option value="fashion">Fashion • أزياء المحجبات</option>
-                  <option value="other">Other • جلسة خاصة</option>
+                  <option value="weddings">{t('زفاف', 'Wedding')}</option>
+                  <option value="children">{t('أطفال وعائلة', 'Children & Family')}</option>
+                  <option value="fashion">{t('أزياء', 'Fashion')}</option>
+                  <option value="other">{t('جلسة خاصة', 'Other')}</option>
                 </select>
               </div>
             </div>
@@ -223,7 +225,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-semibold text-[#403831] mb-1">
-                  تاريخ المناسبة *
+                  {t('تاريخ المناسبة *', 'Event date *')}
                 </label>
                 <input
                   type="date"
@@ -237,14 +239,14 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-[#403831] mb-1">
-                  المكان والمحافظة *
+                  {t('المكان والمحافظة *', 'Location *')}
                 </label>
                 <input
                   type="text"
                   required
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  placeholder="الإسكندرية، الفندق، إلخ"
+                  placeholder={t('الإسكندرية، الفندق، إلخ', 'Alexandria, hotel, venue, etc.')}
                   className="w-full px-3 py-2.5 rounded-xl bg-[#e6e1d6]/40 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-xs text-[#24211e]"
                 />
               </div>
@@ -252,14 +254,14 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-[#403831] mb-1">
-                تفاصيل ورؤيتكم للجلسة *
+                {t('تفاصيل ورؤيتكم للجلسة *', 'Tell us about your vision *')}
               </label>
               <textarea
                 rows={3}
                 required
                 value={formData.storyNotes}
                 onChange={(e) => setFormData({ ...formData, storyNotes: e.target.value })}
-                placeholder="أخبرونا عن تفاصيل يومكم وتطلعاتكم الخاصة..."
+                placeholder={t('أخبرونا عن تفاصيل يومكم وتطلعاتكم الخاصة...', 'Share the important details and what you hope to preserve...')}
                 className="w-full px-4 py-2.5 rounded-xl bg-[#e6e1d6]/40 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-sm text-[#24211e]"
               />
             </div>
@@ -270,7 +272,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 className="w-full bg-[#24211e] hover:bg-[#3d3833] text-[#fffefb] py-3.5 rounded-full text-sm font-semibold tracking-wide shadow-md transition-all flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4 text-[#c6a585]" />
-                <span>إرسال طلب الحجز / Send Inquiry</span>
+                <span>{t('إرسال طلب الحجز', 'Send enquiry')}</span>
               </button>
             </div>
           </form>

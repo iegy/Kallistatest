@@ -2,6 +2,7 @@ import React from 'react';
 import { Sparkles, Calendar, ChevronDown, Camera } from 'lucide-react';
 import { SiteContent } from '../types';
 import { veiledWeddingPhoto } from '../services/storage';
+import { useLanguage } from '../i18n';
 
 interface HeroSectionProps {
   content: SiteContent;
@@ -10,6 +11,7 @@ interface HeroSectionProps {
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ content, onExplore, onInquire }) => {
+  const { t } = useLanguage();
   const { hero, brand } = content;
 
   return (
@@ -51,7 +53,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ content, onExplore, on
                 id="hero-subtitle"
                 className="font-serif text-lg sm:text-xl text-[#5c5248] italic tracking-wide"
               >
-                {brand.taglineEn || 'Preserving what cannot be repeated.'}
+                {t(brand.taglineAr, brand.taglineEn || 'Preserving what cannot be repeated.')}
               </p>
             </div>
 
@@ -105,17 +107,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ content, onExplore, on
                 <img
                   id="hero-featured-image"
                   src={hero.bgImageUrl || veiledWeddingPhoto}
-                  alt="Kallista Editorial Veiled Wedding Photography"
+                  alt={t('تصوير زفاف تحريري من كاليستا', 'Kallista editorial wedding photography')}
                   className="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-700"
                 />
                 
                 {/* Visual Label Tag */}
                 <div className="absolute bottom-4 right-4 left-4 bg-[#24211e]/85 backdrop-blur-md p-4 rounded-2xl border border-[#fffefb]/10 text-right text-[#fffefb] space-y-1">
                   <span className="text-[10px] uppercase tracking-widest text-[#c6a585] font-serif block">
-                    Signature Wedding Story
+                    {t('حكاية زفاف مميزة', 'Signature Wedding Story')}
                   </span>
                   <h3 className="font-arabic-editorial text-sm sm:text-base font-bold">
-                    حكاية نور وكريم — تصوير تحريري ملكي للمحجبات
+                    {t('حكاية نور وكريم — تصوير زفاف تحريري راقٍ', 'Noor & Kareem — a refined editorial wedding story')}
                   </h3>
                 </div>
               </div>
@@ -123,10 +125,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ content, onExplore, on
               {/* Floating Aesthetic Accent Badge */}
               <div className="absolute -top-4 -left-4 bg-[#fffefb] p-4 rounded-2xl border border-[#e6e1d6] shadow-xl text-center hidden sm:block">
                 <span className="font-serif text-xs uppercase tracking-widest text-[#738262] block font-semibold">
-                  Alexandria, Egypt
+                  {t('الإسكندرية، مصر', 'Alexandria, Egypt')}
                 </span>
                 <span className="font-arabic-editorial text-xs text-[#24211e] font-medium">
-                  تصوير احترافي في جميع المحافظات
+                  {t('تصوير احترافي في جميع المحافظات', 'Available across Egypt')}
                 </span>
               </div>
 
@@ -142,7 +144,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ content, onExplore, on
         className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-1 text-[#73685d] hover:text-[#24211e] transition-colors group cursor-pointer"
         aria-label="Scroll to content"
       >
-        <span className="text-[11px] font-serif tracking-widest uppercase">Explore</span>
+        <span className="text-[11px] font-serif tracking-widest uppercase">{t('استكشف', 'Explore')}</span>
         <ChevronDown className="w-4 h-4 group-hover:translate-y-1 transition-transform" />
       </button>
     </section>

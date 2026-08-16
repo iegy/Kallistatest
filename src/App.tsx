@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { User } from 'firebase/auth';
 import { where } from 'firebase/firestore';
 import {
@@ -44,6 +44,7 @@ import { AlbumLightboxModal } from './components/AlbumLightboxModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { BookingModal } from './components/BookingModal';
 import { AccountModal } from './components/AccountModal';
+import { Language, LanguageProvider, localizeAlbums, localizeCategories, localizeContent } from './i18n';
 
 interface UserProfileRecord {
   id: string;
@@ -53,6 +54,12 @@ interface UserProfileRecord {
 }
 
 export default function App() {
+  const [language, setLanguageState] = useState<Language>(() => {
+    const queryLanguage = new URLSearchParams(window.location.search).get('lang');
+    if (queryLanguage === 'en' || queryLanguage === 'ar') return queryLanguage;
+    return localStorage.getItem('kallista_language') === 'en' ? 'en' : 'ar';
+  });
+
   // Global State (Completely Dynamic & User-Editable)
   const [categories, setCategories] = useState<PortfolioCategory[]>(() => getPortfolioCategories());
   const [content, setContent] = useState<SiteContent>(() => getSiteContent());
@@ -77,6 +84,26 @@ export default function App() {
   const [isQuickBookingOpen, setIsQuickBookingOpen] = useState<boolean>(false);
   const [isAccountOpen, setIsAccountOpen] = useState<boolean>(false);
   const [preselectedBookingService, setPreselectedBookingService] = useState<string>('weddings');
+
+  const setLanguage = (nextLanguage: Language) => {
+    setLanguageState(nextLanguage);
+    localStorage.setItem('kallista_language', nextLanguage);
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', nextLanguage);
+    window.history.replaceState({}, '', url);
+  };
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+    document.title = language === 'ar'
+      ? 'Kallista by Ronadisa | تصوير تحريري فاخر'
+      : 'Kallista by Ronadisa | Editorial Photography in Egypt';
+  }, [language]);
+
+  const publicContent = useMemo(() => localizeContent(content, language), [content, language]);
+  const publicCategories = useMemo(() => localizeCategories(categories, language), [categories, language]);
+  const publicAlbums = useMemo(() => localizeAlbums(albums, language), [albums, language]);
 
   useEffect(() => subscribeToFirebaseAuthState(async (nextUser) => {
     setUser(nextUser);
@@ -216,7 +243,7 @@ export default function App() {
 
   const handleNextPhoto = () => {
     if (!activeLightboxPhoto) return;
-    const allPhotos = albums.flatMap((a) => a.images);
+    const allPhotos = publicAlbums.flatMap((a) => a.images);
     const currentIndex = allPhotos.findIndex((p) => p.id === activeLightboxPhoto.id || p.url === activeLightboxPhoto.url);
     if (currentIndex >= 0 && currentIndex < allPhotos.length - 1) {
       setActiveLightboxPhoto(allPhotos[currentIndex + 1]);
@@ -227,7 +254,7 @@ export default function App() {
 
   const handlePrevPhoto = () => {
     if (!activeLightboxPhoto) return;
-    const allPhotos = albums.flatMap((a) => a.images);
+    const allPhotos = publicAlbums.flatMap((a) => a.images);
     const currentIndex = allPhotos.findIndex((p) => p.id === activeLightboxPhoto.id || p.url === activeLightboxPhoto.url);
     if (currentIndex > 0) {
       setActiveLightboxPhoto(allPhotos[currentIndex - 1]);
@@ -258,13 +285,19 @@ export default function App() {
   const birthdayAlerts = getUpcomingBirthdayAlerts(clients);
 
   return (
-    <div id="kallista-app-root" className="min-h-screen bg-[#fffefb] text-[#24211e] flex flex-col selection:bg-[#c6a585]/30">
+    <LanguageProvider value={{
+      language,
+      setLanguage,
+      toggleLanguage: () => setLanguage(language === 'ar' ? 'en' : 'ar'),
+      t: (arabic, english) => language === 'ar' ? arabic : english,
+    }}>
+    <div id="kallista-app-root" dir={language === 'ar' ? 'rtl' : 'ltr'} className="min-h-screen bg-[#fffefb] text-[#24211e] flex flex-col selection:bg-[#c6a585]/30">
       
       {/* 03 — HEADER / NAVIGATION */}
       <Navbar
         settings={settings}
-        content={content}
-        categories={categories}
+        content={publicContent}
+        categories={publicCategories}
         activeSection={activeSection}
         onNavigate={handleNavigate}
         onOpenBooking={() => handleOpenQuickBooking('weddings')}
@@ -278,21 +311,21 @@ export default function App() {
       <main className="flex-1">
         {/* 04 — HOMEPAGE HERO SECTION */}
         <HeroSection
-          content={content}
+          content={publicContent}
           onExplore={() => handleNavigate('portfolio')}
           onInquire={() => handleOpenQuickBooking('weddings')}
         />
 
         {/* 05 — INTRODUCTION SECTION */}
         <IntroductionSection
-          content={content}
+          content={publicContent}
           onDiscover={() => handleNavigate('about')}
         />
 
         {/* 06 — SERVICES (What We Preserve) */}
         <ServicesSection
-          content={content}
-          categories={categories}
+          content={publicContent}
+          categories={publicCategories}
           onSelectCategory={(cat) => {
             setPortfolioCategory(cat);
             handleNavigate('portfolio');
@@ -302,20 +335,20 @@ export default function App() {
 
         {/* 07, 08, 09 — THE KALLISTA APPROACH, SIGNATURE IMAGE & WEDDING FEATURE */}
         <ApproachAndSignatureSection
-          content={content}
+          content={publicContent}
           onInquireWedding={() => handleOpenQuickBooking('weddings')}
         />
 
         {/* 10, 11 — ABOUT KALLISTA & ABOUT RONADISA */}
         <AboutSections
-          content={content}
+          content={publicContent}
           onExploreWork={() => handleNavigate('portfolio')}
         />
 
         {/* 12 — PORTFOLIO (The Work — Visual First Editorial Albums) */}
         <PortfolioSection
-          albums={albums}
-          categories={categories}
+          albums={publicAlbums}
+          categories={publicCategories}
           selectedCategory={portfolioCategory}
           onCategoryChange={setPortfolioCategory}
           onOpenAlbumModal={(album) => setSelectedAlbumForDetails(album)}
@@ -324,7 +357,7 @@ export default function App() {
 
         {/* 13, 14 — THE KALLISTA EXPERIENCE & WHY KALLISTA */}
         <ExperienceSection
-          content={content}
+          content={publicContent}
           onInquire={() => handleOpenQuickBooking('weddings')}
         />
 
@@ -336,15 +369,15 @@ export default function App() {
 
         {/* 16 — FAQ */}
         <FAQSection
-          content={content}
+          content={publicContent}
           onContactClick={() => handleNavigate('contact')}
         />
 
         {/* 17 — CONTACT & BOOKING SYSTEM */}
         <ContactAndBookingSection
           settings={settings}
-          content={content}
-          categories={categories}
+          content={publicContent}
+          categories={publicCategories}
           onSaveBooking={handleSaveBooking}
           preselectedService={preselectedBookingService}
         />
@@ -353,8 +386,8 @@ export default function App() {
       {/* 18, 27 — MINIMAL FOOTER & FINAL WEBSITE MESSAGE */}
       <FooterSection
         settings={settings}
-        content={content}
-        categories={categories}
+        content={publicContent}
+        categories={publicCategories}
         onNavigate={handleNavigate}
         onOpenBooking={() => handleOpenQuickBooking('weddings')}
         onOpenAdmin={handleOpenAdmin}
@@ -424,5 +457,6 @@ export default function App() {
       />
 
     </div>
+    </LanguageProvider>
   );
 }

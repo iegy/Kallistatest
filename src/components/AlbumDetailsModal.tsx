@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Calendar, MapPin, Layers, Download, Share2, ChevronLeft, ChevronRight, Eye, Sparkles } from 'lucide-react';
 import { Album, PhotoItem } from '../types';
+import { useLanguage } from '../i18n';
 
 interface AlbumDetailsModalProps {
   album: Album | null;
@@ -17,6 +18,7 @@ export const AlbumDetailsModal: React.FC<AlbumDetailsModalProps> = ({
   onOpenLightbox,
   onInquireAlbumService,
 }) => {
+  const { t } = useLanguage();
   if (!isOpen || !album) return null;
 
   return (
@@ -34,19 +36,13 @@ export const AlbumDetailsModal: React.FC<AlbumDetailsModalProps> = ({
           <div className="text-right space-y-2 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-3 py-1 bg-[#e6e1d6] text-[#24211e] text-xs font-serif rounded-full font-medium">
-                {album.category === 'weddings' ? 'حفل زفاف' : album.category === 'children' ? 'أطفال' : 'أزياء'}
+                {album.category === 'weddings' ? t('حفل زفاف', 'Wedding') : album.category === 'children' ? t('أطفال', 'Family') : t('أزياء', 'Fashion')}
               </span>
               <span className="text-xs text-[#7d7266] flex items-center gap-1 font-serif">
                 <Layers className="w-3.5 h-3.5 text-[#c6a585]" />
-                {album.images.length} صورة متوفرة
+                {album.images.length} {t('صورة متوفرة', 'photographs')}
               </span>
             </div>
-
-            {album.titleEn && (
-              <p className="font-serif text-sm tracking-widest text-[#c6a585] uppercase">
-                {album.titleEn}
-              </p>
-            )}
 
             <h2 className="font-arabic-editorial text-2xl sm:text-3xl font-bold text-[#24211e]">
               {album.title}
@@ -74,7 +70,7 @@ export const AlbumDetailsModal: React.FC<AlbumDetailsModalProps> = ({
             id="close-album-modal-btn"
             onClick={onClose}
             className="p-2.5 rounded-full bg-[#e6e1d6]/70 hover:bg-[#e6e1d6] text-[#24211e] transition-colors focus:outline-none"
-            aria-label="إغلاق"
+            aria-label={t('إغلاق', 'Close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -87,7 +83,7 @@ export const AlbumDetailsModal: React.FC<AlbumDetailsModalProps> = ({
           {album.story && (
             <div className="p-6 bg-[#e6e1d6]/40 rounded-2xl border-r-4 border-[#c6a585] text-right">
               <span className="text-xs font-serif uppercase tracking-widest text-[#8c6d4e] block mb-1">
-                Story Behind The Session • حكاية اللحظة
+                {t('حكاية الجلسة', 'Story Behind The Session')}
               </span>
               <p className="font-arabic-editorial text-base sm:text-lg text-[#3d362f] leading-relaxed">
                 {album.story}
@@ -98,7 +94,7 @@ export const AlbumDetailsModal: React.FC<AlbumDetailsModalProps> = ({
           {/* Photos Grid (Complete Album Gallery) */}
           <div className="space-y-4">
             <h3 className="text-right font-arabic-editorial text-xl font-bold text-[#24211e] flex items-center justify-end gap-2">
-              <span>معرض صور المناسبة الكاملة</span>
+              <span>{t('معرض صور المناسبة الكاملة', 'Complete session gallery')}</span>
               <Sparkles className="w-4 h-4 text-[#c6a585]" />
             </h3>
 
@@ -118,7 +114,7 @@ export const AlbumDetailsModal: React.FC<AlbumDetailsModalProps> = ({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#24211e]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4 text-right text-[#fffefb]">
                     <p className="font-arabic-editorial text-sm font-bold truncate">
-                      {img.title || `صورة ${idx + 1}`}
+                      {img.title || t(`صورة ${idx + 1}`, `Photograph ${idx + 1}`)}
                     </p>
                     {img.caption && (
                       <p className="text-xs text-[#e6e1d6] font-light line-clamp-1">
@@ -126,7 +122,7 @@ export const AlbumDetailsModal: React.FC<AlbumDetailsModalProps> = ({
                       </p>
                     )}
                     <span className="mt-1 text-[10px] text-[#c6a585] flex items-center justify-end gap-1">
-                      <Eye className="w-3 h-3" /> تكبير الصورة
+                      <Eye className="w-3 h-3" /> {t('تكبير الصورة', 'Enlarge')}
                     </span>
                   </div>
                 </div>
@@ -139,7 +135,7 @@ export const AlbumDetailsModal: React.FC<AlbumDetailsModalProps> = ({
         {/* Modal Footer CTA */}
         <div className="p-6 bg-[#fffefb] border-t border-[#e6e1d6] flex flex-wrap items-center justify-between gap-4">
           <p className="text-xs text-[#70655a] font-arabic-editorial text-right">
-            هل تحلمين بتوثيق مماثل ليومك الخاص؟ يمكنك حجز جلستك مباشرة معنا.
+            {t('هل ترغبون في توثيق يومكم بأسلوب مماثل؟ يمكنكم حجز جلستكم مباشرة معنا.', 'Would you like your story photographed with the same care? Enquire about a tailored session.')}
           </p>
 
           <div className="flex items-center gap-3">
@@ -152,7 +148,7 @@ export const AlbumDetailsModal: React.FC<AlbumDetailsModalProps> = ({
               className="bg-[#24211e] hover:bg-[#3d3833] text-[#fffefb] px-6 py-2.5 rounded-full text-xs sm:text-sm font-medium tracking-wide shadow-md transition-all flex items-center gap-2"
             >
               <Sparkles className="w-3.5 h-3.5 text-[#c6a585]" />
-              <span>احجزي جلسة {album.category === 'weddings' ? 'زفاف' : album.category === 'children' ? 'أطفال' : 'أزياء'} مماثلة</span>
+              <span>{t('احجزوا جلسة مماثلة', 'Enquire about a similar session')}</span>
             </button>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Star, MessageSquarePlus, CheckCircle, Sparkles, User, MapPin } from 'lucide-react';
 import { Review } from '../types';
+import { useLanguage } from '../i18n';
 
 interface TestimonialsSectionProps {
   reviews: Review[];
@@ -11,6 +12,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
   reviews,
   onAddReview,
 }) => {
+  const { t } = useLanguage();
   const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState({
     clientName: '',
@@ -18,7 +20,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
     rating: 5,
     comment: '',
     eventDate: '',
-    clientLocation: 'الإسكندرية',
+    clientLocation: t('الإسكندرية', 'Alexandria'),
   });
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
 
@@ -33,7 +35,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
       service: formData.service,
       rating: formData.rating,
       comment: formData.comment,
-      eventDate: formData.eventDate || 'مؤخراً',
+      eventDate: formData.eventDate || t('مؤخراً', 'Recently'),
       clientLocation: formData.clientLocation,
     });
 
@@ -49,7 +51,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
         rating: 5,
         comment: '',
         eventDate: '',
-        clientLocation: 'الإسكندرية',
+        clientLocation: t('الإسكندرية', 'Alexandria'),
       });
     }, 1800);
   };
@@ -62,16 +64,16 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="text-right space-y-3">
             <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block font-semibold">
-              15 — Testimonials & Words of Trust
+              {t('15 — تجارب وكلمات ثقة', '15 — Testimonials & Words of Trust')}
             </span>
             <h2
               id="reviews-headline"
               className="font-arabic-editorial text-3xl sm:text-4xl md:text-5xl font-bold text-[#24211e]"
             >
-              كلمات من عملاء وثقوا في كاليستا
+              {t('كلمات من عملاء وثقوا في كاليستا', 'Words from clients who trusted Kallista')}
             </h2>
             <p className="text-[#524941] text-base font-light">
-              تجارب حقيقية لعرائس، أزواج، وأسر شاركونا لحظاتهم المميزة ونقلوا إحساسهم بصدق.
+              {t('تجارب حقيقية لعرائس، أزواج، وأسر شاركونا لحظاتهم المميزة ونقلوا إحساسهم بصدق.', 'Honest reflections from couples, families and clients who invited us into meaningful moments.')}
             </p>
           </div>
 
@@ -81,7 +83,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
             className="self-start md:self-auto bg-[#e6e1d6] hover:bg-[#c6a585] hover:text-white text-[#24211e] px-6 py-3 rounded-full text-xs sm:text-sm font-medium tracking-wide transition-all duration-300 flex items-center gap-2 shadow-sm"
           >
             <MessageSquarePlus className="w-4 h-4" />
-            <span>شاركونا تجربتكم ورأيكم</span>
+            <span>{t('شاركونا تجربتكم ورأيكم', 'Share your experience')}</span>
           </button>
         </div>
 
@@ -89,7 +91,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
         {approvedReviews.length === 0 ? (
           <div className="p-12 text-center bg-[#e6e1d6]/30 rounded-3xl border border-[#e6e1d6]">
             <p className="text-[#524941] font-arabic-editorial text-lg">
-              سيتم نشر آراء العملاء وتجاربهم هنا قريباً.
+              {t('سيتم نشر آراء العملاء وتجاربهم هنا قريباً.', 'Client stories and reviews will appear here soon.')}
             </p>
           </div>
         ) : (
@@ -109,7 +111,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                       ))}
                     </div>
                     <span className="text-xs px-2.5 py-1 rounded-full bg-[#e6e1d6] text-[#5e4e3e] font-serif">
-                      {rev.service === 'weddings' ? 'تصوير زفاف' : rev.service === 'children' ? 'تصوير أطفال وعائلة' : 'تصوير أزياء'}
+                      {rev.service === 'weddings' ? t('تصوير زفاف', 'Wedding') : rev.service === 'children' ? t('تصوير أطفال وعائلة', 'Family') : t('تصوير أزياء', 'Fashion')}
                     </span>
                   </div>
 
@@ -165,37 +167,37 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
               <div className="text-center py-8 space-y-3">
                 <CheckCircle className="w-14 h-14 text-[#738262] mx-auto animate-bounce" />
                 <h3 className="font-arabic-editorial text-2xl font-bold text-[#24211e]">
-                  شكراً لمشاركتنا تجربتكم ورأيكم الغالي!
+                  {t('شكراً لمشاركتنا تجربتكم ورأيكم الغالي!', 'Thank you for sharing your experience')}
                 </h3>
                 <p className="text-[#524941] text-sm font-light">
-                  تم استلام تقييمكم وسينشر في الموقع بكل فخر واعتزاز.
+                  {t('تم استلام تقييمكم وسينشر في الموقع بعد المراجعة.', 'Your review has been received and will appear after approval.')}
                 </p>
               </div>
             ) : (
               <form onSubmit={handleSubmitReview} className="space-y-4">
                 <div className="flex items-center justify-between border-b border-[#e6e1d6] pb-4">
                   <h3 className="font-arabic-editorial text-xl font-bold text-[#24211e]">
-                    إضافة تقييم ورأي عن تجربتكم مع كاليستا
+                    {t('إضافة تقييم ورأي عن تجربتكم مع كاليستا', 'Review your Kallista experience')}
                   </h3>
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
                     className="text-[#73685d] hover:text-[#24211e] text-sm"
                   >
-                    إلغاء
+                    {t('إلغاء', 'Cancel')}
                   </button>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-[#403831] mb-1">
-                    الاسم الكريم / اسما العروسين *
+                    {t('الاسم الكريم / اسما العروسين *', 'Name / couple names *')}
                   </label>
                   <input
                     type="text"
                     required
                     value={formData.clientName}
                     onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
-                    placeholder="مثال: ياسمين وعمر"
+                    placeholder={t('مثال: ياسمين وعمر', 'e.g. Jasmine & Omar')}
                     className="w-full px-4 py-2.5 rounded-xl bg-[#e6e1d6]/40 border border-[#e6e1d6] focus:border-[#c6a585] focus:bg-[#fffefb] outline-none text-sm text-[#24211e]"
                   />
                 </div>
@@ -203,23 +205,23 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-[#403831] mb-1">
-                      نوع الجلسة
+                      {t('نوع الجلسة', 'Session type')}
                     </label>
                     <select
                       value={formData.service}
                       onChange={(e) => setFormData({ ...formData, service: e.target.value as any })}
                       className="w-full px-3 py-2.5 rounded-xl bg-[#e6e1d6]/40 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-xs text-[#24211e]"
                     >
-                      <option value="weddings">تصوير زفاف للعروسين (Weddings)</option>
-                      <option value="children">تصوير أطفال وعائلة (Children)</option>
-                      <option value="fashion">تصوير أزياء (Fashion)</option>
-                      <option value="portrait">بورتريه شخصي</option>
+                      <option value="weddings">{t('تصوير زفاف للعروسين', 'Wedding')}</option>
+                      <option value="children">{t('تصوير أطفال وعائلة', 'Children & Family')}</option>
+                      <option value="fashion">{t('تصوير أزياء', 'Fashion')}</option>
+                      <option value="portrait">{t('بورتريه شخصي', 'Portrait')}</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block text-xs font-semibold text-[#403831] mb-1">
-                      التقييم (النجوم)
+                      {t('التقييم (النجوم)', 'Rating')}
                     </label>
                     <div className="flex items-center gap-1.5 pt-2">
                       {[1, 2, 3, 4, 5].map((star) => (
@@ -244,27 +246,27 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
 
                 <div>
                   <label className="block text-xs font-semibold text-[#403831] mb-1">
-                    المدينة / المحافظة
+                    {t('المدينة / المحافظة', 'City')}
                   </label>
                   <input
                     type="text"
                     value={formData.clientLocation}
                     onChange={(e) => setFormData({ ...formData, clientLocation: e.target.value })}
-                    placeholder="الإسكندرية، القاهرة، etc."
+                    placeholder={t('الإسكندرية، القاهرة، إلخ', 'Alexandria, Cairo, etc.')}
                     className="w-full px-4 py-2 rounded-xl bg-[#e6e1d6]/40 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-xs text-[#24211e]"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-[#403831] mb-1">
-                    رأيكم وتجربتكم بالتفصيل *
+                    {t('رأيكم وتجربتكم بالتفصيل *', 'Tell us about your experience *')}
                   </label>
                   <textarea
                     rows={4}
                     required
                     value={formData.comment}
                     onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-                    placeholder="كيف كانت تجربة التصوير والتعامل مع روناديسا، هل شعرتم بالراحة والخصوصية والهدوء؟ ما رأيكم في النتيجة النهائية؟"
+                    placeholder={t('كيف كانت تجربة التصوير والنتيجة النهائية؟', 'How did the session feel, and what did you think of the final photographs?')}
                     className="w-full px-4 py-2.5 rounded-xl bg-[#e6e1d6]/40 border border-[#e6e1d6] focus:border-[#c6a585] focus:bg-[#fffefb] outline-none text-sm text-[#24211e]"
                   />
                 </div>
@@ -275,7 +277,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                     className="w-full bg-[#24211e] hover:bg-[#3d3833] text-[#fffefb] py-3 rounded-xl text-sm font-medium tracking-wide shadow-md transition-colors flex items-center justify-center gap-2"
                   >
                     <Sparkles className="w-4 h-4 text-[#c6a585]" />
-                    <span>إرسال التقييم</span>
+                    <span>{t('إرسال التقييم', 'Submit review')}</span>
                   </button>
                 </div>
               </form>

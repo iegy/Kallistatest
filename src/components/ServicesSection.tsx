@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowLeft, Sparkle, MessageCircle, Calendar } from 'lucide-react';
 import { SiteContent, PortfolioCategory } from '../types';
 import { veiledWeddingPhoto, veiledFashionPhoto, veiledFamilyPhoto } from '../services/storage';
+import { useLanguage } from '../i18n';
 
 interface ServicesSectionProps {
   content: SiteContent;
@@ -16,9 +17,10 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
   onSelectCategory,
   onInquire,
 }) => {
+  const { language, t } = useLanguage();
   const { services, servicesSettings, contact } = content;
   const globalShowPricing = servicesSettings?.showPricing ?? true;
-  const hidePriceText = servicesSettings?.hidePriceCustomText || 'طلب عرض السعر';
+  const hidePriceText = servicesSettings?.hidePriceCustomText || t('طلب عرض السعر', 'Request a quotation');
   const whatsappNumber = (contact?.whatsapp || '').replace(/[^0-9+]/g, '');
 
   // Fallback image mapper
@@ -37,16 +39,16 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
           <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block mb-3 font-semibold">
-            06 — What We Preserve
+            {t('06 — ما نوثقه ونحفظه', '06 — What We Preserve')}
           </span>
           <h2
             id="services-headline"
             className="font-arabic-editorial text-3xl sm:text-4xl md:text-5xl font-bold text-[#24211e] mb-4"
           >
-            ما نقوم بتوثيقه وحفظه لكم
+            {t('ما نقوم بتوثيقه وحفظه لكم', 'Stories and moments we preserve')}
           </h2>
           <p className="text-[#524941] text-base sm:text-lg font-light">
-            باقات وجلسات تصوير فنية مخصصة تمنحكم أعمالاً تزداد قيمة ورونقاً مع مرور السنين.
+            {t('باقات وجلسات تصوير فنية مخصصة تمنحكم أعمالاً تزداد قيمة ورونقاً مع مرور السنين.', 'Tailored photography experiences designed to become more meaningful with time.')}
           </p>
         </div>
 
@@ -54,10 +56,12 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((srv) => {
             const isPriceVisible = globalShowPricing && (srv.showPrice !== false);
-            const inquiryMessage = `مرحباً استوديو كاليستا، أود الاستفسار عن باقات وأسعار جلسة: ${srv.titleAr}`;
+            const inquiryMessage = language === 'ar'
+              ? `مرحباً استوديو كاليستا، أود الاستفسار عن باقات وأسعار جلسة: ${srv.titleAr}`
+              : `Hello Kallista Studio, I would like to enquire about: ${srv.titleAr}`;
             const whatsappInquiryUrl = whatsappNumber
               ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(inquiryMessage)}`
-              : `mailto:${contact.email}?subject=${encodeURIComponent('استفسار عن باقات Kallista')}&body=${encodeURIComponent(inquiryMessage)}`;
+              : `mailto:${contact.email}?subject=${encodeURIComponent(t('استفسار عن باقات Kallista', 'Kallista photography enquiry'))}&body=${encodeURIComponent(inquiryMessage)}`;
 
             return (
               <div
@@ -75,7 +79,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                     />
                     <div className="absolute top-4 right-4">
                       <span className="px-3 py-1 rounded-full text-xs font-serif font-medium bg-[#24211e]/80 text-[#fffefb] backdrop-blur-md">
-                        {srv.titleEn}
+                        {categories.find((category) => category.slug === srv.categorySlug)?.nameAr || srv.titleEn}
                       </span>
                     </div>
                     {srv.badge && (
@@ -117,7 +121,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                     {srv.inclusions && srv.inclusions.length > 0 && (
                       <div className="pt-3 space-y-2 border-t border-[#e6e1d6]/60">
                         {srv.inclusions.map((feat, idx) => (
-                          <div key={idx} className="flex items-center justify-end gap-2 text-xs text-[#524941]">
+                          <div key={idx} className="flex items-center justify-start gap-2 text-xs text-[#524941]">
                             <span>{feat}</span>
                             <Sparkle className="w-3 h-3 text-[#c6a585] flex-shrink-0" />
                           </div>
@@ -134,15 +138,15 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                     className="flex-1 bg-[#24211e] hover:bg-[#3d3833] text-[#fffefb] py-2.5 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
                   >
                     <Calendar className="w-3.5 h-3.5 text-[#c6a585]" />
-                    <span>احجزوا هذه الجلسة</span>
+                    <span>{t('احجزوا هذه الجلسة', 'Book this session')}</span>
                   </button>
 
                   <button
                     onClick={() => onSelectCategory(srv.categorySlug || 'all')}
                     className="px-4 py-2.5 rounded-xl bg-[#e6e1d6]/50 hover:bg-[#e6e1d6] text-[#24211e] text-xs font-semibold flex items-center gap-1 transition-colors"
-                    title="عرض الألبومات"
+                    title={t('عرض الألبومات', 'View albums')}
                   >
-                    <span>الألبومات</span>
+                    <span>{t('الألبومات', 'Albums')}</span>
                     <ArrowLeft className="w-3.5 h-3.5" />
                   </button>
                 </div>

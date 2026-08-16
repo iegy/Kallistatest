@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Lock, Calendar, UserRound } from 'lucide-react';
+import { Menu, X, Lock, Calendar, UserRound, Languages } from 'lucide-react';
 import { SiteSettings, SiteContent, PortfolioCategory } from '../types';
 import { KallistaLogo } from './KallistaLogo';
+import { useLanguage } from '../i18n';
 
 interface NavbarProps {
   settings: SiteSettings;
@@ -28,6 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   userLabel,
   birthdayAlertCount,
 }) => {
+  const { language, toggleLanguage, t } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -105,7 +107,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       : 'text-[#6C635B] hover:text-[#1A1715]'
                   }`}
                 >
-                  <span>{item.labelAr}</span>
+                  <span>{language === 'ar' ? item.labelAr : item.labelEn}</span>
                   {isActive && (
                     <span className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#936942] rounded-full" />
                   )}
@@ -117,25 +119,35 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* CTA & Admin Control actions */}
           <div className="hidden shrink-0 items-center gap-1 xl:flex 2xl:gap-2">
             <button
+              type="button"
+              onClick={toggleLanguage}
+              className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[#ded5c7] px-2.5 py-2 text-xs font-semibold text-[#5f554c] transition-colors hover:bg-[#efe9e0]/70"
+              aria-label={t('تغيير اللغة إلى الإنجليزية', 'Switch language to Arabic')}
+              title={t('English version', 'النسخة العربية')}
+            >
+              <Languages className="h-4 w-4" />
+              <span>{language === 'ar' ? 'EN' : 'عربي'}</span>
+            </button>
+            <button
               onClick={onOpenAccount}
               className="flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-2 text-xs text-[#6c635b] hover:bg-[#efe9e0]/70 hover:text-[#1a1715]"
-              title={userLabel ? 'عرض وإدارة الحساب' : 'تسجيل الدخول أو إنشاء حساب'}
+              title={userLabel ? t('عرض وإدارة الحساب', 'View and manage account') : t('تسجيل الدخول أو إنشاء حساب', 'Sign in or create an account')}
             >
               <UserRound className="h-4 w-4" />
-              <span className="hidden 2xl:inline">حسابي</span>
+              <span className="hidden 2xl:inline">{t('حسابي', 'Account')}</span>
             </button>
             {/* Admin Dashboard Access */}
             <button
               id="admin-dashboard-btn"
               onClick={onOpenAdmin}
               className="relative p-2 text-[#7C7167] hover:text-[#1A1715] hover:bg-[#EFE9E0]/60 rounded-full transition-colors focus:outline-none"
-              title="لوحة التحكم والإدارة الفورية (Admin CMS)"
-              aria-label="Admin Dashboard"
+              title={t('لوحة التحكم والإدارة', 'Admin dashboard')}
+              aria-label={t('لوحة التحكم', 'Admin dashboard')}
             >
               <Lock className="w-4 h-4" />
               {birthdayAlertCount > 0 && (
                 <span
-                  title={`${birthdayAlertCount} تنبيهات أعياد ميلاد قادمة`}
+                  title={t(`${birthdayAlertCount} تنبيهات أعياد ميلاد قادمة`, `${birthdayAlertCount} upcoming birthday alerts`)}
                   className="absolute -top-1 -right-1 w-4 h-4 bg-[#B95D55] text-white text-[9px] font-bold flex items-center justify-center rounded-full animate-pulse"
                 >
                   {birthdayAlertCount}
@@ -150,17 +162,26 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="flex items-center gap-2 whitespace-nowrap rounded-full bg-[#1A1715] px-4 py-2.5 text-xs font-medium tracking-wide text-[#FAF8F5] shadow-[0_2px_12px_rgba(26,23,21,0.12)] transition-all duration-300 hover:bg-[#38312B] active:scale-98 2xl:px-5 2xl:text-sm"
             >
               <Calendar className="w-3.5 h-3.5 text-[#D4A373]" />
-              <span className="2xl:hidden">احجز الآن</span>
-              <span className="hidden 2xl:inline">احجزوا موعدكم</span>
+              <span className="2xl:hidden">{t('احجز الآن', 'Book now')}</span>
+              <span className="hidden 2xl:inline">{t('احجزوا موعدكم', 'Book a session')}</span>
             </button>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="flex shrink-0 items-center gap-1 sm:gap-2 xl:hidden">
             <button
+              type="button"
+              onClick={toggleLanguage}
+              className="flex items-center gap-1 rounded-full border border-[#ded5c7] px-2 py-1.5 text-[11px] font-bold text-[#5f554c]"
+              aria-label={t('تغيير اللغة إلى الإنجليزية', 'Switch language to Arabic')}
+            >
+              <Languages className="h-3.5 w-3.5" />
+              <span>{language === 'ar' ? 'EN' : 'ع'}</span>
+            </button>
+            <button
               onClick={onOpenAccount}
               className="p-2 text-[#7C7167] hover:text-[#1A1715] focus:outline-none"
-              aria-label="حسابي"
+              aria-label={t('حسابي', 'Account')}
             >
               <UserRound className="h-4 w-4" />
             </button>
@@ -168,7 +189,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               id="mobile-admin-btn"
               onClick={onOpenAdmin}
               className="relative p-2 text-[#7C7167] hover:text-[#1A1715] focus:outline-none"
-              aria-label="Admin"
+              aria-label={t('لوحة التحكم', 'Admin dashboard')}
             >
               <Lock className="w-4 h-4" />
               {birthdayAlertCount > 0 && (
@@ -182,7 +203,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               id="mobile-menu-toggle-btn"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 text-[#1A1715] hover:bg-[#EFE9E0]/70 rounded-lg focus:outline-none transition-colors"
-              aria-label="Toggle menu"
+              aria-label={t('فتح قائمة التنقل', 'Toggle navigation menu')}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -211,10 +232,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       : 'text-[#5C534C] hover:bg-[#EFE9E0]/40'
                   }`}
                 >
-                  <span className="font-serif text-sm tracking-wider text-[#9E9084]">
-                    {item.labelEn}
-                  </span>
-                  <span>{item.labelAr}</span>
+                  <span>{language === 'ar' ? item.labelAr : item.labelEn}</span>
                 </button>
               );
               })}
@@ -230,7 +248,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="w-full bg-[#1A1715] text-[#FAF8F5] py-3 rounded-xl text-center text-sm font-medium tracking-wide shadow-md flex items-center justify-center gap-2"
               >
                 <Calendar className="w-4 h-4 text-[#D4A373]" />
-                <span>احجزوا موعدكم الآن / Inquire</span>
+                <span>{t('احجزوا موعدكم الآن', 'Book your session')}</span>
               </button>
             </div>
           </div>

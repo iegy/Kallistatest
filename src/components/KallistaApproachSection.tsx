@@ -2,6 +2,7 @@ import React from 'react';
 import { Eye, Sparkles, Heart, Shield, Award, CheckCircle2, Camera } from 'lucide-react';
 import { SiteContent } from '../types';
 import { veiledWeddingPhoto } from '../services/storage';
+import { useLanguage } from '../i18n';
 
 interface ApproachAndSignatureSectionProps {
   content: SiteContent;
@@ -12,6 +13,7 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
   content,
   onInquireWedding,
 }) => {
+  const { t } = useLanguage();
   const { approach, signature } = content;
 
   return (
@@ -23,7 +25,7 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
           
           <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
             <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block mb-3 font-semibold">
-              07 — The Kallista Approach
+              {t('07 — منهجية كاليستا', '07 — The Kallista Approach')}
             </span>
             <h2
               id="approach-headline"
@@ -103,7 +105,7 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
             {/* Editorial Content */}
             <div className="lg:col-span-6 text-right space-y-6 order-1 lg:order-2">
               <span className="font-serif text-sm tracking-[0.25em] text-[#c6a585] uppercase block font-semibold">
-                09 — Wedding Feature • حفلات الزفاف
+                {t('09 — قصة الزفاف المميزة', '09 — Wedding Feature')}
               </span>
 
               <h2 className="font-arabic-editorial text-3xl sm:text-4xl md:text-5xl font-bold text-[#fffefb] leading-tight">
@@ -111,20 +113,20 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
               </h2>
 
               <p className="text-[#e6e1d6]/80 text-base sm:text-lg leading-relaxed font-light">
-                حفل الزفاف ليس مجرد جلسة تصوير، بل هو بداية فصل جديد في حياتكم. نحن نتواجد معكم بهدوء لنوثق كل لحظة تفيض بالمشاعر: نظرة اللقاء الأولى، دعوات الوالدين، تفاصيل فستان العروس المحتشم وطرحتها، وأناقة العريس.
+                {t('حفل الزفاف ليس مجرد جلسة تصوير، بل هو بداية فصل جديد في حياتكم. نحن نتواجد معكم بهدوء لنوثق كل لحظة تفيض بالمشاعر: نظرة اللقاء الأولى، دعوات الوالدين، تفاصيل فستان العروس المحتشم وطرحتها، وأناقة العريس.', 'A wedding is more than a photography session; it is the beginning of a new chapter. We stay quietly attentive to every meaningful glance, family blessing, considered detail and honest emotion.')}
               </p>
 
               <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-end gap-3 text-sm text-[#e6e1d6]">
-                  <span>تغطية سينمائية وفوتوغرافية متكاملة للعروسين والعائلة</span>
+                <div className="flex items-center justify-start gap-3 text-sm text-[#e6e1d6]">
+                  <span>{t('تغطية سينمائية وفوتوغرافية متكاملة للعروسين والعائلة', 'Complete editorial coverage for the couple and family')}</span>
                   <CheckCircle2 className="w-4 h-4 text-[#738262]" />
                 </div>
-                <div className="flex items-center justify-end gap-3 text-sm text-[#e6e1d6]">
-                  <span>معالجة لونية تحريرية دقيقة تحافظ على طبيعية الملامح ونضارة البشرة</span>
+                <div className="flex items-center justify-start gap-3 text-sm text-[#e6e1d6]">
+                  <span>{t('معالجة لونية تحريرية دقيقة تحافظ على طبيعية الملامح ونضارة البشرة', 'Careful colour finishing that preserves natural features and skin')}</span>
                   <CheckCircle2 className="w-4 h-4 text-[#738262]" />
                 </div>
-                <div className="flex items-center justify-end gap-3 text-sm text-[#e6e1d6]">
-                  <span>تسليم ألبومات فاخرة مطبوعة يدوياً بأرقى الخامات الإيطالية</span>
+                <div className="flex items-center justify-start gap-3 text-sm text-[#e6e1d6]">
+                  <span>{t('تسليم ألبومات فاخرة مطبوعة يدوياً بأرقى الخامات الإيطالية', 'Luxury hand-finished albums made with archival materials')}</span>
                   <CheckCircle2 className="w-4 h-4 text-[#738262]" />
                 </div>
               </div>
@@ -136,7 +138,7 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
                   className="bg-[#c6a585] hover:bg-[#b5926f] text-[#24211e] px-8 py-3.5 rounded-full text-sm font-semibold tracking-wider transition-all duration-300 shadow-xl inline-flex items-center gap-2"
                 >
                   <Camera className="w-4 h-4" />
-                  <span>احجزوا استشارة وتغطية زفافكم</span>
+                  <span>{t('احجزوا استشارة وتغطية زفافكم', 'Book a wedding consultation')}</span>
                 </button>
               </div>
 

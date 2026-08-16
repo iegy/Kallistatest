@@ -3,85 +3,116 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
-    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
-    function isAdmin() { return signedIn() && request.auth.token.admin == true; }
-    function isPublished() { return resource.data.published == true; }
-    function isApproved() { return resource.data.approved == true; }
+    function owns(userId) { return signedIn() && request.auth.uid == userId; }
+    function adminPath() {
+      return /databases/$(database)/documents/kallista_admins/$(request.auth.uid);
+    }
+    function isAdmin() {
+      return signedIn() && (
+        request.auth.uid == 'MhfH4HNxL6UVAUYisFghPiZvt7A3' ||
+        request.auth.token.get('admin', false) == true ||
+        (exists(adminPath()) && get(adminPath()).data.active == true)
+      );
+    }
 
-    match /settings/{document=**} {
+    match /kallista_settings/{settingId} {
+      allow read: if settingId == 'public' || isAdmin();
+      allow write: if isAdmin();
+    }
+    match /kallista_content/{documentId} {
       allow read: if true;
       allow write: if isAdmin();
     }
-
-    match /services/{serviceId} {
-      allow read: if resource.data.active == true || isAdmin();
+    match /kallista_services/{serviceId} {
+      allow read: if resource.data.get('active', false) == true || isAdmin();
       allow write: if isAdmin();
     }
-
-    match /albums/{albumId} {
-      allow read: if isPublished() || isAdmin();
+    match /kallista_categories/{categoryId} {
+      allow read: if resource.data.get('active', false) == true || isAdmin();
       allow write: if isAdmin();
     }
-
-    match /photos/{photoId} {
-      allow read: if isPublished() || isAdmin();
+    match /kallista_albums/{albumId} {
+      allow read: if resource.data.get('published', false) == true || isAdmin();
       allow write: if isAdmin();
     }
-
-    match /bookings/{bookingId} {
+    match /kallista_photos/{photoId} {
+      allow read: if resource.data.get('published', false) == true || isAdmin();
+      allow write: if isAdmin();
+    }
+    match /kallista_bookings/{bookingId} {
       allow create: if signedIn()
         && request.resource.data.userId == request.auth.uid
-        && request.resource.data.status == 'pending';
-      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
-      allow update, delete: if isAdmin();
+        && request.resource.data.status == 'pending'
+        && request.resource.data.clientName is string
+        && request.resource.data.phone is string
+        && request.resource.data.serviceType is string
+        && request.resource.data.date is string;
+      allow read: if isAdmin() || owns(resource.data.userId);
+      allow update: if isAdmin() || (
+        owns(resource.data.userId)
+        && resource.data.status == 'pending'
+        && request.resource.data.status == 'cancelled'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+      );
+      allow delete: if isAdmin();
     }
-
-    match /reviews/{reviewId} {
+    match /kallista_clients/{clientId} {
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAdmin() || owns(resource.data.userId);
+      allow update: if isAdmin() || (
+        owns(resource.data.userId)
+        && request.resource.data.userId == resource.data.userId
+      );
+      allow delete: if isAdmin();
+    }
+    match /kallista_profiles/{userId} {
+      allow create: if owns(userId) && !request.resource.data.keys().hasAny(['admin', 'role']);
+      allow read: if owns(userId) || isAdmin();
+      allow update: if isAdmin() || (
+        owns(userId)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin', 'role'])
+      );
+      allow delete: if isAdmin();
+    }
+    match /kallista_reviews/{reviewId} {
       allow create: if signedIn()
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.approved == false
+        && request.resource.data.rating is int
         && request.resource.data.rating >= 1
-        && request.resource.data.rating <= 5;
-      allow read: if isApproved() || isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+        && request.resource.data.rating <= 5
+        && request.resource.data.comment is string;
+      allow read: if resource.data.get('approved', false) == true || isAdmin() || owns(resource.data.userId);
       allow update, delete: if isAdmin();
     }
-
-    match /comments/{commentId} {
+    match /kallista_comments/{commentId} {
       allow create: if signedIn()
         && request.resource.data.userId == request.auth.uid
-        && request.resource.data.approved == false;
-      allow read: if isApproved() || isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+        && request.resource.data.approved == false
+        && request.resource.data.albumId is string
+        && request.resource.data.text is string;
+      allow read: if resource.data.get('approved', false) == true || isAdmin() || owns(resource.data.userId);
       allow update, delete: if isAdmin();
     }
-
-    match /profiles/{uid} {
-      allow create, read, update: if isOwner(uid) || isAdmin();
-      allow delete: if isAdmin();
-    }
-
-    match /subscribers/{subscriberId} {
+    match /kallista_subscribers/{subscriberId} {
       allow create: if request.resource.data.email is string
-        && request.resource.data.consent == 'on'
+        && request.resource.data.consent == true
         && request.resource.data.active == true;
       allow read, update, delete: if isAdmin();
     }
-
-    match /admins/{uid} {
-      allow read: if isOwner(uid) || isAdmin();
-      allow write: if isAdmin();
+    match /kallista_admins/{userId} {
+      allow read: if owns(userId) || isAdmin();
+      allow write: if isAdmin() && userId == 'MhfH4HNxL6UVAUYisFghPiZvt7A3';
     }
-
-    match /mailQueue/{messageId} {
-      allow create: if isAdmin() || (signedIn()
-        && request.resource.data.type == 'new_booking'
-        && request.resource.data.status == 'pending');
-      allow read, update, delete: if isAdmin();
-    }
-
-    match /birthdayLogs/{logId} {
+    match /kallista_mail_queue/{messageId} {
       allow read, write: if isAdmin();
     }
-
+    match /kallista_birthday_logs/{logId} {
+      allow read, write: if isAdmin();
+    }
+    match /kallista_audit_logs/{logId} {
+      allow read, write: if isAdmin();
+    }
     match /{document=**} {
       allow read, write: if false;
     }

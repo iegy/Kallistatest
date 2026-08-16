@@ -1,8 +1,8 @@
 # Kallista by Ronadisa
 
-موقع تصوير احترافي عربي أولًا، متجاوب مع الهاتف، يشمل ألبومات المناسبات، حسابات Google والبريد، طلبات الحجز، التقييمات والتعليقات، جمع بيانات العملاء ولوحة تحكم كاملة.
+موقع تصوير احترافي متجاوب مبني بـ React وVite، مع لوحة إدارة، ألبومات، حجوزات، تقييمات، رفع صور عبر ImgBB، وتخزين آمن في Firebase.
 
-## التشغيل
+## التشغيل المحلي
 
 ```bash
 cp .env.example .env.local
@@ -10,4 +10,18 @@ npm install
 npm run dev
 ```
 
-التعليمات الكاملة لربط Firebase، قواعد الأمان، المدير، ImgBB، البريد وGitHub Pages موجودة في [FIREBASE_SETUP.md](./FIREBASE_SETUP.md).
+## التحقق والبناء
+
+```bash
+npm run lint
+npm run build
+```
+
+يتم نشر فرع `main` تلقائياً على GitHub Pages من خلال `.github/workflows/deploy-pages.yml`، ومسار الإنتاج مضبوط على `/Kallista/`.
+
+## الأمان
+
+- دخول الإدارة يتم فقط عبر Firebase Authentication والتحقق من UID المدير.
+- لا توجد كلمة مرور افتراضية أو PIN داخل كود الموقع.
+- الحجوزات والتقييمات تتطلب حساب عميل، والتقييمات تبقى معلقة حتى موافقة المدير.
+- قواعد Firestore الجاهزة موجودة في `firestore.rules` ويجب نشرها من Firebase Console.

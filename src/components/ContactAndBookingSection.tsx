@@ -1,0 +1,456 @@
+import React, { useState } from 'react';
+import { Calendar as CalendarIcon, Clock, MapPin, Send, Sparkles, CheckCircle2, User, Phone, Mail, Gift, Heart } from 'lucide-react';
+import { Booking, ClientContact, SiteSettings, SiteContent, PortfolioCategory } from '../types';
+import { createBookingInquiryWhatsAppLink } from '../services/storage';
+
+interface ContactAndBookingSectionProps {
+  settings: SiteSettings;
+  content: SiteContent;
+  categories: PortfolioCategory[];
+  onSaveBooking: (booking: Omit<Booking, 'id' | 'createdAt' | 'status'>, clientData?: Partial<ClientContact>) => Promise<boolean>;
+  preselectedService?: string;
+}
+
+export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> = ({
+  settings,
+  content,
+  categories,
+  onSaveBooking,
+  preselectedService,
+}) => {
+  const { contact } = content;
+
+  const [formData, setFormData] = useState({
+    clientName: '',
+    phone: '',
+    whatsapp: '',
+    email: '',
+    serviceType: preselectedService || 'weddings',
+    date: '',
+    timeSlot: '04:00 PM (Sunset Golden Hour)',
+    location: 'الإسكندرية (Alexandria)',
+    storyNotes: '',
+    budget: '',
+    birthday: '',
+    weddingAnniversary: '',
+    subscribeUpdates: true,
+  });
+
+  const [submittedBooking, setSubmittedBooking] = useState<Booking | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (
+      !formData.clientName.trim() ||
+      !formData.phone.trim() ||
+      !formData.whatsapp.trim() ||
+      !formData.email.trim() ||
+      !formData.date ||
+      !formData.location.trim() ||
+      !formData.storyNotes.trim()
+    ) {
+      alert('جميع الحقول المحددة بعلامة (*) إجبارية. يرجى استكمال كافة بيانات الحجز.');
+      return;
+    }
+
+    const bookingPayload = {
+      clientName: formData.clientName,
+      phone: formData.phone,
+      whatsapp: formData.whatsapp,
+      email: formData.email,
+      serviceType: formData.serviceType as any,
+      date: formData.date,
+      timeSlot: formData.timeSlot,
+      location: formData.location,
+      storyNotes: formData.storyNotes,
+      budget: formData.budget,
+    };
+
+    const clientPayload: Partial<ClientContact> = {
+      name: formData.clientName,
+      phone: formData.phone,
+      whatsapp: formData.whatsapp,
+      email: formData.email,
+      birthday: formData.birthday,
+      weddingAnniversary: formData.weddingAnniversary,
+      subscribeUpdates: formData.subscribeUpdates,
+      serviceInterests: [formData.serviceType as any],
+    };
+
+    const saved = await onSaveBooking(bookingPayload, clientPayload);
+    if (!saved) return;
+
+    setSubmittedBooking({
+      ...bookingPayload,
+      id: 'temp-' + Date.now(),
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    });
+
+    setIsSuccess(true);
+  };
+
+  const handleReset = () => {
+    setIsSuccess(false);
+    setSubmittedBooking(null);
+  };
+
+  return (
+    <section id="contact" className="py-24 sm:py-32 bg-[#fffefb] relative border-t border-[#e6e1d6]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
+          <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block mb-3 font-semibold">
+            17 — Contact & Booking Inquiry
+          </span>
+          <p className="font-serif text-2xl sm:text-3xl text-[#c6a585] italic mb-2">
+            Let's Preserve Something Beautiful.
+          </p>
+          <h2
+            id="contact-main-headline"
+            className="font-arabic-editorial text-3xl sm:text-4xl md:text-5xl font-bold text-[#24211e] mb-4"
+          >
+            {contact.title || 'دعونا نوثق معاً لحظة تستحق أن تبقى.'}
+          </h2>
+          <p
+            id="contact-copy-text"
+            className="text-[#524941] text-base sm:text-lg font-light leading-relaxed"
+          >
+            {contact.subtitle || 'سواء كان حفل زفافكم، جلسة عائلية دافئة، أو قصة خاصة تريدون الاحتفاظ بها، يسعدنا أن نعرف المزيد عنها لنصنع لكم تجربة استثنائية.'}
+          </p>
+        </div>
+
+        {/* Booking Form Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          
+          {/* Left Info & Direct Channels */}
+          <div className="lg:col-span-5 text-right space-y-8 order-2 lg:order-1">
+            <div className="bg-[#e6e1d6]/30 p-8 rounded-3xl border border-[#e6e1d6] space-y-6">
+              <h3 className="font-arabic-editorial text-2xl font-bold text-[#24211e] flex items-center justify-end gap-2">
+                <span>تواصل مباشر وسريع</span>
+                <Sparkles className="w-5 h-5 text-[#c6a585]" />
+              </h3>
+              
+              <p className="text-[#594f45] text-sm leading-relaxed font-light">
+                نرحب بجميع استفساراتكم ومشاركتكم لتفاصيل مناسبتكم في أي وقت، ويسعدنا دائماً تقديم المشورة لاختيار أفضل وقت وإضاءة لجلسة التصوير.
+              </p>
+
+              <div className="space-y-4 pt-2 border-t border-[#e6e1d6]">
+                {contact.whatsapp && <a
+                  href={`https://wa.me/${contact.whatsapp.replace(/[^0-9+]/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-4 bg-[#fffefb] rounded-2xl border border-[#e6e1d6] hover:border-[#738262] hover:shadow-md transition-all group"
+                >
+                  <span className="text-xs px-3 py-1 bg-[#738262]/20 text-[#4e633d] rounded-full font-serif font-semibold">
+                    WhatsApp Chat
+                  </span>
+                  <div className="text-right">
+                    <span className="text-xs text-[#73685d] block">واتساب مباشر</span>
+                    <span className="text-sm font-semibold text-[#24211e] font-serif">
+                      {contact.whatsapp}
+                    </span>
+                  </div>
+                </a>}
+
+                <div className="flex items-center justify-between p-4 bg-[#fffefb] rounded-2xl border border-[#e6e1d6]">
+                  <span className="text-xs px-3 py-1 bg-[#e6e1d6] text-[#5e4f40] rounded-full font-serif">
+                    Studio Location
+                  </span>
+                  <div className="text-right">
+                    <span className="text-xs text-[#73685d] block">المقر والمدينة</span>
+                    <span className="text-sm font-semibold text-[#24211e]">
+                      {contact.address || 'الإسكندرية، مصر'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-[#fffefb] rounded-2xl border border-[#e6e1d6]">
+                  <span className="text-xs px-3 py-1 bg-[#c6a585]/20 text-[#8c6742] rounded-full font-serif">
+                    Email
+                  </span>
+                  <div className="text-right">
+                    <span className="text-xs text-[#73685d] block">البريد الإلكتروني</span>
+                    <span className="text-sm font-semibold text-[#24211e] font-serif">
+                      {contact.email || 'hello@kallistaphoto.com'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* VIP Perks */}
+              <div className="p-5 bg-[#738262]/15 rounded-2xl border border-[#738262]/30 text-right space-y-2">
+                <div className="flex items-center justify-end gap-2 text-[#445636]">
+                  <span className="font-bold text-xs font-arabic-editorial">ميزة كاليستا لعملائنا الكرام</span>
+                  <Gift className="w-4 h-4 text-[#738262]" />
+                </div>
+                <p className="text-xs text-[#4e5e40] leading-relaxed">
+                  عند تسجيل تاريخ ميلادكم أو ذكرى زواجكم، نرسل لكم تهنئة خاصة وهدية خصم مميزة في شهر مناسبتكم السعيدة!
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Form Card */}
+          <div className="lg:col-span-7 bg-[#fffefb] p-8 sm:p-10 rounded-3xl border border-[#e6e1d6] shadow-xl order-1 lg:order-2">
+            {isSuccess && submittedBooking ? (
+              <div className="text-center py-10 space-y-6">
+                <div className="w-16 h-16 bg-[#738262]/20 text-[#4e633d] rounded-full flex items-center justify-center mx-auto animate-bounce">
+                  <CheckCircle2 className="w-10 h-10" />
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="font-arabic-editorial text-3xl font-bold text-[#24211e]">
+                    تم استلام طلب حجزكم بنجاح!
+                  </h3>
+                  <p className="text-[#524941] text-base font-light max-w-md mx-auto">
+                    شكراً لكم <strong className="text-[#24211e]">{submittedBooking.clientName}</strong>. سنراجع الموعد ونتواصل معكم فوراً لتأكيد كافة التفاصيل.
+                  </p>
+                </div>
+
+                {/* Optional email follow-up */}
+                <div className="p-6 bg-[#e6e1d6]/30 rounded-2xl border border-[#c6a585]/40 text-right space-y-4">
+                  <p className="text-xs font-bold text-[#24211e] flex items-center justify-end gap-1.5">
+                    <span>يمكنكم أيضاً إرسال نسخة من التفاصيل عبر البريد:</span>
+                    <Sparkles className="w-4 h-4 text-[#c6a585]" />
+                  </p>
+                  
+                  <a
+                    id="confirm-booking-email-btn"
+                    href={createBookingInquiryWhatsAppLink(submittedBooking)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-[#738262] hover:bg-[#5f6c50] text-[#fffefb] py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-md transition-all"
+                  >
+                    <Send className="w-5 h-5" />
+                    <span>إرسال تفاصيل الحجز بالبريد</span>
+                  </a>
+                </div>
+
+                <button
+                  onClick={handleReset}
+                  className="text-xs text-[#73685d] hover:text-[#24211e] underline"
+                >
+                  إرسال طلب حجز آخر
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6 text-right">
+                
+                {/* Personal Information */}
+                <div className="space-y-4">
+                  <h4 className="font-arabic-editorial text-lg font-bold text-[#24211e] border-b border-[#e6e1d6] pb-2">
+                    البيانات الشخصية والاتصال
+                  </h4>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-[#403831] mb-1.5">
+                        رقم الهاتف الأساسي (Phone Number) *
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        id="booking-phone-input"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        placeholder="01012345678"
+                        className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] focus:bg-[#fffefb] outline-none text-sm text-[#24211e] transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-[#403831] mb-1.5">
+                        رقم الواتساب للتواصل وتأكيد الحجز (WhatsApp) *
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        id="booking-whatsapp-input"
+                        value={formData.whatsapp}
+                        onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                        placeholder="01012345678"
+                        className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] focus:bg-[#fffefb] outline-none text-sm text-[#24211e] transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-[#403831] mb-1.5">
+                        البريد الإلكتروني (Email Address) *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        id="booking-email-input"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="yourname@example.com"
+                        className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] focus:bg-[#fffefb] outline-none text-sm text-[#24211e]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-[#403831] mb-1.5">
+                        نوع الجلسة أو الباقة (Service Type) *
+                      </label>
+                      <select
+                        id="booking-service-select"
+                        required
+                        value={formData.serviceType}
+                        onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] focus:bg-[#fffefb] outline-none text-sm text-[#24211e]"
+                      >
+                        {categories.filter((c) => c.slug !== 'all' && c.active !== false).map((cat) => (
+                          <option key={cat.id} value={cat.slug}>
+                            {cat.nameAr} • {cat.nameEn}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Session Date & Timing */}
+                <div className="space-y-4 pt-2">
+                  <h4 className="font-arabic-editorial text-lg font-bold text-[#24211e] border-b border-[#e6e1d6] pb-2">
+                    تاريخ المناسبة والمكان (Event Details)
+                  </h4>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-[#403831] mb-1.5">
+                        تاريخ المناسبة المفضل (Event Date) *
+                      </label>
+                      <input
+                        type="date"
+                        required
+                        id="booking-date-input"
+                        value={formData.date}
+                        min={new Date().toISOString().split('T')[0]}
+                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] focus:bg-[#fffefb] outline-none text-sm text-[#24211e]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-[#403831] mb-1.5">
+                        التوقيت المفضل (Time Slot) *
+                      </label>
+                      <select
+                        required
+                        value={formData.timeSlot}
+                        onChange={(e) => setFormData({ ...formData, timeSlot: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-xs text-[#24211e]"
+                      >
+                        <option value="04:00 PM (Sunset Golden Hour)">ساعة الغروب الذهبية (04:00 م)</option>
+                        <option value="11:00 AM (Morning Natural Light)">الصباح والإضاءة الطبيعية (11:00 ص)</option>
+                        <option value="Full Wedding Day">يوم الزفاف كاملاً (Full Day)</option>
+                        <option value="Custom Flexible">توقيت مرن يتم تحديده لاحقاً</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-[#403831] mb-1.5">
+                        مكان ومحافظة الجلسة (Location) *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.location}
+                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                        placeholder="الإسكندرية، الفندق، القاعة، إلخ"
+                        className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-sm text-[#24211e]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tell us about your story */}
+                <div>
+                  <label className="block text-xs font-semibold text-[#403831] mb-1.5">
+                    أخبرونا عن حكايتكم وتفاصيل يومكم (Tell us about your story) *
+                  </label>
+                  <textarea
+                    rows={4}
+                    required
+                    id="booking-story-input"
+                    value={formData.storyNotes}
+                    onChange={(e) => setFormData({ ...formData, storyNotes: e.target.value })}
+                    placeholder="ما هي أكثر التفاصيل التي تتمنون توثيقها؟ هل هناك تفاصيل معينة تفضلونها، مثل فستان محتشم، زوايا معينة، أو حضور العائلة؟"
+                    className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] focus:bg-[#fffefb] outline-none text-sm text-[#24211e]"
+                  />
+                </div>
+
+                {/* Optional VIP CRM perks (Birthday and updates) */}
+                <div className="p-4 bg-[#e6e1d6]/40 rounded-2xl border border-[#e6e1d6] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#24211e] flex items-center gap-1">
+                      <Gift className="w-3.5 h-3.5 text-[#c6a585]" />
+                      <span>تنبيه المناسبات وأعياد الميلاد والهدايا الحصرية (اختياري)</span>
+                    </span>
+                    <span className="text-[10px] text-[#73685d]">خصومات وهدايا كاليستا</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] text-[#594f45] mb-1">
+                        تاريخ ميلادكم (Birthday)
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.birthday}
+                        onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
+                        className="w-full px-3 py-2 rounded-lg bg-[#fffefb] border border-[#e6e1d6] text-xs text-[#24211e] outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] text-[#594f45] mb-1">
+                        تاريخ ذكرى الزواج (Wedding Anniversary)
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.weddingAnniversary}
+                        onChange={(e) => setFormData({ ...formData, weddingAnniversary: e.target.value })}
+                        className="w-full px-3 py-2 rounded-lg bg-[#fffefb] border border-[#e6e1d6] text-xs text-[#24211e] outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <label className="flex items-center gap-2 text-xs text-[#524940] cursor-pointer pt-1">
+                    <input
+                      type="checkbox"
+                      checked={formData.subscribeUpdates}
+                      onChange={(e) => setFormData({ ...formData, subscribeUpdates: e.target.checked })}
+                      className="rounded accent-[#c6a585]"
+                    />
+                    <span>نود استلام تحديثات العروض الحصرية وجديد أعمال كاليستا</span>
+                  </label>
+                </div>
+
+                {/* Submit Action Button */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    id="submit-inquiry-btn"
+                    className="w-full bg-[#24211e] hover:bg-[#3d3833] text-[#fffefb] py-4 rounded-full text-base font-medium tracking-wide shadow-lg transition-all duration-300 flex items-center justify-center gap-2 active:scale-98"
+                  >
+                    <Send className="w-4 h-4 text-[#c6a585]" />
+                    <span>Send Inquiry • إرسال طلب الحجز</span>
+                  </button>
+                </div>
+
+              </form>
+            )}
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  );
+};

@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    --font-arabic-serif: 'Amiri', serif;
+    --font-arabic-sans: 'Alexandria', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* Exact user palette */
+    --color-offwhite: #fffefb;
+    --color-light-warm: #e6e1d6;
+    --color-gray-green: #afbb9c;
+    --color-gray-orange: #c6a585;
+    --color-dark: #24211e;
+  }
+
+  body {
+    font-family: var(--font-arabic-sans);
+    color: #24211e;
+    background-color: #fffefb;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif-luxury {
+    font-family: var(--font-serif);
+  }
+
+  .font-arabic-editorial {
+    font-family: var(--font-arabic-serif);
+  }
+
+  .font-sans-modern {
+    font-family: var(--font-arabic-sans);
+  }
+}
+
+/* Custom smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #fffefb;
+}
+::-webkit-scrollbar-thumb {
+  background: #e6e1d6;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c6a585;
+}
+
+/* Image zoom & hover fine-art subtle animations */
+.editorial-img-wrapper {
+  overflow: hidden;
+  position: relative;
+}
+
+.editorial-img {
+  transition: transform 0.9s cubic-bezier(0.25, 1, 0.5, 1), filter 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.editorial-img-wrapper:hover .editorial-img {
+  transform: scale(1.035);
+}
+
+/* Clean glass effect */
+.glass-panel {
+  background: rgba(255, 254, 251, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-dark {
+  background: rgba(36, 33, 30, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+

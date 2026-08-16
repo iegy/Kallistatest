@@ -57,7 +57,9 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
     match /kallista_clients/{clientId} {
-      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow create: if isAdmin() || (
+        signedIn() && request.resource.data.userId == request.auth.uid
+      );
       allow read: if isAdmin() || owns(resource.data.userId);
       allow update: if isAdmin() || (
         owns(resource.data.userId)

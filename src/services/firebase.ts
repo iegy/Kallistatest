@@ -3,14 +3,15 @@ import {
   Auth,
   GoogleAuthProvider,
   User,
+  browserLocalPersistence,
   createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
-  signInWithRedirect,
   signOut,
+  setPersistence,
   updateProfile,
 } from 'firebase/auth';
 import {
@@ -87,7 +88,7 @@ function authError(error: unknown): string {
   if (code === 'auth/email-already-in-use') return 'هذا البريد مسجل بالفعل.';
   if (code === 'auth/weak-password') return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.';
   if (code === 'auth/popup-closed-by-user') return 'تم إغلاق نافذة Google قبل إتمام الدخول.';
-  if (code === 'auth/popup-blocked') return 'المتصفح منع نافذة Google. سنستخدم صفحة تسجيل الدخول المباشرة بدلاً منها.';
+  if (code === 'auth/popup-blocked') return 'المتصفح منع نافذة Google. اسمح بالنوافذ المنبثقة لهذا الموقع ثم حاول مرة أخرى.';
   if (code === 'auth/cancelled-popup-request') return 'تم إلغاء محاولة الدخول السابقة. حاول مرة أخرى.';
   if (code === 'auth/unauthorized-domain') return 'دومين الموقع غير مضاف إلى Authorized domains في Firebase Authentication.';
   if (code === 'auth/operation-not-allowed') return 'تسجيل الدخول باستخدام Google غير مفعّل في Firebase Authentication.';
@@ -108,7 +109,9 @@ function requireDb(): Firestore {
 
 export async function loginWithFirebase(email: string, password: string) {
   try {
-    const credential = await signInWithEmailAndPassword(requireAuth(), email, password);
+    const auth = requireAuth();
+    await setPersistence(auth, browserLocalPersistence);
+    const credential = await signInWithEmailAndPassword(auth, email, password);
     return { success: true as const, user: credential.user };
   } catch (error) {
     return { success: false as const, error: authError(error) };
@@ -117,7 +120,9 @@ export async function loginWithFirebase(email: string, password: string) {
 
 export async function registerWithFirebase(email: string, password: string, name: string) {
   try {
-    const credential = await createUserWithEmailAndPassword(requireAuth(), email, password);
+    const auth = requireAuth();
+    await setPersistence(auth, browserLocalPersistence);
+    const credential = await createUserWithEmailAndPassword(auth, email, password);
     if (name.trim()) await updateProfile(credential.user, { displayName: name.trim() });
     await setDoc(doc(requireDb(), FIRESTORE_COLLECTIONS.PROFILES, credential.user.uid), {
       name: name.trim(),
@@ -133,13 +138,9 @@ export async function registerWithFirebase(email: string, password: string, name
 export async function loginWithGoogle() {
   try {
     const auth = requireAuth();
+    await setPersistence(auth, browserLocalPersistence);
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-    const useRedirect = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-    if (useRedirect) {
-      await signInWithRedirect(auth, provider);
-      return { success: true as const, redirected: true as const };
-    }
     const credential = await signInWithPopup(auth, provider);
     return { success: true as const, user: credential.user };
   } catch (error) {

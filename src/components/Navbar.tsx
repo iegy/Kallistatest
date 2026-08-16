@@ -72,10 +72,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="brand-logo-btn"
             onClick={() => handleItemClick('home')}
-            className="flex w-[150px] shrink-0 items-center gap-3 text-right transition-transform duration-300 active:scale-95 focus:outline-none sm:w-[220px] xl:w-[230px] 2xl:w-[270px]"
+            className="flex w-[150px] shrink-0 flex-col items-center justify-center text-right transition-transform duration-300 active:scale-95 focus:outline-none sm:w-[220px] xl:w-[230px] 2xl:w-[270px]"
             aria-label="Kallista Photography"
           >
             <KallistaLogo
+              className="w-full"
               size={isScrolled ? 'sm' : 'md'}
               customImageUrl={content.brand.logoType === 'image' ? content.brand.logoImageUrl : undefined}
               showSubtitle={true}
@@ -85,9 +86,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             {content.brand.showPalestinianBadge && (
               <span
                 title="فلسطين في القلب — هوية عربية أصيلة"
-                className="hidden md:inline-flex items-center gap-1 text-[11px] bg-[#f2ede4] text-[#423d38] px-2 py-0.5 rounded-full border border-[#ded5c7]"
+                aria-label="فلسطين في القلب"
+                dir="rtl"
+                className="mt-1.5 hidden w-full items-center justify-center gap-1.5 whitespace-nowrap text-[10px] font-medium leading-none text-[#5f554c] md:flex"
               >
-                🇵🇸 <span className="font-light">فلسطين في القلب</span>
+                <span aria-hidden="true" className="h-px w-4 bg-[#cdbfac]" />
+                <span aria-hidden="true" className="text-[12px] leading-none">🇵🇸</span>
+                <span className="tracking-[0.02em]">فلسطين في القلب</span>
+                <span aria-hidden="true" className="h-px w-4 bg-[#cdbfac]" />
               </span>
             )}
           </button>

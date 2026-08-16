@@ -236,6 +236,44 @@ export async function replaceCollection<T extends { id: string }>(collectionName
   await batch.commit();
 }
 
+export async function syncCollection<T extends { id: string }>(
+  collectionName: string,
+  previousValues: T[],
+  nextValues: T[],
+) {
+  const db = requireDb();
+  const previousById = new Map(previousValues.map((value) => [value.id, value]));
+  const nextById = new Map(nextValues.map((value) => [value.id, value]));
+  const operations: Array<
+    | { type: 'set'; value: T }
+    | { type: 'delete'; id: string }
+  > = [];
+
+  nextValues.forEach((value) => {
+    const previous = previousById.get(value.id);
+    if (!previous || JSON.stringify(clean(previous)) !== JSON.stringify(clean(value))) {
+      operations.push({ type: 'set', value });
+    }
+  });
+
+  previousValues.forEach((value) => {
+    if (!nextById.has(value.id)) operations.push({ type: 'delete', id: value.id });
+  });
+
+  // Keep every commit comfortably below Firestore's 500-write limit.
+  for (let index = 0; index < operations.length; index += 400) {
+    const batch = writeBatch(db);
+    operations.slice(index, index + 400).forEach((operation) => {
+      if (operation.type === 'delete') {
+        batch.delete(doc(db, collectionName, operation.id));
+      } else {
+        batch.set(doc(db, collectionName, operation.value.id), clean(operation.value));
+      }
+    });
+    await batch.commit();
+  }
+}
+
 export async function createBookingRecord(
   booking: Omit<Booking, 'id' | 'createdAt' | 'status'>,
   client?: Partial<ClientContact>

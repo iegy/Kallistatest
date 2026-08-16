@@ -40,16 +40,33 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     match /kallista_bookings/{bookingId} {
-      allow create: if signedIn()
-        && request.resource.data.userId == request.auth.uid
-        && request.resource.data.status == 'pending'
+      // Booking is open to guests — requiring an account lost real enquiries.
+      // Everything is validated and length-bounded instead, and a request may
+      // only carry a userId if it genuinely belongs to the signed-in client,
+      // so nobody can file a booking under someone else's account.
+      allow create: if
+        request.resource.data.status == 'pending'
         && request.resource.data.clientName is string
+        && request.resource.data.clientName.size() > 1
+        && request.resource.data.clientName.size() < 120
         && request.resource.data.phone is string
+        && request.resource.data.phone.size() > 6
+        && request.resource.data.phone.size() < 30
         && request.resource.data.serviceType is string
-        && request.resource.data.date is string;
-      allow read: if isAdmin() || owns(resource.data.userId);
+        && request.resource.data.serviceType.size() < 60
+        && request.resource.data.date is string
+        && request.resource.data.date.size() < 40
+        && (!('email' in request.resource.data) || request.resource.data.email.size() < 150)
+        && (!('whatsapp' in request.resource.data) || request.resource.data.whatsapp.size() < 30)
+        && (!('location' in request.resource.data) || request.resource.data.location.size() < 200)
+        && (!('governorate' in request.resource.data) || request.resource.data.governorate.size() < 60)
+        && (!('city' in request.resource.data) || request.resource.data.city.size() < 120)
+        && (!('storyNotes' in request.resource.data) || request.resource.data.storyNotes.size() < 2000)
+        && (!('budget' in request.resource.data) || request.resource.data.budget.size() < 120)
+        && (!('userId' in request.resource.data) || owns(request.resource.data.userId));
+      allow read: if isAdmin() || owns(resource.data.get('userId', ''));
       allow update: if isAdmin() || (
-        owns(resource.data.userId)
+        owns(resource.data.get('userId', ''))
         && resource.data.status == 'pending'
         && request.resource.data.status == 'cancelled'
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
@@ -57,12 +74,37 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
     match /kallista_clients/{clientId} {
-      allow create: if isAdmin() || (
-        signedIn() && request.resource.data.userId == request.auth.uid
-      );
-      allow read: if isAdmin() || owns(resource.data.userId);
+      // Contacts can be created by guests too — this is the list that powers
+      // birthday and seasonal-occasion greetings, so gating it behind an
+      // account would defeat its purpose. A guest record carries no userId
+      // (so only the admin can ever read it back) and is length-bounded.
+      allow create: if isAdmin()
+        || (signedIn() && request.resource.data.userId == request.auth.uid)
+        || (
+          !('userId' in request.resource.data)
+          && request.resource.data.name is string
+          && request.resource.data.name.size() > 1
+          && request.resource.data.name.size() < 120
+          && request.resource.data.phone is string
+          && request.resource.data.phone.size() > 6
+          && request.resource.data.phone.size() < 30
+          && request.resource.data.email is string
+          && request.resource.data.email.size() < 150
+          && request.resource.data.totalBookings is int
+          && (!('birthday' in request.resource.data) || request.resource.data.birthday.size() < 40)
+          && (!('governorate' in request.resource.data) || request.resource.data.governorate.size() < 60)
+          && (!('city' in request.resource.data) || request.resource.data.city.size() < 120)
+          && (!('notes' in request.resource.data) || request.resource.data.notes.size() < 1000)
+        );
+      // A signed-in client's own contact doc is keyed to their uid. Matching on
+      // the document id (not resource.data) lets them read it even before it
+      // exists — otherwise the existence check during their first booking is
+      // denied outright, because `resource` is null for a missing document.
+      allow read: if isAdmin()
+        || (signedIn() && clientId == request.auth.uid)
+        || owns(resource.data.get('userId', ''));
       allow update: if isAdmin() || (
-        owns(resource.data.userId)
+        owns(resource.data.get('userId', ''))
         && request.resource.data.userId == resource.data.userId
       );
       allow delete: if isAdmin();

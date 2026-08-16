@@ -402,6 +402,7 @@ export default function App() {
         onClose={() => setIsAdminOpen(false)}
         isAdminAuthenticated={isAdmin}
         registeredUsersCount={registeredUsers.length}
+        registeredUsers={registeredUsers}
         onRequestLogin={() => {
           setIsAdminOpen(false);
           setIsAccountOpen(true);

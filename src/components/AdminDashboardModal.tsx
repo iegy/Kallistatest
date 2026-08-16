@@ -16,11 +16,19 @@ import {
 } from '../services/storage';
 import { logoutFirebase } from '../services/firebase';
 
+interface RegisteredUserProfile {
+  id: string;
+  name?: string;
+  email?: string;
+  provider?: string;
+}
+
 interface AdminDashboardModalProps {
   isOpen: boolean;
   onClose: () => void;
   isAdminAuthenticated: boolean;
   registeredUsersCount: number;
+  registeredUsers: RegisteredUserProfile[];
   onRequestLogin: () => void;
   albums: Album[];
   categories: PortfolioCategory[];
@@ -43,6 +51,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   onClose,
   isAdminAuthenticated,
   registeredUsersCount,
+  registeredUsers,
   onRequestLogin,
   albums,
   categories,
@@ -61,7 +70,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 }) => {
   // Active Admin Tab (Firebase tab removed as requested, Firebase Auth is retained for login)
   const [activeTab, setActiveTab] = useState<
-    'content' | 'categories' | 'albums' | 'uploader' | 'bookings' | 'clients' | 'reviews' | 'settings'
+    'content' | 'categories' | 'albums' | 'uploader' | 'bookings' | 'users' | 'clients' | 'reviews' | 'settings'
   >('content');
 
   // Content Sub-section Tab
@@ -701,7 +710,25 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 </span>
               </button>
 
-              {/* 6. Clients CRM & Birthday Alerts */}
+              {/* 6. Registered users */}
+              <button
+                onClick={() => setActiveTab('users')}
+                className={`w-full text-right px-4 py-3 rounded-2xl text-xs sm:text-sm font-semibold flex items-center justify-between transition-all ${
+                  activeTab === 'users'
+                    ? 'bg-[#24211e] text-[#fffefb] shadow-md'
+                    : 'text-[#594f45] hover:bg-[#e6e1d6]/70'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <UserCheck className="w-4 h-4 text-[#c6a585]" />
+                  <span>المستخدمون المسجّلون</span>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#e6e1d6] text-[#24211e] font-serif">
+                  {registeredUsersCount}
+                </span>
+              </button>
+
+              {/* 7. Clients CRM & Birthday Alerts */}
               <button
                 onClick={() => setActiveTab('clients')}
                 className={`w-full text-right px-4 py-3 rounded-2xl text-xs sm:text-sm font-semibold flex items-center justify-between transition-all ${
@@ -721,7 +748,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 )}
               </button>
 
-              {/* 7. Reviews */}
+              {/* 8. Reviews */}
               <button
                 onClick={() => setActiveTab('reviews')}
                 className={`w-full text-right px-4 py-3 rounded-2xl text-xs sm:text-sm font-semibold flex items-center justify-between transition-all ${
@@ -737,7 +764,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 <span className="text-[10px] opacity-70 font-mono">{reviews.length}</span>
               </button>
 
-              {/* 8. Settings */}
+              {/* 9. Settings */}
               <button
                 onClick={() => setActiveTab('settings')}
                 className={`w-full text-right px-4 py-3 rounded-2xl text-xs sm:text-sm font-semibold flex items-center justify-between transition-all ${
@@ -2954,7 +2981,51 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 </div>
               )}
 
-              {/* TAB 6: CLIENT CRM & BIRTHDAY ALERTS */}
+              {/* TAB 6: REGISTERED USERS */}
+              {activeTab === 'users' && (
+                <div className="space-y-6 text-right">
+                  <div className="border-b border-[#e6e1d6] pb-4">
+                    <h3 className="font-arabic-editorial text-2xl font-bold text-[#24211e] flex items-center gap-2">
+                      <span>المستخدمون المسجّلون</span>
+                      <UserCheck className="w-5 h-5 text-[#c6a585]" />
+                    </h3>
+                    <p className="mt-1 text-xs text-[#73685d]">
+                      الأسماء والبريد الإلكتروني وطريقة التسجيل متاحة للمدير فقط. لا يعرض Firebase كلمات المرور مطلقًا.
+                    </p>
+                  </div>
+
+                  <div className="overflow-x-auto rounded-2xl border border-[#e6e1d6]">
+                    <table className="w-full min-w-[620px] text-sm">
+                      <thead className="bg-[#faf8f5] text-[#5a4f44]">
+                        <tr>
+                          <th className="p-3.5 text-right">الاسم</th>
+                          <th className="p-3.5 text-right">البريد الإلكتروني</th>
+                          <th className="p-3.5 text-right">طريقة التسجيل</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#eee8df]">
+                        {registeredUsers.length === 0 ? (
+                          <tr>
+                            <td colSpan={3} className="p-8 text-center text-[#8c7f73]">
+                              سيظهر المستخدمون هنا بعد تسجيل دخولهم إلى الموقع.
+                            </td>
+                          </tr>
+                        ) : registeredUsers.map((profile) => (
+                          <tr key={profile.id} className="hover:bg-[#faf8f5]/70">
+                            <td className="p-3.5 font-semibold text-[#302a25]">{profile.name || 'بدون اسم'}</td>
+                            <td className="p-3.5 text-[#6e6359]" dir="ltr">{profile.email || '—'}</td>
+                            <td className="p-3.5 text-[#6e6359]">
+                              {profile.provider === 'google.com' ? 'Google' : 'البريد الإلكتروني'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 7: CLIENT CRM & BIRTHDAY ALERTS */}
               {activeTab === 'clients' && (
                 <div className="space-y-6 text-right">
                   <div className="flex items-center justify-between border-b border-[#e6e1d6] pb-4">
@@ -3062,7 +3133,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 </div>
               )}
 
-              {/* TAB 7: REVIEWS */}
+              {/* TAB 8: REVIEWS */}
               {activeTab === 'reviews' && (
                 <div className="space-y-6 text-right">
                   <div className="border-b border-[#e6e1d6] pb-4">
@@ -3114,7 +3185,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 </div>
               )}
 
-              {/* TAB 8: SETTINGS & BACKUP */}
+              {/* TAB 9: SETTINGS & BACKUP */}
               {activeTab === 'settings' && (
                 <div className="space-y-6 text-right">
                   <div className="border-b border-[#e6e1d6] pb-4">

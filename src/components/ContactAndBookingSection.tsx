@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Send, Sparkles, CheckCircle2, Gift } from 'lucide-react';
 import { Booking, ClientContact, SiteSettings, SiteContent, PortfolioCategory } from '../types';
 import { createBookingInquiryWhatsAppLink } from '../services/storage';
+import { EGYPT_GOVERNORATES } from '../data/egyptGovernorates';
 import { useLanguage } from '../i18n';
 import { SocialPlatformIcon } from './SocialPlatformIcon';
 
@@ -32,6 +33,8 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
     date: '',
     timeSlot: '04:00 PM (Sunset Golden Hour)',
     location: t('الإسكندرية', 'Alexandria'),
+    governorate: '',
+    city: '',
     storyNotes: '',
     budget: '',
     birthday: '',
@@ -51,6 +54,8 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
       !formData.email.trim() ||
       !formData.date ||
       !formData.location.trim() ||
+      !formData.governorate ||
+      !formData.city.trim() ||
       !formData.storyNotes.trim()
     ) {
       alert(t('جميع الحقول المحددة بعلامة (*) إجبارية. يرجى استكمال كافة بيانات الحجز.', 'Please complete all required booking fields marked with (*).'));
@@ -66,6 +71,8 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
       date: formData.date,
       timeSlot: formData.timeSlot,
       location: formData.location,
+      governorate: formData.governorate,
+      city: formData.city,
       storyNotes: formData.storyNotes,
       budget: formData.budget,
     };
@@ -77,6 +84,8 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
       email: formData.email,
       birthday: formData.birthday,
       weddingAnniversary: formData.weddingAnniversary,
+      governorate: formData.governorate,
+      city: formData.city,
       subscribeUpdates: formData.subscribeUpdates,
       serviceInterests: [formData.serviceType as any],
     };
@@ -374,15 +383,50 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
 
                     <div>
                       <label className="block text-xs font-semibold text-[#403831] mb-1.5">
-                        {t('مكان ومحافظة الجلسة *', 'Location *')}
+                        {t('مكان الجلسة (الفندق/القاعة) *', 'Venue *')}
                       </label>
                       <input
                         type="text"
                         required
                         value={formData.location}
                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        placeholder={t('الإسكندرية، الفندق، القاعة، إلخ', 'Alexandria, hotel, venue, etc.')}
+                        placeholder={t('اسم الفندق أو القاعة أو المكان', 'Hotel, venue or place')}
                         className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-sm text-[#24211e]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-[#403831] mb-1.5">
+                        {t('المحافظة *', 'Governorate *')}
+                      </label>
+                      <select
+                        required
+                        id="booking-governorate-select"
+                        value={formData.governorate}
+                        onChange={(e) => setFormData({ ...formData, governorate: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] focus:bg-[#fffefb] outline-none text-sm text-[#24211e]"
+                      >
+                        <option value="" disabled>{t('اختاروا المحافظة', 'Select governorate')}</option>
+                        {EGYPT_GOVERNORATES.map((gov) => (
+                          <option key={gov.value} value={gov.value}>{language === 'ar' ? gov.ar : gov.en}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-[#403831] mb-1.5">
+                        {t('المركز أو المدينة *', 'City / Markaz *')}
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        id="booking-city-input"
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        placeholder={t('مثال: سموحة', 'e.g. Smouha')}
+                        className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] focus:bg-[#fffefb] outline-none text-sm text-[#24211e]"
                       />
                     </div>
                   </div>

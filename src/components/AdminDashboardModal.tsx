@@ -3,7 +3,7 @@ import {
   Lock, Key, Image as ImageIcon, Upload, Plus, Trash2, Edit3, CheckCircle2,
   Calendar, Users, Star, Settings, Download, RefreshCw, MessageCircle, AlertCircle,
   Sparkles, Gift, Eye, Filter, ArrowUpRight, Phone, Mail, Check, Layers, FileText,
-  Sliders, Shield, Database, Globe, HelpCircle, UserCheck, ArrowRight, Type
+  Sliders, Shield, Database, Globe, HelpCircle, UserCheck, ArrowRight, Type, Moon
 } from 'lucide-react';
 import {
   Album, Booking, ClientContact, Review, SiteSettings, PhotoItem,
@@ -12,8 +12,11 @@ import {
 import {
   uploadImageToImgBB, getUpcomingBirthdayAlerts, createBirthdayWhatsAppLink,
   createBookingInquiryWhatsAppLink,
+  getUpcomingOccasionAlerts, createOccasionWhatsAppLink,
+  buildClientsCsv, buildBookingsCsv, downloadCsv,
   ronadisaPhoto, veiledWeddingPhoto, veiledFashionPhoto, veiledFamilyPhoto
 } from '../services/storage';
+import { governorateLabel } from '../data/egyptGovernorates';
 import { logoutFirebase } from '../services/firebase';
 import { SOCIAL_PLATFORM_OPTIONS, SocialPlatformIcon, inferSocialPlatform } from './SocialPlatformIcon';
 import {
@@ -187,6 +190,10 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
   // Birthday Alerts calculation
   const birthdayAlerts = getUpcomingBirthdayAlerts(clients);
+  // Hijri dates move ~11 days a year, so scan far enough ahead that the next
+  // occasion is always visible rather than appearing only weeks beforehand.
+  const occasionAlerts = React.useMemo(() => getUpcomingOccasionAlerts(400), []);
+  const greetableClients = clients.filter((client) => client.whatsapp || client.phone);
 
   // Uploader Handlers
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -3205,13 +3212,27 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
               {/* TAB 5: BOOKINGS CRM */}
               {activeTab === 'bookings' && (
                 <div className="space-y-6 text-right">
-                  <div className="border-b border-[#e6e1d6] pb-4">
-                    <h3 className="font-arabic-editorial text-2xl font-bold text-[#24211e]">
-                      إدارة ومتابعة طلبات الحجز (Bookings CRM)
-                    </h3>
-                    <p className="text-xs text-[#73685d]">
-                      استعراض طلبات الحجز القادمة، تأكيد المواعيد، والتواصل الفوري عبر الواتساب
-                    </p>
+                  <div className="border-b border-[#e6e1d6] pb-4 flex items-start justify-between gap-4 flex-wrap">
+                    <div>
+                      <h3 className="font-arabic-editorial text-2xl font-bold text-[#24211e]">
+                        إدارة ومتابعة طلبات الحجز (Bookings CRM)
+                      </h3>
+                      <p className="text-xs text-[#73685d]">
+                        استعراض طلبات الحجز القادمة، تأكيد المواعيد، والتواصل الفوري عبر الواتساب
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => downloadCsv(
+                        `kallista-bookings-${new Date().toISOString().slice(0, 10)}.csv`,
+                        buildBookingsCsv(bookings, 'ar'),
+                      )}
+                      className="bg-[#738262] hover:bg-[#5f6c50] text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md shrink-0"
+                      title="تصدير كل الحجوزات كملف Excel/CSV"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>تصدير Excel</span>
+                    </button>
                   </div>
 
                   <div className="border border-[#e6e1d6] rounded-2xl overflow-hidden shadow-sm">
@@ -3353,14 +3374,66 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                       </p>
                     </div>
 
-                    <button
-                      onClick={() => setShowAddClient(true)}
-                      className="bg-[#24211e] hover:bg-[#3d3833] text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md"
-                    >
-                      <Plus className="w-4 h-4 text-[#c6a585]" />
-                      <span>إضافة عميل جديد</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => downloadCsv(
+                          `kallista-clients-${new Date().toISOString().slice(0, 10)}.csv`,
+                          buildClientsCsv(clients, 'ar'),
+                        )}
+                        className="bg-[#738262] hover:bg-[#5f6c50] text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md"
+                        title="تصدير كل بيانات العملاء كملف Excel/CSV"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>تصدير Excel</span>
+                      </button>
+
+                      <button
+                        onClick={() => setShowAddClient(true)}
+                        className="bg-[#24211e] hover:bg-[#3d3833] text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-md"
+                      >
+                        <Plus className="w-4 h-4 text-[#c6a585]" />
+                        <span>إضافة عميل جديد</span>
+                      </button>
+                    </div>
                   </div>
+
+                  {/* Islamic occasion reminders */}
+                  {occasionAlerts.length > 0 && (
+                    <div className="p-5 bg-[#afbb9c]/12 rounded-2xl border-2 border-[#afbb9c] space-y-3">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <span className="font-bold text-sm text-[#24211e] flex items-center gap-2">
+                          <Moon className="w-4 h-4 text-[#738262]" />
+                          <span>المناسبات الإسلامية القادمة</span>
+                        </span>
+                        <span className="text-[11px] text-[#5f6c50]">
+                          التواريخ تقريبية حسب تقويم أم القرى وقد تختلف يوماً حسب الرؤية
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        {occasionAlerts.slice(0, 4).map((occasion) => (
+                          <div key={occasion.key} className="p-3 bg-white rounded-xl border border-[#e6e1d6]">
+                            <span className="font-bold text-xs text-[#24211e] block mb-0.5">{occasion.titleAr}</span>
+                            <span className="text-[11px] text-[#738262] font-semibold block mb-2">
+                              {occasion.isToday ? 'اليوم! 🌙' : `بعد ${occasion.daysRemaining} يوماً (${occasion.formattedDate})`}
+                            </span>
+                            {occasion.daysRemaining <= 30 && greetableClients.length > 0 && (
+                              <a
+                                href={createOccasionWhatsAppLink(greetableClients[0], occasion)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#738262] hover:bg-[#5f6c50] text-white rounded-lg text-[11px] font-semibold"
+                                title="يفتح رسالة تهنئة جاهزة — كرروها مع باقي العملاء"
+                              >
+                                <MessageCircle className="w-3 h-3" />
+                                <span>رسالة تهنئة جاهزة</span>
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Upcoming Birthday Alerts Banner */}
                   {birthdayAlerts.length > 0 && (
@@ -3406,7 +3479,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                           <th className="p-3.5">اسم العميل</th>
                           <th className="p-3.5">الهاتف والواتساب</th>
                           <th className="p-3.5">تاريخ الميلاد</th>
-                          <th className="p-3.5">ذكرى الزواج</th>
+                          <th className="p-3.5">المحافظة والمدينة</th>
                           <th className="p-3.5">الاهتمامات</th>
                           <th className="p-3.5 text-center">إجراءات</th>
                         </tr>
@@ -3414,22 +3487,50 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                       <tbody className="divide-y divide-[#e6e1d6]/60">
                         {clients.map((c) => (
                           <tr key={c.id} className="hover:bg-[#FAF8F5]/50 transition-colors">
-                            <td className="p-3.5 font-bold text-[#24211e]">{c.name}</td>
+                            <td className="p-3.5 font-bold text-[#24211e]">
+                              {c.name}
+                              {c.source === 'stay-in-touch' && (
+                                <span className="ms-2 align-middle text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[#c6a585]/20 text-[#a5794f]">
+                                  تواصل
+                                </span>
+                              )}
+                            </td>
                             <td className="p-3.5 font-mono text-[#594f45]">{c.whatsapp || c.phone}</td>
                             <td className="p-3.5 font-mono text-[#738262]">{c.birthday || '—'}</td>
-                            <td className="p-3.5 font-mono text-[#c6a585]">{c.weddingAnniversary || '—'}</td>
+                            <td className="p-3.5 text-[#594f45]">
+                              {c.governorate ? governorateLabel(c.governorate, 'ar') : '—'}
+                              {c.city ? <span className="block text-[11px] text-[#8a8075]">{c.city}</span> : null}
+                            </td>
                             <td className="p-3.5 text-[#594f45]">{c.serviceInterests?.join(', ') || 'weddings'}</td>
                             <td className="p-3.5 text-center">
                               <div className="flex items-center justify-center gap-2">
                                 <a
-                                  href={`https://wa.me/${(c.whatsapp || c.phone).replace(/[^0-9+]/g, '')}`}
+                                  href={`https://wa.me/${(c.whatsapp || c.phone || '').replace(/[^0-9+]/g, '')}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="p-1.5 bg-[#738262]/20 text-[#495b3a] rounded-lg"
-                                  title="مراسلة"
+                                  className="p-1.5 bg-[#738262]/20 text-[#495b3a] rounded-lg hover:bg-[#738262]/35 transition-colors"
+                                  title="مراسلة واتساب"
                                 >
                                   <MessageCircle className="w-4 h-4" />
                                 </a>
+                                {(c.phone || c.whatsapp) && (
+                                  <a
+                                    href={`tel:${(c.phone || c.whatsapp || '').replace(/[^0-9+]/g, '')}`}
+                                    className="p-1.5 bg-[#c6a585]/20 text-[#a5794f] rounded-lg hover:bg-[#c6a585]/35 transition-colors"
+                                    title="اتصال مباشر"
+                                  >
+                                    <Phone className="w-4 h-4" />
+                                  </a>
+                                )}
+                                {c.email && (
+                                  <a
+                                    href={`mailto:${c.email}`}
+                                    className="p-1.5 bg-[#e6e1d6] text-[#5e4f40] rounded-lg hover:bg-[#d8cfc4] transition-colors"
+                                    title="إرسال بريد إلكتروني"
+                                  >
+                                    <Mail className="w-4 h-4" />
+                                  </a>
+                                )}
                                 <button
                                   onClick={() => handleDeleteClient(c.id)}
                                   className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"

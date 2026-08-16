@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Calendar, Sparkles, Send, CheckCircle2 } from 'lucide-react';
 import { Booking, ClientContact, SiteSettings } from '../types';
 import { createBookingInquiryWhatsAppLink } from '../services/storage';
+import { EGYPT_GOVERNORATES } from '../data/egyptGovernorates';
 import { useLanguage } from '../i18n';
 
 interface BookingModalProps {
@@ -19,7 +20,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   preselectedService,
   onSaveBooking,
 }) => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const [formData, setFormData] = useState({
     clientName: '',
     phone: '',
@@ -29,6 +30,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     date: '',
     timeSlot: '04:00 PM (Golden Hour)',
     location: t('الإسكندرية', 'Alexandria'),
+    governorate: '',
+    city: '',
     storyNotes: '',
     birthday: '',
   });
@@ -47,6 +50,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       !formData.email.trim() ||
       !formData.date ||
       !formData.location.trim() ||
+      !formData.governorate ||
+      !formData.city.trim() ||
       !formData.storyNotes.trim()
     ) {
       alert(t('يرجى استكمال جميع بيانات الحجز المطلوبة.', 'Please complete all required booking details.'));
@@ -62,6 +67,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       date: formData.date,
       timeSlot: formData.timeSlot,
       location: formData.location,
+      governorate: formData.governorate,
+      city: formData.city,
       storyNotes: formData.storyNotes,
     };
 
@@ -71,6 +78,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       whatsapp: formData.whatsapp,
       email: formData.email,
       birthday: formData.birthday,
+      governorate: formData.governorate,
+      city: formData.city,
       serviceInterests: [formData.serviceType as any],
     });
 
@@ -239,14 +248,47 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-[#403831] mb-1">
-                  {t('المكان والمحافظة *', 'Location *')}
+                  {t('مكان الجلسة *', 'Venue *')}
                 </label>
                 <input
                   type="text"
                   required
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  placeholder={t('الإسكندرية، الفندق، إلخ', 'Alexandria, hotel, venue, etc.')}
+                  placeholder={t('الفندق أو القاعة أو المكان', 'Hotel, venue or place')}
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#e6e1d6]/40 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-xs text-[#24211e]"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-[#403831] mb-1">
+                  {t('المحافظة *', 'Governorate *')}
+                </label>
+                <select
+                  required
+                  value={formData.governorate}
+                  onChange={(e) => setFormData({ ...formData, governorate: e.target.value })}
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#e6e1d6]/40 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-xs text-[#24211e]"
+                >
+                  <option value="" disabled>{t('اختاروا المحافظة', 'Select governorate')}</option>
+                  {EGYPT_GOVERNORATES.map((gov) => (
+                    <option key={gov.value} value={gov.value}>{language === 'ar' ? gov.ar : gov.en}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#403831] mb-1">
+                  {t('المركز أو المدينة *', 'City / Markaz *')}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  placeholder={t('مثال: سموحة', 'e.g. Smouha')}
                   className="w-full px-3 py-2.5 rounded-xl bg-[#e6e1d6]/40 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-xs text-[#24211e]"
                 />
               </div>

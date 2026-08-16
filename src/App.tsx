@@ -11,6 +11,13 @@ import {
   getPortfolioCategories,
   getSiteContent,
   getUpcomingBirthdayAlerts,
+  saveAlbums,
+  saveBookings,
+  saveClients,
+  savePortfolioCategories,
+  saveReviews,
+  saveSettings,
+  saveSiteContent,
 } from './services/storage';
 import {
   FIRESTORE_COLLECTIONS,
@@ -18,10 +25,10 @@ import {
   createReviewRecord,
   isFirebaseAdmin,
   logoutFirebase,
-  replaceCollection,
   saveDocument,
   seedDefaults,
   subscribeToFirebaseAuthState,
+  syncCollection,
   syncUserProfile,
   watchCollection,
   watchDocument,
@@ -116,24 +123,60 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribers = [
-      watchDocument<SiteContent>(FIRESTORE_COLLECTIONS.CONTENT, 'main', (value) => value && setContent(value)),
-      watchDocument<SiteSettings>(FIRESTORE_COLLECTIONS.SETTINGS, 'public', (value) => value && setSettings(value)),
-      watchCollection<PortfolioCategory>(FIRESTORE_COLLECTIONS.CATEGORIES, (values) => values.length && setCategories(values), where('active', '==', true)),
-      watchCollection<Album>(FIRESTORE_COLLECTIONS.ALBUMS, (values) => values.length && setAlbums(values), where('published', '==', true)),
-      watchCollection<Review>(FIRESTORE_COLLECTIONS.REVIEWS, setReviews, where('approved', '==', true)),
+      watchDocument<SiteContent>(FIRESTORE_COLLECTIONS.CONTENT, 'main', (value) => {
+        if (!value) return;
+        setContent(value);
+        saveSiteContent(value);
+      }),
+      watchDocument<SiteSettings>(FIRESTORE_COLLECTIONS.SETTINGS, 'public', (value) => {
+        if (!value) return;
+        setSettings(value);
+        saveSettings(value);
+      }),
     ];
+    if (!isAdmin) {
+      unsubscribers.push(
+        watchCollection<PortfolioCategory>(FIRESTORE_COLLECTIONS.CATEGORIES, (values) => {
+          setCategories(values);
+          savePortfolioCategories(values);
+        }, where('active', '==', true)),
+        watchCollection<Album>(FIRESTORE_COLLECTIONS.ALBUMS, (values) => {
+          setAlbums(values);
+          saveAlbums(values);
+        }, where('published', '==', true)),
+        watchCollection<Review>(FIRESTORE_COLLECTIONS.REVIEWS, (values) => {
+          setReviews(values);
+          saveReviews(values);
+        }, where('approved', '==', true)),
+      );
+    }
     return () => unsubscribers.forEach((unsubscribe) => unsubscribe());
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
     if (!isAdmin) return;
     void seedDefaults({ content, settings, categories, albums });
     const unsubscribers = [
-      watchCollection<PortfolioCategory>(FIRESTORE_COLLECTIONS.CATEGORIES, setCategories),
-      watchCollection<Album>(FIRESTORE_COLLECTIONS.ALBUMS, setAlbums),
-      watchCollection<Booking>(FIRESTORE_COLLECTIONS.BOOKINGS, setBookings),
-      watchCollection<ClientContact>(FIRESTORE_COLLECTIONS.CLIENTS, setClients),
-      watchCollection<Review>(FIRESTORE_COLLECTIONS.REVIEWS, setReviews),
+      watchCollection<PortfolioCategory>(FIRESTORE_COLLECTIONS.CATEGORIES, (values) => {
+        setCategories(values);
+        savePortfolioCategories(values);
+      }),
+      watchCollection<Album>(FIRESTORE_COLLECTIONS.ALBUMS, (values) => {
+        setAlbums(values);
+        saveAlbums(values);
+      }),
+      watchCollection<Booking>(FIRESTORE_COLLECTIONS.BOOKINGS, (values) => {
+        setBookings(values);
+        saveBookings(values);
+      }),
+      watchCollection<ClientContact>(FIRESTORE_COLLECTIONS.CLIENTS, (values) => {
+        setClients(values);
+        saveClients(values);
+      }),
+      watchCollection<Review>(FIRESTORE_COLLECTIONS.REVIEWS, (values) => {
+        setReviews(values);
+        saveReviews(values);
+      }),
       watchCollection<UserProfileRecord>(FIRESTORE_COLLECTIONS.PROFILES, setRegisteredUsers),
     ];
     return () => unsubscribers.forEach((unsubscribe) => unsubscribe());
@@ -149,39 +192,85 @@ export default function App() {
     alert(`تعذر حفظ التغيير في Firebase${code ? ` (${code})` : ''}. حاول مرة أخرى.`);
   };
 
-  const handleUpdateCategories = (newCategories: PortfolioCategory[]) => {
-    setCategories(newCategories);
-    void replaceCollection(FIRESTORE_COLLECTIONS.CATEGORIES, newCategories).catch(reportSaveError);
+  const commitSave = async (operation: () => Promise<void>, onSuccess: () => void) => {
+    try {
+      await operation();
+      onSuccess();
+    } catch (error) {
+      reportSaveError(error);
+      throw error;
+    }
   };
 
-  const handleUpdateContent = (newContent: SiteContent) => {
-    setContent(newContent);
-    void saveDocument(FIRESTORE_COLLECTIONS.CONTENT, 'main', newContent).catch(reportSaveError);
+  const handleUpdateCategories = async (newCategories: PortfolioCategory[]) => {
+    await commitSave(
+      () => syncCollection(FIRESTORE_COLLECTIONS.CATEGORIES, categories, newCategories),
+      () => {
+        setCategories(newCategories);
+        savePortfolioCategories(newCategories);
+      },
+    );
   };
 
-  const handleUpdateAlbums = (newAlbums: Album[]) => {
-    setAlbums(newAlbums);
-    void replaceCollection(FIRESTORE_COLLECTIONS.ALBUMS, newAlbums.map((album) => ({ ...album, published: album.published ?? true }))).catch(reportSaveError);
+  const handleUpdateContent = async (newContent: SiteContent) => {
+    await commitSave(
+      () => saveDocument(FIRESTORE_COLLECTIONS.CONTENT, 'main', newContent),
+      () => {
+        setContent(newContent);
+        saveSiteContent(newContent);
+      },
+    );
   };
 
-  const handleUpdateBookings = (newBookings: Booking[]) => {
-    setBookings(newBookings);
-    void replaceCollection(FIRESTORE_COLLECTIONS.BOOKINGS, newBookings).catch(reportSaveError);
+  const handleUpdateAlbums = async (newAlbums: Album[]) => {
+    const normalizedAlbums = newAlbums.map((album) => ({ ...album, published: album.published ?? true }));
+    await commitSave(
+      () => syncCollection(FIRESTORE_COLLECTIONS.ALBUMS, albums, normalizedAlbums),
+      () => {
+        setAlbums(normalizedAlbums);
+        saveAlbums(normalizedAlbums);
+      },
+    );
   };
 
-  const handleUpdateClients = (newClients: ClientContact[]) => {
-    setClients(newClients);
-    void replaceCollection(FIRESTORE_COLLECTIONS.CLIENTS, newClients).catch(reportSaveError);
+  const handleUpdateBookings = async (newBookings: Booking[]) => {
+    await commitSave(
+      () => syncCollection(FIRESTORE_COLLECTIONS.BOOKINGS, bookings, newBookings),
+      () => {
+        setBookings(newBookings);
+        saveBookings(newBookings);
+      },
+    );
   };
 
-  const handleUpdateReviews = (newReviews: Review[]) => {
-    setReviews(newReviews);
-    void replaceCollection(FIRESTORE_COLLECTIONS.REVIEWS, newReviews).catch(reportSaveError);
+  const handleUpdateClients = async (newClients: ClientContact[]) => {
+    await commitSave(
+      () => syncCollection(FIRESTORE_COLLECTIONS.CLIENTS, clients, newClients),
+      () => {
+        setClients(newClients);
+        saveClients(newClients);
+      },
+    );
   };
 
-  const handleUpdateSettings = (newSettings: SiteSettings) => {
-    setSettings(newSettings);
-    void saveDocument(FIRESTORE_COLLECTIONS.SETTINGS, 'public', newSettings).catch(reportSaveError);
+  const handleUpdateReviews = async (newReviews: Review[]) => {
+    await commitSave(
+      () => syncCollection(FIRESTORE_COLLECTIONS.REVIEWS, reviews, newReviews),
+      () => {
+        setReviews(newReviews);
+        saveReviews(newReviews);
+      },
+    );
+  };
+
+  const handleUpdateSettings = async (newSettings: SiteSettings) => {
+    await commitSave(
+      () => saveDocument(FIRESTORE_COLLECTIONS.SETTINGS, 'public', newSettings),
+      () => {
+        setSettings(newSettings);
+        saveSettings(newSettings);
+      },
+    );
   };
 
   // Add new Booking
@@ -457,6 +546,7 @@ export default function App() {
         isAdminAuthenticated={isAdmin}
         registeredUsersCount={registeredUsers.length}
         registeredUsers={registeredUsers}
+        currentUserId={user?.uid}
         onRequestLogin={() => {
           setIsAdminOpen(false);
           setIsAccountOpen(true);

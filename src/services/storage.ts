@@ -523,26 +523,30 @@ export function savePortfolioCategories(categories: PortfolioCategory[]): void {
   }
 }
 
+export function mergeSiteContent(value?: Partial<SiteContent> | null): SiteContent {
+  const source = value || {};
+  return {
+    ...DEFAULT_SITE_CONTENT,
+    ...source,
+    brand: { ...DEFAULT_SITE_CONTENT.brand, ...(source.brand || {}) },
+    hero: { ...DEFAULT_SITE_CONTENT.hero, ...(source.hero || {}) },
+    intro: { ...DEFAULT_SITE_CONTENT.intro, ...(source.intro || {}) },
+    servicesSettings: { ...DEFAULT_SITE_CONTENT.servicesSettings, ...(source.servicesSettings || {}) },
+    approach: { ...DEFAULT_SITE_CONTENT.approach, ...(source.approach || {}) },
+    signature: { ...DEFAULT_SITE_CONTENT.signature, ...(source.signature || {}) },
+    aboutKallista: { ...DEFAULT_SITE_CONTENT.aboutKallista, ...(source.aboutKallista || {}) },
+    aboutRonadisa: { ...DEFAULT_SITE_CONTENT.aboutRonadisa, ...(source.aboutRonadisa || {}) },
+    experience: { ...DEFAULT_SITE_CONTENT.experience, ...(source.experience || {}) },
+    contact: { ...DEFAULT_SITE_CONTENT.contact, ...(source.contact || {}) },
+    footer: { ...DEFAULT_SITE_CONTENT.footer, ...(source.footer || {}) },
+  };
+}
+
 export function getSiteContent(): SiteContent {
   try {
     const item = localStorage.getItem(STORAGE_KEYS.CONTENT);
     if (!item) return DEFAULT_SITE_CONTENT;
-    const parsed = JSON.parse(item);
-    return {
-      ...DEFAULT_SITE_CONTENT,
-      ...parsed,
-      brand: { ...DEFAULT_SITE_CONTENT.brand, ...(parsed.brand || {}) },
-      hero: { ...DEFAULT_SITE_CONTENT.hero, ...(parsed.hero || {}) },
-      intro: { ...DEFAULT_SITE_CONTENT.intro, ...(parsed.intro || {}) },
-      servicesSettings: { ...DEFAULT_SITE_CONTENT.servicesSettings, ...(parsed.servicesSettings || {}) },
-      approach: { ...DEFAULT_SITE_CONTENT.approach, ...(parsed.approach || {}) },
-      signature: { ...DEFAULT_SITE_CONTENT.signature, ...(parsed.signature || {}) },
-      aboutKallista: { ...DEFAULT_SITE_CONTENT.aboutKallista, ...(parsed.aboutKallista || {}) },
-      aboutRonadisa: { ...DEFAULT_SITE_CONTENT.aboutRonadisa, ...(parsed.aboutRonadisa || {}) },
-      experience: { ...DEFAULT_SITE_CONTENT.experience, ...(parsed.experience || {}) },
-      contact: { ...DEFAULT_SITE_CONTENT.contact, ...(parsed.contact || {}) },
-      footer: { ...DEFAULT_SITE_CONTENT.footer, ...(parsed.footer || {}) },
-    };
+    return mergeSiteContent(JSON.parse(item));
   } catch {
     return DEFAULT_SITE_CONTENT;
   }

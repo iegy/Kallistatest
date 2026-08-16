@@ -219,7 +219,11 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         }
         return alb;
       });
-      onUpdateAlbums(updated);
+      try {
+        await onUpdateAlbums(updated);
+      } catch {
+        return;
+      }
       alert(`تم رفع وإضافة ${newItems.length} صورة إلى الألبوم المحدد بنجاح!`);
     }
   };
@@ -2380,7 +2384,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                         <label className="block text-xs font-semibold text-[#594f45] mb-1">حقوق التصميم والتطوير (Developer Credit)</label>
                         <input
                           type="text"
-                          value={editableContent.footer.developerCredit || 'Designed & Developed by Mohammed Hussein · iegy.net ©'}
+                          value={editableContent.footer.developerCredit ?? ''}
                           onChange={(e) => setEditableContent({
                             ...editableContent,
                             footer: { ...editableContent.footer, developerCredit: e.target.value }
@@ -2391,7 +2395,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-[#594f45] mb-1">الوصف القانوني والخصوصية</label>
+                        <label className="block text-xs font-semibold text-[#594f45] mb-1">الوصف التعريفي أسفل لوجو الفوتر</label>
                         <textarea
                           rows={2}
                           value={editableContent.footer.disclaimerText}
@@ -2402,6 +2406,29 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                           className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e]"
                         />
                       </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-[#594f45] mb-1">تنبيه الخصوصية أسفل وصف الفوتر</label>
+                        <textarea
+                          rows={2}
+                          value={editableContent.footer.privacyNotice}
+                          onChange={(e) => setEditableContent({
+                            ...editableContent,
+                            footer: { ...editableContent.footer, privacyNotice: e.target.value }
+                          })}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e]"
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleSaveSiteContent}
+                        disabled={isSavingContent}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#24211e] px-5 py-3 text-xs font-semibold text-[#fffefb] shadow-md transition-colors hover:bg-[#3d3833] disabled:cursor-wait disabled:opacity-60"
+                      >
+                        {isSavingContent ? <RefreshCw className="h-4 w-4 animate-spin text-[#c6a585]" /> : <Check className="h-4 w-4 text-[#c6a585]" />}
+                        <span>{isSavingContent ? 'جاري حفظ الفوتر في Firebase...' : 'حفظ نصوص الفوتر في Firebase'}</span>
+                      </button>
                     </div>
                   )}
 

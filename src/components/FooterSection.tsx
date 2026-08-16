@@ -82,7 +82,14 @@ export const FooterSection: React.FC<FooterSectionProps> = ({
             </div>
             
             {language === 'en' && <p className="mx-auto max-w-sm pt-2 font-serif text-sm italic text-[#e6e1d6]/80">{brand.taglineEn}</p>}
-            <p className="mx-auto max-w-sm font-arabic-editorial text-xs leading-relaxed text-[#afbb9c]">{brand.taglineAr}</p>
+            <p className="mx-auto max-w-sm font-arabic-editorial text-xs leading-relaxed text-[#afbb9c]">
+              {footer.disclaimerText || brand.taglineAr}
+            </p>
+            {footer.privacyNotice && (
+              <p className="mx-auto max-w-sm text-[10px] leading-relaxed text-[#e6e1d6]/55">
+                {footer.privacyNotice}
+              </p>
+            )}
           </div>
 
           {/* Navigation Links */}
@@ -182,16 +189,14 @@ export const FooterSection: React.FC<FooterSectionProps> = ({
               {footer.copyrightText || '© 2026 KALLISTA by Ronadisa. All rights reserved.'}
             </p>
             <p className="font-serif text-[11px] text-[#c6a585]/90">
-              Designed & Developed by{' '}
               <a
                 href="https://iegy.net"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#c6a585] hover:text-[#fffefb] underline underline-offset-2 transition-colors font-medium"
               >
-                Mohammed Hussein · iegy.net
-              </a>{' '}
-              ©
+                {footer.developerCredit || 'Designed & Developed by Mohammed Hussein · iegy.net ©'}
+              </a>
             </p>
           </div>
 

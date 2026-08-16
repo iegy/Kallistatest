@@ -94,6 +94,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   firebaseMessagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
   firebaseAppId: import.meta.env.VITE_FIREBASE_APP_ID || '',
   currency: 'EGP',
+  bodyFontKey: 'alexandria',
+  headingFontKey: 'amiri',
 };
 
 // --- 3. DEFAULT SITE CONTENT (Every single section is editable) ---
@@ -628,10 +630,19 @@ export function saveReviews(reviews: Review[]): void {
   }
 }
 
+export function mergeSettings(value?: Partial<SiteSettings> | null): SiteSettings {
+  return {
+    ...DEFAULT_SETTINGS,
+    ...(value || {}),
+    bodyFontKey: value?.bodyFontKey || DEFAULT_SETTINGS.bodyFontKey,
+    headingFontKey: value?.headingFontKey || DEFAULT_SETTINGS.headingFontKey,
+  };
+}
+
 export function getSettings(): SiteSettings {
   try {
     const item = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-    return item ? JSON.parse(item) : DEFAULT_SETTINGS;
+    return item ? mergeSettings(JSON.parse(item)) : DEFAULT_SETTINGS;
   } catch {
     return DEFAULT_SETTINGS;
   }

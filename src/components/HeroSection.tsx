@@ -15,7 +15,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ content, onExplore, on
   return (
     <section
       id="home"
-      className="relative min-h-[92vh] flex items-center justify-center bg-[#fffefb] overflow-hidden pt-16 pb-20"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#fffefb] pb-20 pt-28 sm:pt-32 xl:pt-36"
     >
       {/* Background Decorative Ambient Circles */}
       <div className="absolute top-1/4 -right-24 w-96 h-96 bg-[#e6e1d6]/50 rounded-full blur-3xl pointer-events-none -z-0" />
@@ -28,9 +28,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ content, onExplore, on
           <div className="lg:col-span-7 text-right space-y-8">
             
             {/* Header Brand Tag */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#e6e1d6]/60 border border-[#c6a585]/40 text-[#24211e]">
+            <div className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-[#c6a585]/40 bg-[#e6e1d6]/60 px-4 py-2 text-[#24211e]">
               <Sparkles className="w-4 h-4 text-[#c6a585]" />
-              <span className="text-xs font-serif tracking-[0.2em] uppercase font-semibold">
+              <span className="text-center font-serif text-[10px] font-semibold uppercase leading-relaxed tracking-[0.12em] sm:text-xs sm:tracking-[0.2em]">
                 {brand.studioName} • {hero.preTitle || 'Fine Art Photography'}
               </span>
             </div>

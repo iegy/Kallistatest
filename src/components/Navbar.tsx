@@ -61,16 +61,16 @@ export const Navbar: React.FC<NavbarProps> = ({
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
         isScrolled
           ? 'glass-panel border-b border-[#EAE3DA]/80 py-3 shadow-[0_4px_24px_rgba(26,23,21,0.04)] bg-[#fffefb]/95 backdrop-blur-md'
-          : 'bg-transparent py-4 sm:py-5'
+          : 'border-b border-[#EAE3DA]/60 bg-[#fffefb]/96 py-3 backdrop-blur-md sm:py-4 xl:border-transparent xl:bg-transparent xl:py-5 xl:backdrop-blur-none'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
+      <div className="mx-auto max-w-[1536px] px-4 sm:px-6 xl:px-8">
+        <div className="flex items-center justify-between gap-3">
           {/* Brand Official KALLISTA Logo */}
           <button
             id="brand-logo-btn"
             onClick={() => handleItemClick('home')}
-            className="flex items-center gap-3 focus:outline-none transition-transform duration-300 active:scale-95 text-right"
+            className="flex w-[150px] shrink-0 items-center gap-3 text-right transition-transform duration-300 active:scale-95 focus:outline-none sm:w-[220px] xl:w-[230px] 2xl:w-[270px]"
             aria-label="Kallista Photography"
           >
             <KallistaLogo
@@ -78,6 +78,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               customImageUrl={content.brand.logoType === 'image' ? content.brand.logoImageUrl : undefined}
               showSubtitle={true}
               subtitleText={`BY ${content.brand.founderName || 'RONADISA'}`}
+              subtitleClassName="hidden xl:block"
             />
             {content.brand.showPalestinianBadge && (
               <span
@@ -90,7 +91,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-3 xl:flex 2xl:gap-6">
             {defaultNavItems.map((item) => {
               const isActive = activeSection === item.id;
               return (
@@ -98,7 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   key={item.id}
                   id={`nav-link-${item.id}`}
                   onClick={() => handleItemClick(item.id)}
-                  className={`text-sm tracking-wide transition-all duration-300 relative py-1 focus:outline-none font-medium ${
+                  className={`relative whitespace-nowrap py-1 text-xs font-medium tracking-wide transition-all duration-300 focus:outline-none 2xl:text-sm ${
                     isActive
                       ? 'text-[#1A1715] font-semibold'
                       : 'text-[#6C635B] hover:text-[#1A1715]'
@@ -114,14 +115,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {/* CTA & Admin Control actions */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden shrink-0 items-center gap-1 xl:flex 2xl:gap-2">
             <button
               onClick={onOpenAccount}
-              className="flex items-center gap-1.5 rounded-full px-3 py-2 text-xs text-[#6c635b] hover:bg-[#efe9e0]/70 hover:text-[#1a1715]"
+              className="flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-2 text-xs text-[#6c635b] hover:bg-[#efe9e0]/70 hover:text-[#1a1715]"
               title={userLabel ? 'عرض وإدارة الحساب' : 'تسجيل الدخول أو إنشاء حساب'}
             >
               <UserRound className="h-4 w-4" />
-              <span className="hidden xl:inline">{userLabel || 'حسابي'}</span>
+              <span className="hidden 2xl:inline">حسابي</span>
             </button>
             {/* Admin Dashboard Access */}
             <button
@@ -146,15 +147,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="header-inquire-btn"
               onClick={onOpenBooking}
-              className="bg-[#1A1715] text-[#FAF8F5] px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-medium tracking-wider hover:bg-[#38312B] active:scale-98 transition-all duration-300 shadow-[0_2px_12px_rgba(26,23,21,0.12)] flex items-center gap-2"
+              className="flex items-center gap-2 whitespace-nowrap rounded-full bg-[#1A1715] px-4 py-2.5 text-xs font-medium tracking-wide text-[#FAF8F5] shadow-[0_2px_12px_rgba(26,23,21,0.12)] transition-all duration-300 hover:bg-[#38312B] active:scale-98 2xl:px-5 2xl:text-sm"
             >
               <Calendar className="w-3.5 h-3.5 text-[#D4A373]" />
-              <span>احجزوا موعدكم</span>
+              <span className="2xl:hidden">احجز الآن</span>
+              <span className="hidden 2xl:inline">احجزوا موعدكم</span>
             </button>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex lg:hidden items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2 xl:hidden">
             <button
               onClick={onOpenAccount}
               className="p-2 text-[#7C7167] hover:text-[#1A1715] focus:outline-none"
@@ -192,17 +194,18 @@ export const Navbar: React.FC<NavbarProps> = ({
       {mobileMenuOpen && (
         <div
           id="mobile-drawer"
-          className="lg:hidden fixed inset-x-0 top-[65px] bg-[#FAF8F5]/98 backdrop-blur-xl border-b border-[#E8E1D7] px-6 py-6 shadow-2xl transition-all duration-300 animate-in fade-in slide-in-from-top-4 max-h-[85vh] overflow-y-auto"
+          className="absolute inset-x-0 top-full max-h-[calc(100vh-76px)] overflow-y-auto border-b border-[#E8E1D7] bg-[#FAF8F5]/98 px-4 py-5 shadow-2xl backdrop-blur-xl transition-all duration-300 animate-in fade-in slide-in-from-top-4 sm:px-8 xl:hidden"
         >
-          <div className="flex flex-col gap-3">
-            {defaultNavItems.map((item) => {
+          <div className="mx-auto max-w-5xl">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {defaultNavItems.map((item) => {
               const isActive = activeSection === item.id;
               return (
                 <button
                   key={item.id}
                   id={`mobile-nav-${item.id}`}
                   onClick={() => handleItemClick(item.id)}
-                  className={`text-right py-2.5 px-3 rounded-lg text-base transition-colors flex items-center justify-between ${
+                  className={`flex items-center justify-between rounded-xl px-4 py-3 text-right text-sm transition-colors ${
                     isActive
                       ? 'bg-[#EAE3DA]/70 font-semibold text-[#1A1715]'
                       : 'text-[#5C534C] hover:bg-[#EFE9E0]/40'
@@ -214,9 +217,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span>{item.labelAr}</span>
                 </button>
               );
-            })}
+              })}
+            </div>
 
-            <div className="pt-4 border-t border-[#EAE3DA] flex flex-col gap-2">
+            <div className="mt-4 flex flex-col gap-2 border-t border-[#EAE3DA] pt-4">
               <button
                 id="mobile-drawer-inquire-btn"
                 onClick={() => {

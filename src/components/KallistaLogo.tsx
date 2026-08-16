@@ -7,6 +7,7 @@ interface KallistaLogoProps {
   customImageUrl?: string;
   showSubtitle?: boolean;
   subtitleText?: string;
+  subtitleClassName?: string;
   inverted?: boolean;
 }
 
@@ -17,6 +18,7 @@ export const KallistaLogo: React.FC<KallistaLogoProps> = ({
   customImageUrl,
   showSubtitle = false,
   subtitleText = 'BY RONADISA',
+  subtitleClassName = '',
   inverted = false,
 }) => {
   if (customImageUrl) {
@@ -25,14 +27,14 @@ export const KallistaLogo: React.FC<KallistaLogoProps> = ({
         <img
           src={customImageUrl}
           alt="Kallista Logo"
-          className={`object-contain transition-transform duration-300 ${
+          className={`max-w-full object-contain transition-transform duration-300 ${
             size === 'sm' ? 'h-7' : size === 'md' ? 'h-10' : size === 'lg' ? 'h-16' : 'h-24'
           }`}
           referrerPolicy="no-referrer"
         />
         {showSubtitle && (
           <span
-            className={`text-[9px] tracking-[0.35em] uppercase mt-1 font-light ${
+            className={`text-[9px] tracking-[0.35em] uppercase mt-1 font-light ${subtitleClassName} ${
               inverted ? 'text-[#c6a585]' : 'text-[#8a8075]'
             }`}
           >
@@ -70,7 +72,7 @@ export const KallistaLogo: React.FC<KallistaLogoProps> = ({
         viewBox="0 0 540 64"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className={`${heights[size]} w-auto`}
+        className={`${heights[size]} max-w-full w-auto`}
         aria-label="KALLISTA"
       >
         {/* Letter K */}
@@ -147,7 +149,7 @@ export const KallistaLogo: React.FC<KallistaLogoProps> = ({
 
       {showSubtitle && (
         <span
-          className={`tracking-[0.45em] text-[#8a8075] uppercase font-serif mt-1 ${
+          className={`tracking-[0.45em] text-[#8a8075] uppercase font-serif mt-1 ${subtitleClassName} ${
             size === 'sm' ? 'text-[8px]' : size === 'md' ? 'text-[10px]' : 'text-xs'
           }`}
           style={{ letterSpacing: '0.45em' }}

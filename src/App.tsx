@@ -11,6 +11,7 @@ import {
   getPortfolioCategories,
   getSiteContent,
   getUpcomingBirthdayAlerts,
+  mergeSiteContent,
   saveAlbums,
   saveBookings,
   saveClients,
@@ -125,8 +126,9 @@ export default function App() {
     const unsubscribers = [
       watchDocument<SiteContent>(FIRESTORE_COLLECTIONS.CONTENT, 'main', (value) => {
         if (!value) return;
-        setContent(value);
-        saveSiteContent(value);
+        const normalizedContent = mergeSiteContent(value);
+        setContent(normalizedContent);
+        saveSiteContent(normalizedContent);
       }),
       watchDocument<SiteSettings>(FIRESTORE_COLLECTIONS.SETTINGS, 'public', (value) => {
         if (!value) return;
@@ -213,11 +215,12 @@ export default function App() {
   };
 
   const handleUpdateContent = async (newContent: SiteContent) => {
+    const normalizedContent = mergeSiteContent(newContent);
     await commitSave(
-      () => saveDocument(FIRESTORE_COLLECTIONS.CONTENT, 'main', newContent),
+      () => saveDocument(FIRESTORE_COLLECTIONS.CONTENT, 'main', normalizedContent),
       () => {
-        setContent(newContent);
-        saveSiteContent(newContent);
+        setContent(normalizedContent);
+        saveSiteContent(normalizedContent);
       },
     );
   };

@@ -274,39 +274,102 @@ export async function syncCollection<T extends { id: string }>(
   }
 }
 
+/**
+ * Creates a booking request.
+ *
+ * Signing in is optional. A guest can book straight from the form (fewer
+ * abandoned enquiries), and a signed-in client still gets the booking tied to
+ * their account so it shows up in their profile. The matching contact record is
+ * written either way, because the contact list is what drives birthday and
+ * seasonal-occasion outreach.
+ */
 export async function createBookingRecord(
   booking: Omit<Booking, 'id' | 'createdAt' | 'status'>,
   client?: Partial<ClientContact>
 ) {
-  const user = requireAuth().currentUser;
-  if (!user) throw new Error('سجّل الدخول أولاً لإرسال طلب الحجز.');
+  const user = getFirebaseAuth()?.currentUser || null;
   const db = requireDb();
   const bookingRef = await addDoc(collection(db, FIRESTORE_COLLECTIONS.BOOKINGS), clean({
     ...booking,
-    userId: user.uid,
+    ...(user ? { userId: user.uid } : {}),
     status: 'pending',
     createdAt: serverTimestamp(),
   }));
-  const clientRef = doc(db, FIRESTORE_COLLECTIONS.CLIENTS, user.uid);
-  const clientSnapshot = await getDoc(clientRef);
-  if (!clientSnapshot.exists()) {
-    await setDoc(clientRef, clean({
-      id: user.uid,
-      userId: user.uid,
-      name: client?.name || booking.clientName,
-      phone: client?.phone || booking.phone,
-      whatsapp: client?.whatsapp || booking.whatsapp,
-      email: client?.email || booking.email || user.email,
-      birthday: client?.birthday,
-      weddingAnniversary: client?.weddingAnniversary,
-      serviceInterests: client?.serviceInterests || [booking.serviceType],
-      subscribeUpdates: client?.subscribeUpdates ?? false,
-      totalBookings: 1,
-      tags: ['Website Booking'],
-      createdAt: serverTimestamp(),
-    }));
+
+  const contactPayload = {
+    name: client?.name || booking.clientName,
+    phone: client?.phone || booking.phone,
+    whatsapp: client?.whatsapp || booking.whatsapp || booking.phone,
+    email: client?.email || booking.email || user?.email || '',
+    birthday: client?.birthday || '',
+    weddingAnniversary: client?.weddingAnniversary || '',
+    governorate: client?.governorate || booking.governorate || '',
+    city: client?.city || booking.city || '',
+    serviceInterests: client?.serviceInterests || [booking.serviceType],
+    subscribeUpdates: client?.subscribeUpdates ?? false,
+    totalBookings: 1,
+    tags: ['Website Booking'],
+    source: 'booking' as const,
+    createdAt: serverTimestamp(),
+  };
+
+  // The booking itself is the part that must not be lost. If writing the CRM
+  // contact fails, log it and still report the booking as sent rather than
+  // showing an error for a request that was actually received.
+  try {
+    if (user) {
+      // Signed-in clients get one stable contact record keyed to their account,
+      // so repeat bookings update rather than duplicate them.
+      const clientRef = doc(db, FIRESTORE_COLLECTIONS.CLIENTS, user.uid);
+      if (!(await getDoc(clientRef)).exists()) {
+        await setDoc(clientRef, clean({ id: user.uid, userId: user.uid, ...contactPayload }));
+      }
+    } else {
+      await addDoc(collection(db, FIRESTORE_COLLECTIONS.CLIENTS), clean(contactPayload));
+    }
+  } catch (error) {
+    console.warn('Booking saved, but the contact record could not be written:', error);
   }
+
   return bookingRef.id;
+}
+
+/**
+ * Saves a "stay in touch" contact — someone who is not booking today but wants
+ * to hear from the studio on their birthday and on seasonal occasions. This is
+ * deliberately open to guests: requiring an account here would defeat the whole
+ * purpose of the list.
+ */
+export async function createLeadRecord(lead: {
+  name: string;
+  phone: string;
+  whatsapp?: string;
+  email: string;
+  birthday?: string;
+  governorate?: string;
+  city?: string;
+  serviceInterests?: string[];
+  notes?: string;
+}) {
+  const user = getFirebaseAuth()?.currentUser || null;
+  return addDoc(collection(requireDb(), FIRESTORE_COLLECTIONS.CLIENTS), clean({
+    name: lead.name,
+    phone: lead.phone,
+    whatsapp: lead.whatsapp || lead.phone,
+    email: lead.email,
+    birthday: lead.birthday || '',
+    weddingAnniversary: '',
+    governorate: lead.governorate || '',
+    city: lead.city || '',
+    serviceInterests: lead.serviceInterests || [],
+    notes: lead.notes || '',
+    subscribeUpdates: true,
+    totalBookings: 0,
+    tags: ['Stay In Touch'],
+    source: 'stay-in-touch' as const,
+    ...(user ? { userId: user.uid } : {}),
+    createdAt: serverTimestamp(),
+  }));
 }
 
 export async function createReviewRecord(review: Omit<Review, 'id' | 'createdAt' | 'approved'>) {

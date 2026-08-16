@@ -8,6 +8,7 @@ import {
   PortfolioCategory,
   SiteContent,
 } from '../types';
+import { governorateLabel } from '../data/egyptGovernorates';
 
 import ronadisaPhoto from '../assets/images/ronadisa_founder_1786838963744.jpg';
 import veiledWeddingPhoto from '../assets/images/veiled_bride_groom_1786838979487.jpg';
@@ -741,12 +742,166 @@ export function getUpcomingBirthdayAlerts(clients: ClientContact[]): {
   return results.sort((a, b) => a.daysRemaining - b.daysRemaining);
 }
 
+/* ------------------------------------------------------------------
+   Islamic occasion reminders
+   ------------------------------------------------------------------
+   The studio greets its contacts on the Islamic holidays as well as on
+   birthdays. Hijri dates shift ~11 days earlier each Gregorian year, so
+   they are resolved with the Umm al-Qura calendar via Intl rather than
+   hard-coded. Dates are religious observances that can move by a day
+   locally, so these are treated as a heads-up, not an exact ruling.
+------------------------------------------------------------------ */
+
+export type OccasionKey = 'ramadan' | 'eid-fitr' | 'eid-adha' | 'hijri-new-year';
+
+export interface OccasionAlert {
+  key: OccasionKey;
+  titleAr: string;
+  titleEn: string;
+  date: Date;
+  formattedDate: string;
+  daysRemaining: number;
+  isToday: boolean;
+}
+
+const HIJRI_OCCASIONS: { key: OccasionKey; month: number; day: number; titleAr: string; titleEn: string }[] = [
+  { key: 'ramadan', month: 9, day: 1, titleAr: 'بداية شهر رمضان', titleEn: 'First day of Ramadan' },
+  { key: 'eid-fitr', month: 10, day: 1, titleAr: 'عيد الفطر المبارك', titleEn: 'Eid al-Fitr' },
+  { key: 'eid-adha', month: 12, day: 10, titleAr: 'عيد الأضحى المبارك', titleEn: 'Eid al-Adha' },
+  { key: 'hijri-new-year', month: 1, day: 1, titleAr: 'رأس السنة الهجرية', titleEn: 'Islamic New Year' },
+];
+
+function hijriMonthDay(date: Date): { month: number; day: number } | null {
+  try {
+    const parts = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+      day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'UTC',
+    }).formatToParts(date);
+    const read = (type: string) => Number(parts.find((part: any) => part.type === type)?.value);
+    const month = read('month');
+    const day = read('day');
+    if (!month || !day || Number.isNaN(month) || Number.isNaN(day)) return null;
+    return { month, day };
+  } catch {
+    return null; // Environment without the Umm al-Qura calendar — degrade quietly.
+  }
+}
+
+/** Islamic occasions falling within the next `withinDays` days. */
+export function getUpcomingOccasionAlerts(withinDays = 45): OccasionAlert[] {
+  const found = new Map<OccasionKey, OccasionAlert>();
+  const today = new Date();
+  const start = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+
+  for (let offset = 0; offset <= withinDays; offset += 1) {
+    const probe = new Date(start + offset * 86400000);
+    const hijri = hijriMonthDay(probe);
+    if (!hijri) break;
+    HIJRI_OCCASIONS.forEach((occasion) => {
+      if (found.has(occasion.key)) return;
+      if (hijri.month !== occasion.month || hijri.day !== occasion.day) return;
+      found.set(occasion.key, {
+        key: occasion.key,
+        titleAr: occasion.titleAr,
+        titleEn: occasion.titleEn,
+        date: probe,
+        formattedDate: `${probe.getUTCDate()}/${probe.getUTCMonth() + 1}`,
+        daysRemaining: offset,
+        isToday: offset === 0,
+      });
+    });
+  }
+
+  return Array.from(found.values()).sort((a, b) => a.daysRemaining - b.daysRemaining);
+}
+
+export function createOccasionWhatsAppLink(client: ClientContact, occasion: OccasionAlert): string {
+  const cleanPhone = (client.whatsapp || client.phone || '').replace(/[^0-9+]/g, '');
+  const greetings: Record<OccasionKey, string> = {
+    'ramadan': `رمضان كريم يا ${client.name}! 🌙\nمن أسرة ستوديو كاليستا (KALLISTA by Ronadisa)، نتمنى لكم شهرًا مباركًا مليئًا بالرحمة والسكينة.`,
+    'eid-fitr': `كل عام وأنتم بخير يا ${client.name}! 🌸\nعيد فطر مبارك من أسرة ستوديو كاليستا (KALLISTA by Ronadisa) — أعاده الله عليكم بالخير واليُمن.`,
+    'eid-adha': `عيد أضحى مبارك يا ${client.name}! 🌿\nمن أسرة ستوديو كاليستا (KALLISTA by Ronadisa)، كل عام وأنتم وعائلتكم بخير وسعادة.`,
+    'hijri-new-year': `عام هجري جديد سعيد يا ${client.name}! ✨\nمن أسرة ستوديو كاليستا (KALLISTA by Ronadisa)، نتمنى لكم عامًا مليئًا بالبركة والذكريات الجميلة.`,
+  };
+  return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(greetings[occasion.key])}`;
+}
+
+/* ------------------------------------------------------------------
+   CSV export (Excel-friendly)
+------------------------------------------------------------------ */
+
+function csvCell(value: unknown): string {
+  const text = value === null || value === undefined ? '' : String(value);
+  return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function toCsv(headers: string[], rows: unknown[][]): string {
+  return [headers, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n');
+}
+
+export function buildClientsCsv(clients: ClientContact[], language: 'ar' | 'en' = 'ar'): string {
+  return toCsv(
+    ['Name', 'Phone', 'WhatsApp', 'Email', 'Birthday', 'Anniversary', 'Governorate', 'City', 'Interests', 'Source', 'Subscribed', 'Bookings', 'Notes', 'Created'],
+    clients.map((client) => [
+      client.name,
+      client.phone,
+      client.whatsapp,
+      client.email,
+      client.birthday,
+      client.weddingAnniversary,
+      governorateLabel(client.governorate, language),
+      client.city,
+      (client.serviceInterests || []).join(' | '),
+      client.source || '',
+      client.subscribeUpdates ? 'yes' : 'no',
+      client.totalBookings ?? 0,
+      client.notes,
+      client.createdAt,
+    ]),
+  );
+}
+
+export function buildBookingsCsv(bookings: Booking[], language: 'ar' | 'en' = 'ar'): string {
+  return toCsv(
+    ['Client', 'Phone', 'WhatsApp', 'Email', 'Service', 'Date', 'Time', 'Venue', 'Governorate', 'City', 'Status', 'Budget', 'Notes', 'Created'],
+    bookings.map((booking) => [
+      booking.clientName,
+      booking.phone,
+      booking.whatsapp,
+      booking.email,
+      booking.serviceType,
+      booking.date,
+      booking.timeSlot,
+      booking.location,
+      governorateLabel(booking.governorate, language),
+      booking.city,
+      booking.status,
+      booking.budget,
+      booking.storyNotes,
+      booking.createdAt,
+    ]),
+  );
+}
+
+/** Triggers a CSV download. The UTF-8 BOM is what makes Excel read Arabic
+ *  correctly instead of showing mojibake. */
+export function downloadCsv(filename: string, csv: string): void {
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 // WhatsApp Message Builders
 export function createBirthdayWhatsAppLink(client: ClientContact): string {
   const cleanPhone = client.whatsapp.replace(/[^0-9+]/g, '');
-  const message = `كل عام وأنتِ بألف خير وسعادة يا ${client.name}! 🎂✨
-من أسرة ستوديو كاليستا للتصوير الفوتوغرافي (KALLISTA by Ronadisa)، يسعدنا أن نهنئك بمناسبة عيد ميلادك السعيد، ويسرنا تقديم هدية خاصة لكِ بخصم 20% على أي جلسة تصوير تختارينها هذا الشهر. 🌸📷
-كل عام وأنتِ مصدر للبهجة والجمال!`;
+  const message = `كل عام وأنتم بألف خير وسعادة يا ${client.name}! 🎂✨
+من أسرة ستوديو كاليستا للتصوير الفوتوغرافي (KALLISTA by Ronadisa)، يسعدنا أن نهنئكم بمناسبة عيد ميلادكم السعيد، ويسرنا تقديم هدية خاصة لكم بخصم 20% على أي جلسة تصوير تختارونها هذا الشهر. 🌸📷
+كل عام وأنتم بخير وسعادة دائمة!`;
 
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 }

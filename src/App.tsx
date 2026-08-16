@@ -24,6 +24,7 @@ import {
 import {
   FIRESTORE_COLLECTIONS,
   createBookingRecord,
+  createLeadRecord,
   createReviewRecord,
   isFirebaseAdmin,
   logoutFirebase,
@@ -47,6 +48,7 @@ import { ExperienceSection } from './components/ExperienceSection';
 import { TestimonialsSection } from './components/TestimonialsSection';
 import { FAQSection } from './components/FAQSection';
 import { ContactAndBookingSection } from './components/ContactAndBookingSection';
+import { StayInTouchSection } from './components/StayInTouchSection';
 import { FooterSection } from './components/FooterSection';
 import { AlbumDetailsModal } from './components/AlbumDetailsModal';
 import { AlbumLightboxModal } from './components/AlbumLightboxModal';
@@ -290,20 +292,32 @@ export default function App() {
     );
   };
 
-  // Add new Booking
+  // Add new Booking — no account required; signing in is optional and simply
+  // links the request to the client's profile.
   const handleSaveBooking = async (
     bookingData: Omit<Booking, 'id' | 'createdAt' | 'status'>,
     clientData?: Partial<ClientContact>
   ): Promise<boolean> => {
-    if (!user) {
-      setIsAccountOpen(true);
-      return false;
-    }
     try {
       await createBookingRecord(bookingData, clientData);
       return true;
     } catch (error) {
       alert((error as Error).message || 'تعذر إرسال الحجز.');
+      return false;
+    }
+  };
+
+  // "Stay in touch" lead capture — open to everyone, no account needed.
+  const handleSaveLead = async (lead: {
+    name: string; phone: string; whatsapp?: string; email: string;
+    birthday?: string; governorate?: string; city?: string;
+    serviceInterests?: string[]; notes?: string;
+  }): Promise<boolean> => {
+    try {
+      await createLeadRecord(lead);
+      return true;
+    } catch (error) {
+      alert((error as Error).message || 'تعذر حفظ بياناتك. حاول مرة أخرى.');
       return false;
     }
   };
@@ -520,6 +534,12 @@ export default function App() {
           categories={publicCategories}
           onSaveBooking={handleSaveBooking}
           preselectedService={preselectedBookingService}
+        />
+
+        {/* 17b — STAY IN TOUCH (lead capture for visitors not booking today) */}
+        <StayInTouchSection
+          categories={publicCategories}
+          onSaveLead={handleSaveLead}
         />
       </main>
 

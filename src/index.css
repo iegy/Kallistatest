@@ -249,6 +249,22 @@ html[data-theme='dark'] #kallista-app-root select {
   border-color: rgba(175, 187, 156, 0.3);
 }
 
+/* Colours introduced by the Stay-in-Touch section and the newer dashboard
+   controls, mapped for dark mode so nothing turns dark-on-dark. */
+html[data-theme='dark'] #kallista-app-root [class*='text-[#a5794f]'] {
+  color: #d8b183 !important;
+}
+html[data-theme='dark'] #kallista-app-root [class*='text-[#a4553f]'] {
+  color: #e0917c !important;
+}
+html[data-theme='dark'] #kallista-app-root [class*='text-[#5f6c50]'] {
+  color: #a9bb92 !important;
+}
+html[data-theme='dark'] #kallista-app-root [class*='bg-[#fffefb]'] input,
+html[data-theme='dark'] #kallista-app-root input[class*='bg-[#fffefb]'] {
+  background-color: #242720 !important;
+}
+
 html[data-theme='dark'] ::-webkit-scrollbar-track {
   background: #181a16;
 }
@@ -307,6 +323,77 @@ html[data-theme='dark'] ::-webkit-scrollbar-thumb {
   background: rgba(36, 33, 30, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+}
+
+/* ------------------------------------------------------------------
+   Editorial polish
+------------------------------------------------------------------ */
+
+/* The navbar is fixed, so an un-offset jump to #portfolio / #contact hides
+   the section heading underneath it. Reserve the header height. */
+#kallista-app-root section[id],
+#kallista-app-root [id='stay-in-touch'] {
+  scroll-margin-top: 6.5rem;
+}
+@media (max-width: 640px) {
+  #kallista-app-root section[id] {
+    scroll-margin-top: 5rem;
+  }
+}
+
+/* Headlines break on meaning rather than leaving a single orphaned word,
+   and body copy avoids widows. This is most of what separates a headline
+   that looks typeset from one that looks merely wrapped. */
+#kallista-app-root h1,
+#kallista-app-root h2,
+#kallista-app-root h3 {
+  text-wrap: balance;
+}
+#kallista-app-root p {
+  text-wrap: pretty;
+}
+
+/* Latin display type is set slightly tighter; Arabic needs its natural
+   spacing, so the adjustment is scoped to LTR only. */
+#kallista-app-root :dir(ltr) h1,
+#kallista-app-root :dir(ltr) h2 {
+  letter-spacing: -0.015em;
+}
+
+/* Dates, phone numbers and prices line up in columns. */
+#kallista-app-root table,
+#kallista-app-root .font-mono,
+#kallista-app-root input[type='date'],
+#kallista-app-root input[type='tel'] {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* A single, consistent focus ring — visible for keyboard users, absent for
+   mouse users, and in the brand copper rather than the browser default. */
+#kallista-app-root :focus-visible,
+.appearance-panel :focus-visible {
+  outline: 2px solid #c6a585;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+html[data-theme='dark'] #kallista-app-root :focus-visible {
+  outline-color: #d8b183;
+}
+
+/* Photographs carry the site, so let them resize cleanly. */
+#kallista-app-root img {
+  image-rendering: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .editorial-img,
+  .editorial-img-wrapper:hover .editorial-img {
+    transition: none;
+    transform: none;
+  }
 }
 
 /* Direction-aware typography and alignment for the bilingual public site. */

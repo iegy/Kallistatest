@@ -46,6 +46,8 @@ export interface Booking {
   date: string; // YYYY-MM-DD
   timeSlot?: string;
   location: string;
+  governorate?: string; // stable key from EGYPT_GOVERNORATES
+  city?: string; // markaz / city within the governorate
   storyNotes?: string;
   budget?: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
@@ -61,6 +63,8 @@ export interface ClientContact {
   email?: string;
   birthday?: string; // YYYY-MM-DD
   weddingAnniversary?: string; // YYYY-MM-DD
+  governorate?: string; // stable key from EGYPT_GOVERNORATES
+  city?: string; // markaz / city within the governorate
   serviceInterests: string[];
   notes?: string;
   subscribeUpdates: boolean;
@@ -68,6 +72,9 @@ export interface ClientContact {
   tags: string[];
   createdAt: string;
   userId?: string;
+  /** Where this contact came from — a booking request, the standalone
+   *  "stay in touch" form, or added by hand in the dashboard. */
+  source?: 'booking' | 'stay-in-touch' | 'manual';
 }
 
 export interface Review {

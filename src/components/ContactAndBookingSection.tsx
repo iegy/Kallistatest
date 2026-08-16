@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Send, Sparkles, CheckCircle2, Gift, ExternalLink } from 'lucide-react';
+import { Send, Sparkles, CheckCircle2, Gift } from 'lucide-react';
 import { Booking, ClientContact, SiteSettings, SiteContent, PortfolioCategory } from '../types';
 import { createBookingInquiryWhatsAppLink } from '../services/storage';
 import { useLanguage } from '../i18n';
+import { SocialPlatformIcon } from './SocialPlatformIcon';
 
 interface ContactAndBookingSectionProps {
   settings: SiteSettings;
@@ -186,7 +187,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                 <div className="flex flex-wrap gap-2">
                   {contact.socialLinks.filter((link) => link.label && link.url).map((link) => (
                     <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-[#d8cfc4] bg-[#fffefb] px-3 py-2 text-xs font-semibold text-[#5a4f44] hover:border-[#c6a585]">
-                      <ExternalLink className="h-3.5 w-3.5" />
+                      <SocialPlatformIcon platform={link.icon} label={link.label} url={link.url} className="h-3.5 w-3.5" />
                       {link.label}
                     </a>
                   ))}

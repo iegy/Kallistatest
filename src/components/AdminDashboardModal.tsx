@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
-  X, Lock, Key, Image as ImageIcon, Upload, Plus, Trash2, Edit3, CheckCircle2,
+  Lock, Key, Image as ImageIcon, Upload, Plus, Trash2, Edit3, CheckCircle2,
   Calendar, Users, Star, Settings, Download, RefreshCw, MessageCircle, AlertCircle,
   Sparkles, Gift, Eye, Filter, ArrowUpRight, Phone, Mail, Check, Layers, FileText,
-  Sliders, Shield, Database, Globe, HelpCircle, UserCheck, ExternalLink
+  Sliders, Shield, Database, Globe, HelpCircle, UserCheck, ArrowRight
 } from 'lucide-react';
 import {
   Album, Booking, ClientContact, Review, SiteSettings, PhotoItem,
-  PortfolioCategory, SiteContent, ServiceItem, FAQItem
+  PortfolioCategory, SiteContent, ServiceItem, FAQItem, SocialLink
 } from '../types';
 import {
   uploadImageToImgBB, getUpcomingBirthdayAlerts, createBirthdayWhatsAppLink,
@@ -15,6 +15,7 @@ import {
   ronadisaPhoto, veiledWeddingPhoto, veiledFashionPhoto, veiledFamilyPhoto
 } from '../services/storage';
 import { logoutFirebase } from '../services/firebase';
+import { SOCIAL_PLATFORM_OPTIONS, SocialPlatformIcon, inferSocialPlatform } from './SocialPlatformIcon';
 
 interface RegisteredUserProfile {
   id: string;
@@ -149,10 +150,10 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   // Settings edit state
   const [tempSettings, setTempSettings] = useState<SiteSettings>(settings);
   const [settingsSavedSuccess, setSettingsSavedSuccess] = useState(false);
-  const editableSocialLinks = editableContent.contact.socialLinks ?? [
-    ...(editableContent.contact.instagram ? [{ id: 'social-instagram', label: 'Instagram', url: editableContent.contact.instagram }] : []),
-    ...(editableContent.contact.facebook ? [{ id: 'social-facebook', label: 'Facebook', url: editableContent.contact.facebook }] : []),
-    ...(editableContent.contact.tiktok ? [{ id: 'social-tiktok', label: 'TikTok', url: editableContent.contact.tiktok }] : []),
+  const editableSocialLinks: SocialLink[] = editableContent.contact.socialLinks ?? [
+    ...(editableContent.contact.instagram ? [{ id: 'social-instagram', label: 'Instagram', icon: 'instagram', url: editableContent.contact.instagram }] : []),
+    ...(editableContent.contact.facebook ? [{ id: 'social-facebook', label: 'Facebook', icon: 'facebook', url: editableContent.contact.facebook }] : []),
+    ...(editableContent.contact.tiktok ? [{ id: 'social-tiktok', label: 'TikTok', icon: 'tiktok', url: editableContent.contact.tiktok }] : []),
   ];
   if (!isOpen) return null;
 
@@ -549,23 +550,23 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   };
 
   return (
-    <div dir="rtl" className="fixed inset-0 z-50 overflow-y-auto bg-[#24211e]/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
-      <div className="bg-[#fffefb] rounded-3xl w-full max-w-7xl max-h-[92vh] flex flex-col shadow-2xl border border-[#e6e1d6] overflow-hidden text-[#24211e]">
+    <div dir="rtl" className="fixed inset-0 z-50 overflow-hidden bg-[#fffefb]">
+      <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-[#fffefb] text-[#24211e]">
         
         {/* MODAL HEADER */}
-        <div className="px-6 py-4 border-b border-[#e6e1d6] bg-[#FAF8F5] flex items-center justify-between flex-shrink-0">
+        <div className="flex flex-shrink-0 items-center justify-between gap-3 border-b border-[#e6e1d6] bg-[#FAF8F5] px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-[#24211e] text-[#fffefb] flex items-center justify-center font-serif font-bold text-lg shadow-md">
               K
             </div>
             <div>
-              <h2 className="font-arabic-editorial text-xl font-bold text-[#24211e] flex items-center gap-2">
+              <h2 className="flex flex-wrap items-center gap-2 font-arabic-editorial text-base font-bold text-[#24211e] sm:text-xl">
                 <span>لوحة التحكم والإدارة الشاملة (Kallista CMS)</span>
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#738262]/20 text-[#495b3a] font-serif">
                   v3.0 Live
                 </span>
               </h2>
-              <p className="text-xs text-[#73685d] font-sans">
+              <p className="hidden text-xs text-[#73685d] font-sans sm:block">
                 تحكم كامل في محتوى الموقع، الألبومات، التصنيفات، الحجوزات، وأمان Firebase
               </p>
             </div>
@@ -582,10 +583,11 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
             )}
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-[#73685d] hover:bg-[#e6e1d6] hover:text-[#24211e] transition-colors"
-              aria-label="Close modal"
+              className="inline-flex items-center gap-2 rounded-xl p-2 text-[#73685d] transition-colors hover:bg-[#e6e1d6] hover:text-[#24211e] sm:px-3"
+              aria-label="العودة إلى الموقع"
             >
-              <X className="w-5 h-5" />
+              <ArrowRight className="h-5 w-5" />
+              <span className="hidden text-xs font-semibold sm:inline">العودة إلى الموقع</span>
             </button>
           </div>
         </div>
@@ -2061,7 +2063,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                         <div className="flex items-center justify-between gap-3">
                           <div>
                             <h5 className="text-xs font-bold text-[#403831]">روابط منصات التواصل</h5>
-                            <p className="text-[11px] text-[#85796f]">يمكنك إضافة أي منصة وكتابة اسمها ورابطها، مثل Instagram أو YouTube أو LinkedIn.</p>
+                            <p className="text-[11px] text-[#85796f]">اختر لوجو المنصة، ثم أضف اسم الحساب أو المنصة والرابط.</p>
                           </div>
                           <button
                             type="button"
@@ -2069,7 +2071,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                               ...editableContent,
                               contact: {
                                 ...editableContent.contact,
-                                socialLinks: [...editableSocialLinks, { id: `social-${Date.now()}`, label: '', url: '' }],
+                                socialLinks: [...editableSocialLinks, { id: `social-${Date.now()}`, label: 'Instagram', icon: 'instagram', url: '' }],
                               },
                             })}
                             className="inline-flex items-center gap-1 rounded-lg bg-[#24211e] px-3 py-2 text-[11px] font-semibold text-white"
@@ -2085,42 +2087,78 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                           </div>
                         )}
 
-                        {editableSocialLinks.map((link, index) => (
-                          <div key={link.id} className="grid grid-cols-1 gap-2 rounded-xl border border-[#e6e1d6] bg-white p-3 sm:grid-cols-[180px_1fr_auto]">
-                            <input
-                              type="text"
-                              value={link.label}
-                              placeholder="اسم المنصة"
-                              onChange={(event) => {
-                                const updated = editableSocialLinks.map((item, itemIndex) => itemIndex === index ? { ...item, label: event.target.value } : item);
-                                setEditableContent({ ...editableContent, contact: { ...editableContent.contact, socialLinks: updated } });
-                              }}
-                              className="w-full rounded-lg border border-[#e6e1d6] bg-[#FAF8F5] px-3 py-2 text-xs text-[#24211e]"
-                            />
-                            <input
-                              type="url"
-                              value={link.url}
-                              placeholder="https://..."
-                              dir="ltr"
-                              onChange={(event) => {
-                                const updated = editableSocialLinks.map((item, itemIndex) => itemIndex === index ? { ...item, url: event.target.value } : item);
-                                setEditableContent({ ...editableContent, contact: { ...editableContent.contact, socialLinks: updated } });
-                              }}
-                              className="w-full rounded-lg border border-[#e6e1d6] bg-[#FAF8F5] px-3 py-2 text-left text-xs text-[#24211e]"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setEditableContent({
-                                ...editableContent,
-                                contact: { ...editableContent.contact, socialLinks: editableSocialLinks.filter((_, itemIndex) => itemIndex !== index) },
-                              })}
-                              className="rounded-lg p-2 text-red-600 hover:bg-red-50"
-                              title="حذف الرابط"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        ))}
+                        {editableSocialLinks.map((link, index) => {
+                          const selectedPlatform = link.icon || inferSocialPlatform(link.label, link.url);
+                          return (
+                            <div key={link.id} className="space-y-3 rounded-2xl border border-[#e6e1d6] bg-white p-3 sm:p-4">
+                              <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-2 text-xs font-bold text-[#403831]">
+                                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#24211e] text-white">
+                                    <SocialPlatformIcon platform={selectedPlatform} className="h-4 w-4" />
+                                  </span>
+                                  <span>{link.label || 'منصة جديدة'}</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => setEditableContent({
+                                    ...editableContent,
+                                    contact: { ...editableContent.contact, socialLinks: editableSocialLinks.filter((_, itemIndex) => itemIndex !== index) },
+                                  })}
+                                  className="rounded-lg p-2 text-red-600 hover:bg-red-50"
+                                  title="حذف الرابط"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+
+                              <div>
+                                <span className="mb-2 block text-[11px] font-semibold text-[#6e6359]">اختر لوجو المنصة</span>
+                                <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6 lg:grid-cols-11">
+                                  {SOCIAL_PLATFORM_OPTIONS.map((option) => (
+                                    <button
+                                      key={option.value}
+                                      type="button"
+                                      onClick={() => {
+                                        const updated = editableSocialLinks.map((item, itemIndex) => itemIndex === index ? { ...item, icon: option.value, label: option.value === 'website' && item.label ? item.label : option.label } : item);
+                                        setEditableContent({ ...editableContent, contact: { ...editableContent.contact, socialLinks: updated } });
+                                      }}
+                                      className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl border px-1.5 py-2 text-[9px] font-semibold transition-all ${selectedPlatform === option.value ? 'border-[#24211e] bg-[#24211e] text-white shadow-sm' : 'border-[#e6e1d6] bg-[#FAF8F5] text-[#594f45] hover:border-[#c6a585]'}`}
+                                      title={option.label}
+                                      aria-label={`اختيار ${option.label}`}
+                                    >
+                                      <SocialPlatformIcon platform={option.value} className="h-4 w-4" />
+                                      <span className="max-w-full truncate">{option.label}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 gap-2 sm:grid-cols-[180px_1fr]">
+                                <input
+                                  type="text"
+                                  value={link.label}
+                                  placeholder="اسم المنصة أو الحساب"
+                                  onChange={(event) => {
+                                    const updated = editableSocialLinks.map((item, itemIndex) => itemIndex === index ? { ...item, label: event.target.value } : item);
+                                    setEditableContent({ ...editableContent, contact: { ...editableContent.contact, socialLinks: updated } });
+                                  }}
+                                  className="w-full rounded-lg border border-[#e6e1d6] bg-[#FAF8F5] px-3 py-2 text-xs text-[#24211e]"
+                                />
+                                <input
+                                  type="url"
+                                  value={link.url}
+                                  placeholder="https://..."
+                                  dir="ltr"
+                                  onChange={(event) => {
+                                    const updated = editableSocialLinks.map((item, itemIndex) => itemIndex === index ? { ...item, url: event.target.value } : item);
+                                    setEditableContent({ ...editableContent, contact: { ...editableContent.contact, socialLinks: updated } });
+                                  }}
+                                  className="w-full rounded-lg border border-[#e6e1d6] bg-[#FAF8F5] px-3 py-2 text-left text-xs text-[#24211e]"
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   )}

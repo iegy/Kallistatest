@@ -12,7 +12,7 @@ interface AboutSectionsProps {
 export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExploreWork }) => {
   const { t } = useLanguage();
   const { aboutKallista, aboutRonadisa, brand } = content;
-  const instagramUrl = content.contact.socialLinks?.find((link) => link.label.toLowerCase().includes('instagram'))?.url || content.contact.instagram || 'https://instagram.com';
+  const instagramUrl = content.contact.socialLinks?.find((link) => link.icon === 'instagram' || link.label.toLowerCase().includes('instagram'))?.url || content.contact.instagram || 'https://instagram.com';
 
   return (
     <div id="about" className="space-y-0">

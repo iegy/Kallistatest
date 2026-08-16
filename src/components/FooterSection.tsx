@@ -1,8 +1,9 @@
 import React from 'react';
-import { Instagram, Facebook, MessageCircle, ArrowUp, Calendar, Lock, Youtube, Linkedin, ExternalLink } from 'lucide-react';
-import { SiteSettings, SiteContent, PortfolioCategory } from '../types';
+import { MessageCircle, ArrowUp, Calendar, Lock } from 'lucide-react';
+import { SiteSettings, SiteContent, PortfolioCategory, SocialLink } from '../types';
 import { KallistaLogo } from './KallistaLogo';
 import { useLanguage } from '../i18n';
+import { SocialPlatformIcon } from './SocialPlatformIcon';
 
 interface FooterSectionProps {
   settings: SiteSettings;
@@ -27,20 +28,11 @@ export const FooterSection: React.FC<FooterSectionProps> = ({
   };
 
   const { footer, brand, contact } = content;
-  const socialLinks = contact.socialLinks?.filter((link) => link.label.trim() && link.url.trim()) || [
-    ...(contact.instagram ? [{ id: 'legacy-instagram', label: 'Instagram', url: contact.instagram }] : []),
-    ...(contact.facebook ? [{ id: 'legacy-facebook', label: 'Facebook', url: contact.facebook }] : []),
-    ...(contact.tiktok ? [{ id: 'legacy-tiktok', label: 'TikTok', url: contact.tiktok }] : []),
+  const socialLinks: SocialLink[] = contact.socialLinks?.filter((link) => link.label.trim() && link.url.trim()) || [
+    ...(contact.instagram ? [{ id: 'legacy-instagram', label: 'Instagram', icon: 'instagram', url: contact.instagram }] : []),
+    ...(contact.facebook ? [{ id: 'legacy-facebook', label: 'Facebook', icon: 'facebook', url: contact.facebook }] : []),
+    ...(contact.tiktok ? [{ id: 'legacy-tiktok', label: 'TikTok', icon: 'tiktok', url: contact.tiktok }] : []),
   ];
-
-  const socialIcon = (label: string) => {
-    const name = label.toLowerCase();
-    if (name.includes('instagram')) return <Instagram className="w-4 h-4" />;
-    if (name.includes('facebook')) return <Facebook className="w-4 h-4" />;
-    if (name.includes('youtube')) return <Youtube className="w-4 h-4" />;
-    if (name.includes('linkedin')) return <Linkedin className="w-4 h-4" />;
-    return <ExternalLink className="w-4 h-4" />;
-  };
 
   return (
     <footer id="main-footer" className="bg-[#24211e] text-[#fffefb] relative border-t border-[#3d3833]">
@@ -154,7 +146,7 @@ export const FooterSection: React.FC<FooterSectionProps> = ({
                   title={link.label}
                   aria-label={link.label}
                 >
-                  {socialIcon(link.label)}
+                  <SocialPlatformIcon platform={link.icon} label={link.label} url={link.url} />
                 </a>
               ))}
 

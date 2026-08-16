@@ -81,7 +81,7 @@ export default function App() {
   const [selectedAlbumForDetails, setSelectedAlbumForDetails] = useState<Album | null>(null);
   const [activeLightboxPhoto, setActiveLightboxPhoto] = useState<PhotoItem | null>(null);
   const [lightboxAlbumTitle, setLightboxAlbumTitle] = useState<string | undefined>(undefined);
-  const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
+  const [isAdminOpen, setIsAdminOpen] = useState<boolean>(() => window.location.hash === '#/admin');
   const [isQuickBookingOpen, setIsQuickBookingOpen] = useState<boolean>(false);
   const [isAccountOpen, setIsAccountOpen] = useState<boolean>(false);
   const [preselectedBookingService, setPreselectedBookingService] = useState<string>('weddings');
@@ -97,10 +97,12 @@ export default function App() {
   useEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
-    document.title = language === 'ar'
-      ? 'Kallista by Ronadisa | تصوير تحريري فاخر'
-      : 'Kallista by Ronadisa | Editorial Photography in Egypt';
-  }, [language]);
+    document.title = isAdminOpen
+      ? 'لوحة تحكم كاليستا | Kallista CMS'
+      : language === 'ar'
+        ? 'Kallista by Ronadisa | تصوير تحريري فاخر'
+        : 'Kallista by Ronadisa | Editorial Photography in Egypt';
+  }, [language, isAdminOpen]);
 
   const publicContent = useMemo(() => localizeContent(content, language), [content, language]);
   const publicCategories = useMemo(() => localizeCategories(categories, language), [categories, language]);
@@ -279,8 +281,26 @@ export default function App() {
       alert('الحساب الحالي مستخدم عادي ولا يملك صلاحية فتح لوحة التحكم.');
       return;
     }
+    window.location.hash = '/admin';
     setIsAdminOpen(true);
   };
+
+  const handleCloseAdmin = () => {
+    if (window.location.hash === '#/admin') {
+      window.history.replaceState({}, '', `${window.location.pathname}${window.location.search}`);
+    }
+    setIsAdminOpen(false);
+  };
+
+  useEffect(() => {
+    const syncAdminRoute = () => setIsAdminOpen(window.location.hash === '#/admin');
+    window.addEventListener('hashchange', syncAdminRoute);
+    return () => window.removeEventListener('hashchange', syncAdminRoute);
+  }, []);
+
+  useEffect(() => {
+    if (window.location.hash === '#/admin' && user && isAdmin) setIsAdminOpen(true);
+  }, [user, isAdmin]);
 
   // Birthday alerts count
   const birthdayAlerts = getUpcomingBirthdayAlerts(clients);
@@ -433,7 +453,7 @@ export default function App() {
       {/* 4. Full Admin Management Dashboard Modal */}
       <AdminDashboardModal
         isOpen={isAdminOpen}
-        onClose={() => setIsAdminOpen(false)}
+        onClose={handleCloseAdmin}
         isAdminAuthenticated={isAdmin}
         registeredUsersCount={registeredUsers.length}
         registeredUsers={registeredUsers}

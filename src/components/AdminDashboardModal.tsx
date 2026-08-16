@@ -11,7 +11,7 @@ import {
 } from '../types';
 import {
   uploadImageToImgBB, getUpcomingBirthdayAlerts, createBirthdayWhatsAppLink,
-  createBookingInquiryWhatsAppLink, exportDataAsJSON, importDataFromJSON,
+  createBookingInquiryWhatsAppLink,
   ronadisaPhoto, veiledWeddingPhoto, veiledFashionPhoto, veiledFamilyPhoto
 } from '../services/storage';
 import { logoutFirebase } from '../services/firebase';
@@ -30,6 +30,7 @@ interface AdminDashboardModalProps {
   isAdminAuthenticated: boolean;
   registeredUsersCount: number;
   registeredUsers: RegisteredUserProfile[];
+  currentUserId?: string;
   onRequestLogin: () => void;
   albums: Album[];
   categories: PortfolioCategory[];
@@ -38,13 +39,13 @@ interface AdminDashboardModalProps {
   clients: ClientContact[];
   reviews: Review[];
   settings: SiteSettings;
-  onUpdateAlbums: (albums: Album[]) => void;
-  onUpdateCategories: (categories: PortfolioCategory[]) => void;
-  onUpdateContent: (content: SiteContent) => void;
-  onUpdateBookings: (bookings: Booking[]) => void;
-  onUpdateClients: (clients: ClientContact[]) => void;
-  onUpdateReviews: (reviews: Review[]) => void;
-  onUpdateSettings: (settings: SiteSettings) => void;
+  onUpdateAlbums: (albums: Album[]) => Promise<void>;
+  onUpdateCategories: (categories: PortfolioCategory[]) => Promise<void>;
+  onUpdateContent: (content: SiteContent) => Promise<void>;
+  onUpdateBookings: (bookings: Booking[]) => Promise<void>;
+  onUpdateClients: (clients: ClientContact[]) => Promise<void>;
+  onUpdateReviews: (reviews: Review[]) => Promise<void>;
+  onUpdateSettings: (settings: SiteSettings) => Promise<void>;
 }
 
 export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
@@ -53,6 +54,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   isAdminAuthenticated,
   registeredUsersCount,
   registeredUsers,
+  currentUserId,
   onRequestLogin,
   albums,
   categories,
@@ -82,6 +84,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   // Local Editable Content State
   const [editableContent, setEditableContent] = useState<SiteContent>(content);
   const [contentSavedSuccess, setContentSavedSuccess] = useState(false);
+  const [isSavingContent, setIsSavingContent] = useState(false);
 
   // Categories Local State
   const [editingCategory, setEditingCategory] = useState<PortfolioCategory | null>(null);
@@ -150,6 +153,15 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   // Settings edit state
   const [tempSettings, setTempSettings] = useState<SiteSettings>(settings);
   const [settingsSavedSuccess, setSettingsSavedSuccess] = useState(false);
+  const [isSavingSettings, setIsSavingSettings] = useState(false);
+
+  useEffect(() => {
+    setEditableContent(content);
+  }, [content]);
+
+  useEffect(() => {
+    setTempSettings(settings);
+  }, [settings]);
   const editableSocialLinks: SocialLink[] = editableContent.contact.socialLinks ?? [
     ...(editableContent.contact.instagram ? [{ id: 'social-instagram', label: 'Instagram', icon: 'instagram', url: editableContent.contact.instagram }] : []),
     ...(editableContent.contact.facebook ? [{ id: 'social-facebook', label: 'Facebook', icon: 'facebook', url: editableContent.contact.facebook }] : []),
@@ -285,7 +297,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
           logoImageUrl: res.url,
         },
       }));
-      alert('تم رفع لوجو أعلى الموقع بنجاح! تم تطبيق اللوجو الجديد وتفعيله.');
+      alert('تم رفع لوجو أعلى الموقع. اضغط «حفظ كافة التعديلات في الموقع» لتثبيت الرابط في Firebase.');
     } else {
       alert('فشل رفع لوجو أعلى الموقع: ' + (res.error || 'يرجى التأكد من اتصال الإنترنت وصلاحية مفتاح ImgBB'));
     }
@@ -308,7 +320,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
           footerLogoImageUrl: res.url,
         },
       }));
-      alert('تم رفع لوجو أسفل الموقع بنجاح! تم تطبيق اللوجو الجديد وتفعيله في الفوتر.');
+      alert('تم رفع لوجو أسفل الموقع. اضغط «حفظ كافة التعديلات في الموقع» لتثبيت الرابط في Firebase.');
     } else {
       alert('فشل رفع لوجو أسفل الموقع: ' + (res.error || 'يرجى التأكد من اتصال الإنترنت وصلاحية مفتاح ImgBB'));
     }
@@ -344,7 +356,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   };
 
   // Category Save / Delete Handlers
-  const handleSaveCategory = () => {
+  const handleSaveCategory = async () => {
     if (!categoryFormData.nameAr || !categoryFormData.slug) {
       alert('يرجى كتابة الاسم بالعربية والمعرّف (Slug)');
       return;
@@ -358,7 +370,11 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
           ? ({ ...c, ...categoryFormData, slug: cleanSlug } as PortfolioCategory)
           : c
       );
-      onUpdateCategories(updated);
+      try {
+        await onUpdateCategories(updated);
+      } catch {
+        return;
+      }
       setEditingCategory(null);
     } else {
       const newCat: PortfolioCategory = {
@@ -371,7 +387,11 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         active: categoryFormData.active ?? true,
         displayOrder: categoryFormData.displayOrder || categories.length + 1,
       };
-      onUpdateCategories([...categories, newCat]);
+      try {
+        await onUpdateCategories([...categories, newCat]);
+      } catch {
+        return;
+      }
       setIsAddingCategory(false);
     }
     setCategoryFormData({ nameAr: '', nameEn: '', slug: '', description: '', active: true, displayOrder: categories.length + 1 });
@@ -379,14 +399,18 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     setTimeout(() => setCategorySavedSuccess(false), 3000);
   };
 
-  const handleDeleteCategory = (catId: string, slug: string, nameAr?: string) => {
+  const handleDeleteCategory = async (catId: string, slug: string, nameAr?: string) => {
     if (slug === 'all') {
       alert('لا يمكن حذف قسم "كافة الأعمال" الأساسي.');
       return;
     }
     const catLabel = nameAr ? `"${nameAr}"` : `(${slug})`;
     if (confirm(`هل أنت متأكد من حذف تصنيف ${catLabel} نهائياً؟\n\nلن يتم حذف الألبومات المرتبطة به ولكن سيتم عرضها ضمن كافة الأعمال.`)) {
-      onUpdateCategories(categories.filter((c) => c.id !== catId));
+      try {
+        await onUpdateCategories(categories.filter((c) => c.id !== catId));
+      } catch {
+        return;
+      }
       if (editingCategory?.id === catId) {
         setEditingCategory(null);
         setIsAddingCategory(false);
@@ -395,10 +419,17 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   };
 
   // Content Save Handler
-  const handleSaveSiteContent = () => {
-    onUpdateContent(editableContent);
-    setContentSavedSuccess(true);
-    setTimeout(() => setContentSavedSuccess(false), 3000);
+  const handleSaveSiteContent = async () => {
+    setIsSavingContent(true);
+    try {
+      await onUpdateContent(editableContent);
+      setContentSavedSuccess(true);
+      setTimeout(() => setContentSavedSuccess(false), 3000);
+    } catch {
+      setContentSavedSuccess(false);
+    } finally {
+      setIsSavingContent(false);
+    }
   };
 
   const handleAddServicePackage = () => {
@@ -439,7 +470,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   };
 
   // Album Save / Delete Handlers
-  const handleSaveAlbum = () => {
+  const handleSaveAlbum = async () => {
     if (!albumFormData.title || !albumFormData.coverImage) {
       alert('يرجى كتابة عنوان الألبوم ووضع رابط صورة الغلاف');
       return;
@@ -451,7 +482,11 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
           ? ({ ...a, ...albumFormData } as Album)
           : a
       );
-      onUpdateAlbums(updated);
+      try {
+        await onUpdateAlbums(updated);
+      } catch {
+        return;
+      }
       setEditingAlbum(null);
     } else {
       const newAlbum: Album = {
@@ -467,7 +502,11 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         tags: albumFormData.tags || ['Editorial', 'Kallista'],
         images: albumFormData.images || [],
       };
-      onUpdateAlbums([newAlbum, ...albums]);
+      try {
+        await onUpdateAlbums([newAlbum, ...albums]);
+      } catch {
+        return;
+      }
       setIsCreatingAlbum(false);
     }
     setAlbumFormData({
@@ -483,26 +522,38 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     });
   };
 
-  const handleDeleteAlbum = (id: string) => {
+  const handleDeleteAlbum = async (id: string) => {
     if (confirm('هل أنت متأكد من حذف هذا الألبوم بالكامل؟')) {
-      onUpdateAlbums(albums.filter((a) => a.id !== id));
+      try {
+        await onUpdateAlbums(albums.filter((a) => a.id !== id));
+      } catch {
+        return;
+      }
     }
   };
 
   // Booking Status Handler
-  const handleUpdateBookingStatus = (bookingId: string, newStatus: Booking['status']) => {
+  const handleUpdateBookingStatus = async (bookingId: string, newStatus: Booking['status']) => {
     const updated = bookings.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b));
-    onUpdateBookings(updated);
+    try {
+      await onUpdateBookings(updated);
+    } catch {
+      return;
+    }
   };
 
-  const handleDeleteBooking = (bookingId: string) => {
+  const handleDeleteBooking = async (bookingId: string) => {
     if (confirm('هل تريد حذف هذا الحجز نهائياً؟')) {
-      onUpdateBookings(bookings.filter((b) => b.id !== bookingId));
+      try {
+        await onUpdateBookings(bookings.filter((b) => b.id !== bookingId));
+      } catch {
+        return;
+      }
     }
   };
 
   // Client Handlers
-  const handleSaveNewClient = () => {
+  const handleSaveNewClient = async () => {
     if (!newClientData.name || !newClientData.phone) {
       alert('يرجى إدخال اسم العميل ورقم الهاتف');
       return;
@@ -521,46 +572,80 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
       totalBookings: 1,
       tags: newClientData.tags || ['VIP Client'],
       createdAt: new Date().toISOString(),
+      userId: currentUserId,
     };
-    onUpdateClients([newClient, ...clients]);
+    try {
+      await onUpdateClients([newClient, ...clients]);
+    } catch {
+      return;
+    }
     setShowAddClient(false);
     setNewClientData({ name: '', phone: '', whatsapp: '', email: '', birthday: '', weddingAnniversary: '', serviceInterests: ['weddings'], notes: '', subscribeUpdates: true, tags: ['New Client'] });
   };
 
-  const handleDeleteClient = (clientId: string) => {
+  const handleDeleteClient = async (clientId: string) => {
     if (confirm('هل تريد حذف هذا العميل من سجل الـ CRM؟')) {
-      onUpdateClients(clients.filter((c) => c.id !== clientId));
+      try {
+        await onUpdateClients(clients.filter((c) => c.id !== clientId));
+      } catch {
+        return;
+      }
     }
   };
 
   // Review Handlers
-  const handleToggleReviewApproval = (id: string) => {
+  const handleToggleReviewApproval = async (id: string) => {
     const updated = reviews.map((r) => (r.id === id ? { ...r, approved: !r.approved } : r));
-    onUpdateReviews(updated);
+    try {
+      await onUpdateReviews(updated);
+    } catch {
+      return;
+    }
   };
 
-  const handleDeleteReview = (id: string) => {
+  const handleDeleteReview = async (id: string) => {
     if (confirm('هل تريد حذف هذا التقييم؟')) {
-      onUpdateReviews(reviews.filter((r) => r.id !== id));
+      try {
+        await onUpdateReviews(reviews.filter((r) => r.id !== id));
+      } catch {
+        return;
+      }
     }
   };
 
   // Settings Save
-  const handleSaveSettings = () => {
-    onUpdateSettings({
-      ...tempSettings,
-      adminUsername: import.meta.env.VITE_ADMIN_EMAIL || tempSettings.adminUsername,
-      adminPassword: '',
-      adminPin: '',
-      useFirebaseAuth: true,
-    });
-    setSettingsSavedSuccess(true);
-    setTimeout(() => setSettingsSavedSuccess(false), 3000);
+  const handleSaveSettings = async () => {
+    setIsSavingSettings(true);
+    try {
+      await onUpdateSettings({
+        ...tempSettings,
+        adminUsername: import.meta.env.VITE_ADMIN_EMAIL || tempSettings.adminUsername,
+        adminPassword: '',
+        adminPin: '',
+        useFirebaseAuth: true,
+      });
+      setSettingsSavedSuccess(true);
+      setTimeout(() => setSettingsSavedSuccess(false), 3000);
+    } catch {
+      setSettingsSavedSuccess(false);
+    } finally {
+      setIsSavingSettings(false);
+    }
   };
 
   // Backup handlers
   const handleDownloadBackup = () => {
-    const jsonStr = exportDataAsJSON();
+    const jsonStr = JSON.stringify({
+      version: '4.0',
+      exportDate: new Date().toISOString(),
+      categories,
+      content,
+      albums,
+      bookings,
+      clients,
+      reviews,
+      settings,
+    }, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -574,12 +659,34 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      if (content && importDataFromJSON(content)) {
-        alert('تم استعادة النسخة الاحتياطية بنجاح! سيتم تحديث الصفحة.');
-        window.location.reload();
-      } else {
+    reader.onload = async (event) => {
+      try {
+        const fileContent = event.target?.result as string;
+        const data = JSON.parse(fileContent) as Partial<{
+          categories: PortfolioCategory[];
+          content: SiteContent;
+          albums: Album[];
+          bookings: Booking[];
+          clients: ClientContact[];
+          reviews: Review[];
+          settings: SiteSettings;
+        }>;
+        if (!data || !Object.keys(data).some((key) => ['categories', 'content', 'albums', 'bookings', 'clients', 'reviews', 'settings'].includes(key))) {
+          throw new Error('Invalid backup payload');
+        }
+
+        if (data.content) await onUpdateContent(data.content);
+        if (data.settings) await onUpdateSettings(data.settings);
+        if (data.categories) await onUpdateCategories(data.categories);
+        if (data.albums) await onUpdateAlbums(data.albums);
+        if (data.bookings) await onUpdateBookings(data.bookings);
+        if (data.clients) await onUpdateClients(data.clients);
+        if (data.reviews) await onUpdateReviews(data.reviews);
+
+        if (data.content) setEditableContent(data.content);
+        if (data.settings) setTempSettings(data.settings);
+        alert('تمت استعادة النسخة الاحتياطية وحفظها في Firebase بنجاح.');
+      } catch {
         alert('فشل استيراد الملف، يرجى التأكد من أنه ملف JSON صالح.');
       }
     };
@@ -863,10 +970,11 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
                     <button
                       onClick={handleSaveSiteContent}
-                      className="bg-[#24211e] hover:bg-[#3d3833] text-[#fffefb] px-6 py-2.5 rounded-xl text-xs font-semibold shadow-md flex items-center gap-2 transition-all"
+                      disabled={isSavingContent}
+                      className="bg-[#24211e] hover:bg-[#3d3833] disabled:cursor-wait disabled:opacity-60 text-[#fffefb] px-6 py-2.5 rounded-xl text-xs font-semibold shadow-md flex items-center gap-2 transition-all"
                     >
-                      <Check className="w-4 h-4 text-[#c6a585]" />
-                      <span>حفظ كافة التعديلات في الموقع</span>
+                      {isSavingContent ? <RefreshCw className="w-4 h-4 animate-spin text-[#c6a585]" /> : <Check className="w-4 h-4 text-[#c6a585]" />}
+                      <span>{isSavingContent ? 'جاري الحفظ في Firebase...' : 'حفظ كافة التعديلات في الموقع'}</span>
                     </button>
                   </div>
 
@@ -3408,9 +3516,10 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                     <div className="pt-3">
                       <button
                         onClick={handleSaveSettings}
-                        className="px-6 py-2.5 bg-[#24211e] hover:bg-[#3d3833] text-white rounded-xl text-xs font-semibold shadow-md"
+                        disabled={isSavingSettings}
+                        className="px-6 py-2.5 bg-[#24211e] hover:bg-[#3d3833] disabled:cursor-wait disabled:opacity-60 text-white rounded-xl text-xs font-semibold shadow-md"
                       >
-                        حفظ الإعدادات
+                        {isSavingSettings ? 'جاري الحفظ في Firebase...' : 'حفظ الإعدادات'}
                       </button>
                     </div>
                   </div>

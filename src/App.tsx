@@ -22,6 +22,7 @@ import {
   saveDocument,
   seedDefaults,
   subscribeToFirebaseAuthState,
+  syncUserProfile,
   watchCollection,
   watchDocument,
 } from './services/firebase';
@@ -44,6 +45,13 @@ import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { BookingModal } from './components/BookingModal';
 import { AccountModal } from './components/AccountModal';
 
+interface UserProfileRecord {
+  id: string;
+  name?: string;
+  email?: string;
+  provider?: string;
+}
+
 export default function App() {
   // Global State (Completely Dynamic & User-Editable)
   const [categories, setCategories] = useState<PortfolioCategory[]>(() => getPortfolioCategories());
@@ -52,6 +60,7 @@ export default function App() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [clients, setClients] = useState<ClientContact[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [registeredUsers, setRegisteredUsers] = useState<UserProfileRecord[]>([]);
   const [settings, setSettings] = useState<SiteSettings>(() => getSettings());
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -71,6 +80,7 @@ export default function App() {
 
   useEffect(() => subscribeToFirebaseAuthState(async (nextUser) => {
     setUser(nextUser);
+    if (nextUser) void syncUserProfile(nextUser).catch((error) => console.warn('Profile sync failed:', error));
     setIsAdmin(await isFirebaseAdmin(nextUser).catch(() => false));
   }), []);
 
@@ -94,6 +104,7 @@ export default function App() {
       watchCollection<Booking>(FIRESTORE_COLLECTIONS.BOOKINGS, setBookings),
       watchCollection<ClientContact>(FIRESTORE_COLLECTIONS.CLIENTS, setClients),
       watchCollection<Review>(FIRESTORE_COLLECTIONS.REVIEWS, setReviews),
+      watchCollection<UserProfileRecord>(FIRESTORE_COLLECTIONS.PROFILES, setRegisteredUsers),
     ];
     return () => unsubscribers.forEach((unsubscribe) => unsubscribe());
   }, [isAdmin]);
@@ -231,6 +242,18 @@ export default function App() {
     setIsQuickBookingOpen(true);
   };
 
+  const handleOpenAdmin = () => {
+    if (!user) {
+      setIsAccountOpen(true);
+      return;
+    }
+    if (!isAdmin) {
+      alert('الحساب الحالي مستخدم عادي ولا يملك صلاحية فتح لوحة التحكم.');
+      return;
+    }
+    setIsAdminOpen(true);
+  };
+
   // Birthday alerts count
   const birthdayAlerts = getUpcomingBirthdayAlerts(clients);
 
@@ -245,7 +268,7 @@ export default function App() {
         activeSection={activeSection}
         onNavigate={handleNavigate}
         onOpenBooking={() => handleOpenQuickBooking('weddings')}
-        onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenAdmin={handleOpenAdmin}
         onOpenAccount={() => setIsAccountOpen(true)}
         userLabel={user?.displayName || user?.email || undefined}
         birthdayAlertCount={birthdayAlerts.length}
@@ -334,7 +357,7 @@ export default function App() {
         categories={categories}
         onNavigate={handleNavigate}
         onOpenBooking={() => handleOpenQuickBooking('weddings')}
-        onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenAdmin={handleOpenAdmin}
       />
 
       {/* MODAL DIALOGS */}
@@ -377,6 +400,12 @@ export default function App() {
       <AdminDashboardModal
         isOpen={isAdminOpen}
         onClose={() => setIsAdminOpen(false)}
+        isAdminAuthenticated={isAdmin}
+        registeredUsersCount={registeredUsers.length}
+        onRequestLogin={() => {
+          setIsAdminOpen(false);
+          setIsAccountOpen(true);
+        }}
         albums={albums}
         categories={categories}
         content={content}

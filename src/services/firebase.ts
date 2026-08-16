@@ -148,6 +148,17 @@ export async function loginWithGoogle() {
   }
 }
 
+export async function syncUserProfile(user: User): Promise<void> {
+  const provider = user.providerData.find((item) => item.providerId)?.providerId || 'password';
+  await setDoc(doc(requireDb(), FIRESTORE_COLLECTIONS.PROFILES, user.uid), {
+    name: user.displayName || '',
+    email: user.email || '',
+    provider,
+    createdAt: user.metadata.creationTime || new Date().toISOString(),
+    lastLoginAt: serverTimestamp(),
+  }, { merge: true });
+}
+
 export async function resetFirebasePassword(email: string) {
   try {
     await sendPasswordResetEmail(requireAuth(), email);

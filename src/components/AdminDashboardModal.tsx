@@ -14,11 +14,14 @@ import {
   createBookingInquiryWhatsAppLink, exportDataAsJSON, importDataFromJSON,
   ronadisaPhoto, veiledWeddingPhoto, veiledFashionPhoto, veiledFamilyPhoto
 } from '../services/storage';
-import { isFirebaseAdmin, loginWithFirebase, logoutFirebase, subscribeToFirebaseAuthState } from '../services/firebase';
+import { logoutFirebase } from '../services/firebase';
 
 interface AdminDashboardModalProps {
   isOpen: boolean;
   onClose: () => void;
+  isAdminAuthenticated: boolean;
+  registeredUsersCount: number;
+  onRequestLogin: () => void;
   albums: Album[];
   categories: PortfolioCategory[];
   content: SiteContent;
@@ -38,6 +41,9 @@ interface AdminDashboardModalProps {
 export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   isOpen,
   onClose,
+  isAdminAuthenticated,
+  registeredUsersCount,
+  onRequestLogin,
   albums,
   categories,
   content,
@@ -53,13 +59,6 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   onUpdateReviews,
   onUpdateSettings,
 }) => {
-  // Authentication State
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-
   // Active Admin Tab (Firebase tab removed as requested, Firebase Auth is retained for login)
   const [activeTab, setActiveTab] = useState<
     'content' | 'categories' | 'albums' | 'uploader' | 'bookings' | 'clients' | 'reviews' | 'settings'
@@ -141,32 +140,11 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   // Settings edit state
   const [tempSettings, setTempSettings] = useState<SiteSettings>(settings);
   const [settingsSavedSuccess, setSettingsSavedSuccess] = useState(false);
-  useEffect(() => subscribeToFirebaseAuthState(async (user) => {
-    setIsAuthenticated(await isFirebaseAdmin(user).catch(() => false));
-  }), []);
-
   if (!isOpen) return null;
-
-  // Firebase Authentication + UID/role verification.
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginError('');
-    setIsLoggingIn(true);
-
-    const result = await loginWithFirebase(loginEmail.trim(), loginPassword);
-    if (result.success && await isFirebaseAdmin(result.user)) {
-      setIsAuthenticated(true);
-      setIsLoggingIn(false);
-      return;
-    }
-    if (result.success) await logoutFirebase();
-    setLoginError(result.success ? 'هذا الحساب لا يملك صلاحية إدارة الموقع.' : result.error);
-    setIsLoggingIn(false);
-  };
 
   const handleLogout = async () => {
     await logoutFirebase();
-    setIsAuthenticated(false);
+    onClose();
   };
 
   // Birthday Alerts calculation
@@ -580,7 +558,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
-            {isAuthenticated && (
+            {isAdminAuthenticated && (
               <button
                 onClick={handleLogout}
                 className="px-3 py-1.5 rounded-xl border border-[#d8cfc4] hover:bg-[#e6e1d6] text-xs font-semibold text-[#5a4f44] transition-colors"
@@ -599,7 +577,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         </div>
 
         {/* MODAL BODY */}
-        {!isAuthenticated ? (
+        {!isAdminAuthenticated ? (
           /* LOGIN SCREEN */
           <div className="flex-1 p-8 sm:p-16 flex items-center justify-center">
             <div className="w-full max-w-md bg-[#fffefb] p-8 rounded-3xl border border-[#e6e1d6] shadow-xl text-center space-y-6">
@@ -616,54 +594,14 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 </p>
               </div>
 
-              <form onSubmit={handleLoginSubmit} className="space-y-4 text-right">
-                <div>
-                  <label className="block text-xs font-semibold text-[#403831] mb-1">
-                    البريد الإلكتروني / اسم المستخدم (Email)
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    autoComplete="off"
-                    name="kallista-admin-email"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    placeholder="أدخل البريد الإلكتروني"
-                    className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-sm text-[#24211e]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-[#403831] mb-1">
-                    كلمة مرور حساب Firebase
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    autoComplete="off"
-                    name="kallista-admin-password"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full px-4 py-3 rounded-xl bg-[#e6e1d6]/30 border border-[#e6e1d6] focus:border-[#c6a585] outline-none text-sm text-[#24211e]"
-                  />
-                </div>
-
-                {loginError && (
-                  <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 text-right">
-                    {loginError}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={isLoggingIn}
-                  className="w-full bg-[#24211e] hover:bg-[#3d3833] text-[#fffefb] py-3.5 rounded-xl font-medium text-sm transition-all shadow-md flex items-center justify-center gap-2"
-                >
-                  {isLoggingIn ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Key className="w-4 h-4 text-[#c6a585]" />}
-                  <span>{isLoggingIn ? 'جاري التحقق...' : 'دخول لوحة التحكم'}</span>
-                </button>
-              </form>
+              <button
+                type="button"
+                onClick={onRequestLogin}
+                className="w-full bg-[#24211e] hover:bg-[#3d3833] text-[#fffefb] py-3.5 rounded-xl font-medium text-sm transition-all shadow-md flex items-center justify-center gap-2"
+              >
+                <Key className="w-4 h-4 text-[#c6a585]" />
+                <span>الدخول من حسابي</span>
+              </button>
 
               <div className="pt-2 text-[11px] text-[#8c7f73] bg-[#faf7f2] p-3 rounded-xl border border-[#e8ded3]">
                 الدخول محمي بواسطة Firebase Authentication، ولا توجد كلمة مرور افتراضية أو PIN داخل كود الموقع.
@@ -822,6 +760,25 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
               {/* TAB 1: SITE CONTENT CMS (Edit All Sections) */}
               {activeTab === 'content' && (
                 <div className="space-y-6 text-right">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    {[
+                      { label: 'الحسابات المسجّلة', value: registeredUsersCount, icon: UserCheck },
+                      { label: 'سجل العملاء', value: clients.length, icon: Users },
+                      { label: 'طلبات الحجز', value: bookings.length, icon: Calendar },
+                      { label: 'الألبومات', value: albums.length, icon: ImageIcon },
+                    ].map(({ label, value, icon: MetricIcon }) => (
+                      <div key={label} className="rounded-2xl border border-[#e6e1d6] bg-[#faf8f5] p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <MetricIcon className="w-5 h-5 text-[#8c6742]" />
+                          <span className="font-serif text-2xl font-bold text-[#24211e]">{value}</span>
+                        </div>
+                        <p className="mt-2 text-xs font-semibold text-[#6e6359]">{label}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-[#8c7f73]">
+                    عداد الحسابات يعرض المستخدمين الفريدين الذين سجّلوا دخولهم إلى الموقع منذ تفعيل الإحصاء.
+                  </p>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e6e1d6] pb-4">
                     <div>
                       <h3 className="font-arabic-editorial text-2xl font-bold text-[#24211e] flex items-center gap-2">

@@ -114,7 +114,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {/* CTA & Admin Control actions */}
-          <div className="hidden sm:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3">
             <button
               onClick={onOpenAccount}
               className="flex items-center gap-1.5 rounded-full px-3 py-2 text-xs text-[#6c635b] hover:bg-[#efe9e0]/70 hover:text-[#1a1715]"

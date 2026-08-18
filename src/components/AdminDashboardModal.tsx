@@ -181,19 +181,23 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     ...(editableContent.contact.facebook ? [{ id: 'social-facebook', label: 'Facebook', icon: 'facebook', url: editableContent.contact.facebook }] : []),
     ...(editableContent.contact.tiktok ? [{ id: 'social-tiktok', label: 'TikTok', icon: 'tiktok', url: editableContent.contact.tiktok }] : []),
   ];
-  if (!isOpen) return null;
+  const occasionAlerts = React.useMemo(
+  () => getUpcomingOccasionAlerts(400),
+  []
+);
 
-  const handleLogout = async () => {
-    await logoutFirebase();
-    onClose();
-  };
+if (!isOpen) return null;
 
-  // Birthday Alerts calculation
-  const birthdayAlerts = getUpcomingBirthdayAlerts(clients);
-  // Hijri dates move ~11 days a year, so scan far enough ahead that the next
-  // occasion is always visible rather than appearing only weeks beforehand.
-  const occasionAlerts = React.useMemo(() => getUpcomingOccasionAlerts(400), []);
-  const greetableClients = clients.filter((client) => client.whatsapp || client.phone);
+const handleLogout = async () => {
+  await logoutFirebase();
+  onClose();
+};
+
+// Birthday Alerts calculation
+const birthdayAlerts = getUpcomingBirthdayAlerts(clients);
+const greetableClients = clients.filter(
+  (client) => client.whatsapp || client.phone
+);
 
   // Uploader Handlers
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

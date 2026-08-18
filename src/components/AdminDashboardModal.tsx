@@ -3905,7 +3905,7 @@ const greetableClients = clients.filter(
                       <div className="mb-3">
                         <span className="block text-xs font-bold text-[#24211e]">ثيم ألوان الموقع</span>
                         <span className="mt-1 block text-[11px] leading-5 text-[#73685d]">
-                          الثيم الثاني يحافظ على هوية كاليستا الحالية مع زيادة حضور الأخضر بدرجاته الهادئة والعميقة.
+                          اختر من أربعة ثيمات تحفظ هوية كاليستا، من الكلاسيكي إلى الأخضر الدافئ والزيتوني التحريري.
                         </span>
                       </div>
 
@@ -3981,6 +3981,80 @@ const greetableClients = clients.filter(
                             <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#8fa278' }} />
                             <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#738262' }} />
                             <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#4e633d' }} />
+                          </div>
+                        </label>
+
+                        <label
+                          className={`cursor-pointer rounded-2xl border p-4 transition-all ${
+                            tempSettings.themeKey === 'meadow'
+                              ? 'border-[#8fa278] bg-[#fff9ee] shadow-sm ring-1 ring-[#e7b07b]/35'
+                              : 'border-[#e6e1d6] bg-white hover:border-[#8fa278]/70'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="siteTheme"
+                            value="meadow"
+                            checked={tempSettings.themeKey === 'meadow'}
+                            onChange={() => setTempSettings({ ...tempSettings, themeKey: 'meadow' })}
+                            className="sr-only"
+                          />
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <span className="block text-xs font-bold text-[#302a25]">Kallista Meadow</span>
+                              <span className="mt-1 block text-[10px] leading-4 text-[#73685d]">
+                                أخضر فاتح مع برتقاني ناعم وبيج وسكري — دافئ، طبيعي ومشرق.
+                              </span>
+                            </div>
+                            <span className={`mt-0.5 h-4 w-4 rounded-full border-2 ${
+                              tempSettings.themeKey === 'meadow'
+                                ? 'border-[#8fa278] bg-[#8fa278]'
+                                : 'border-[#d8cfc4] bg-white'
+                            }`} />
+                          </div>
+                          <div className="mt-4 flex gap-1.5" aria-hidden="true">
+                            <span className="h-7 flex-1 rounded-lg border border-[#eee3d3]" style={{ backgroundColor: '#fff9ee' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#ddd1be' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#b8c9a7' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#e7b07b' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#667a52' }} />
+                          </div>
+                        </label>
+
+                        <label
+                          className={`cursor-pointer rounded-2xl border p-4 transition-all ${
+                            tempSettings.themeKey === 'olive-blush'
+                              ? 'border-[#929d78] bg-[#fff9f1] shadow-sm ring-1 ring-[#d8b3a8]/35'
+                              : 'border-[#e6e1d6] bg-white hover:border-[#929d78]/70'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="siteTheme"
+                            value="olive-blush"
+                            checked={tempSettings.themeKey === 'olive-blush'}
+                            onChange={() => setTempSettings({ ...tempSettings, themeKey: 'olive-blush' })}
+                            className="sr-only"
+                          />
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <span className="block text-xs font-bold text-[#342c28]">Kallista Olive Blush</span>
+                              <span className="mt-1 block text-[10px] leading-4 text-[#73685d]">
+                                زيتوني هادئ مع وردي ترابي وبيج — طابع Editorial فاخر وناعم.
+                              </span>
+                            </div>
+                            <span className={`mt-0.5 h-4 w-4 rounded-full border-2 ${
+                              tempSettings.themeKey === 'olive-blush'
+                                ? 'border-[#929d78] bg-[#929d78]'
+                                : 'border-[#d8cfc4] bg-white'
+                            }`} />
+                          </div>
+                          <div className="mt-4 flex gap-1.5" aria-hidden="true">
+                            <span className="h-7 flex-1 rounded-lg border border-[#eadfd2]" style={{ backgroundColor: '#fff9f1' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#d9ccba' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#b6be9d' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#d8b3a8' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#606b4d' }} />
                           </div>
                         </label>
                       </div>

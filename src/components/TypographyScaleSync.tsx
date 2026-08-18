@@ -758,19 +758,15 @@ const typographyCss = `
   }
 
   /*
-   * Kallista Velora — faithful colour distribution based on the Velora source.
-   * Palette:
-   *   background       #fffefb
-   *   alternate        #e6e1d6
-   *   green            #afbb9c
-   *   warm accent      #c6a585
-   *   primary text     #2c2a26
-   *   secondary text   #6b6459
-   *   border           #e2ddd0
-   *   footer           #2c2a26
+   * Kallista Velora V2
+   * ------------------
+   * This version fixes the selector bug in V1:
+   * [class*='...'] also matched opacity utilities and hover utilities such as
+   * bg-[#738262]/15 and hover:text-[#c6a585], which made translucent blocks
+   * solid and made hover colours appear permanently.
    *
-   * Kallista keeps its own layout/content; this block changes only visual theme
-   * distribution and public light-theme colours.
+   * V2 uses exact class-token matching ([class~='...']) and explicitly
+   * preserves opacity variants. It changes only the Velora public theme.
    */
   html[data-kallista-theme='velora']:not([data-theme='dark']) {
     --color-offwhite: #fffefb;
@@ -778,251 +774,471 @@ const typographyCss = `
     --color-gray-green: #afbb9c;
     --color-gray-orange: #c6a585;
     --color-dark: #2c2a26;
+
+    --velora-bg: #fffefb;
+    --velora-bg-alt: #e6e1d6;
+    --velora-green: #afbb9c;
+    --velora-green-deep: #7f8f6c;
+    --velora-orange: #c6a585;
+    --velora-orange-hover: #b18f6f;
+    --velora-text: #2c2a26;
+    --velora-text-soft: #6b6459;
+    --velora-border: #e2ddd0;
+    --velora-footer-text: #b7b1a3;
+    --velora-footer-muted: #918b7d;
   }
 
-  /* Exact Velora typography: Arabic = Cairo, English body = Poppins,
-     English display headings = Playfair Display. */
-  html[data-kallista-theme='velora']:not([data-theme='dark'])[lang='ar'] body,
+  /* Exact Velora font family on the PUBLIC interface only.
+     The admin dashboard keeps its own inherited typography. */
   html[data-kallista-theme='velora']:not([data-theme='dark'])[lang='ar']
-  #kallista-app-root {
+  #kallista-app-root > :where(header, main, footer),
+  html[data-kallista-theme='velora']:not([data-theme='dark'])[lang='ar']
+  #kallista-app-root [role='dialog']:not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *) {
     font-family: 'Cairo', 'Poppins', sans-serif !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])[lang='ar']
-  #kallista-app-root :where(h1, h2, h3, h4, h5, h6, .font-serif-luxury, .font-arabic-editorial) {
+  #kallista-app-root > :where(header, main, footer)
+  :where(h1, h2, h3, h4, h5, h6, .font-serif-luxury, .font-arabic-editorial),
+  html[data-kallista-theme='velora']:not([data-theme='dark'])[lang='ar']
+  #kallista-app-root [role='dialog']:not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *)
+  :where(h1, h2, h3, h4, h5, h6, .font-serif-luxury, .font-arabic-editorial) {
     font-family: 'Cairo', 'Poppins', sans-serif !important;
     font-weight: 700;
   }
 
-  html[data-kallista-theme='velora']:not([data-theme='dark'])[lang='en'] body,
   html[data-kallista-theme='velora']:not([data-theme='dark'])[lang='en']
-  #kallista-app-root {
+  #kallista-app-root > :where(header, main, footer),
+  html[data-kallista-theme='velora']:not([data-theme='dark'])[lang='en']
+  #kallista-app-root [role='dialog']:not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *) {
     font-family: 'Poppins', 'Cairo', sans-serif !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])[lang='en']
-  #kallista-app-root :where(h1, h2, h3, h4, h5, h6, .font-serif-luxury, .font-arabic-editorial) {
+  #kallista-app-root > :where(header, main, footer)
+  :where(h1, h2, h3, h4, h5, h6, .font-serif-luxury, .font-arabic-editorial),
+  html[data-kallista-theme='velora']:not([data-theme='dark'])[lang='en']
+  #kallista-app-root [role='dialog']:not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *)
+  :where(h1, h2, h3, h4, h5, h6, .font-serif-luxury, .font-arabic-editorial) {
     font-family: 'Playfair Display', 'Cairo', serif !important;
     font-weight: 600;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark']) body,
   html[data-kallista-theme='velora']:not([data-theme='dark']) #kallista-app-root {
-    color: #2c2a26;
-    background-color: #fffefb !important;
+    color: var(--velora-text);
+    background-color: var(--velora-bg) !important;
   }
 
-  /* Velora-style translucent off-white navigation. */
+  /* Velora header: warm off-white with the same subtle blur as the source site. */
   html[data-kallista-theme='velora']:not([data-theme='dark'])
   #kallista-app-root > header {
-    color: #2c2a26 !important;
+    color: var(--velora-text) !important;
     background: rgba(255, 254, 251, 0.92) !important;
-    border-color: #e2ddd0 !important;
+    border-color: var(--velora-border) !important;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
 
-  /* Off-white / light-beige alternating sections. */
+  /* Main rhythm: off-white / beige, while nested sections keep their own intended tone. */
   html[data-kallista-theme='velora']:not([data-theme='dark'])
   #kallista-app-root > main > section:nth-of-type(odd) {
-    background-color: #fffefb !important;
+    background-color: var(--velora-bg) !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
   #kallista-app-root > main > section:nth-of-type(even) {
-    background-color: #e6e1d6 !important;
+    background-color: var(--velora-bg-alt) !important;
   }
 
-  /* White cards on both section colours, with Velora's soft border. */
+  /* Nested about sections and any explicit section backgrounds. */
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main
+  #kallista-app-root main section[class~='bg-[#fffefb]'] {
+    background-color: var(--velora-bg) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root main section[class~='bg-[#e6e1d6]/30'] {
+    background-color: var(--velora-bg-alt) !important;
+  }
+
+  /* Exact solid card/background mappings. They DO NOT match /opacity or hover utilities. */
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root
   :where(
-    div[class*='bg-white'],
-    div[class*='bg-[#fffefb]'],
-    div[class*='bg-[#FAF8F5]'],
-    div[class*='bg-[#faf8f5]'],
-    div[class*='bg-[#faf7f2]'],
-    div[class*='bg-[#fdfaf6]'],
-    div[class*='bg-[#f8f4ee]'],
-    div[class*='bg-[#F7F3EE]'],
-    article[class*='bg-white'],
-    article[class*='bg-[#fffefb]'],
-    article[class*='bg-[#FAF8F5]'],
-    aside[class*='bg-white'],
-    aside[class*='bg-[#fffefb]'],
-    form[class*='bg-white'],
-    form[class*='bg-[#fffefb]']
+    main,
+    [role='dialog']:not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *)
+  )
+  :where(
+    [class~='bg-white'],
+    [class~='bg-[#fffefb]'],
+    [class~='bg-[#FAF8F5]'],
+    [class~='bg-[#faf8f5]'],
+    [class~='bg-[#faf7f2]'],
+    [class~='bg-[#fdfaf6]'],
+    [class~='bg-[#f8f4ee]'],
+    [class~='bg-[#F7F3EE]']
   ) {
     background-color: #ffffff !important;
-    border-color: #e2ddd0 !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main
+  #kallista-app-root
   :where(
-    div[class*='bg-[#e6e1d6]'],
-    div[class*='bg-[#EAE3DA]'],
-    div[class*='bg-[#f2ede4]'],
-    div[class*='bg-[#efe9e0]'],
-    div[class*='bg-[#EFE9E0]'],
-    article[class*='bg-[#e6e1d6]'],
-    article[class*='bg-[#EAE3DA]']
+    main,
+    [role='dialog']:not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *)
+  )
+  :where(
+    [class~='bg-[#e6e1d6]'],
+    [class~='bg-[#EAE3DA]'],
+    [class~='bg-[#f2ede4]'],
+    [class~='bg-[#efe9e0]'],
+    [class~='bg-[#EFE9E0]']
   ) {
-    background-color: #e6e1d6 !important;
-    border-color: #e2ddd0 !important;
+    background-color: var(--velora-bg-alt) !important;
   }
 
-  /* Primary headings and strong labels use Velora's dark brown-charcoal. */
+  /* Preserve Kallista's intentionally translucent warm surfaces. */
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root
-  :where(
-    [class*='text-[#1A1715]'],
-    [class*='text-[#1a1715]'],
-    [class*='text-[#24211e]'],
-    [class*='text-[#302a25]'],
-    [class*='text-[#38312b]'],
-    [class*='text-[#3d342d]'],
-    [class*='text-[#3d362f]'],
-    [class*='text-[#403831]'],
-    [class*='text-[#423d38]']
-  ):not(#kallista-admin-dashboard *) {
-    color: #2c2a26 !important;
-  }
-
-  /* Body copy / secondary labels use the exact Velora soft-text tone. */
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root
-  :where(
-    [class*='text-[#4a4038]'],
-    [class*='text-[#4d443b]'],
-    [class*='text-[#524940]'],
-    [class*='text-[#524941]'],
-    [class*='text-[#594f45]'],
-    [class*='text-[#595046]'],
-    [class*='text-[#5C534C]'],
-    [class*='text-[#5a4f44]'],
-    [class*='text-[#5c5248]'],
-    [class*='text-[#5e4b3c]'],
-    [class*='text-[#5e4e3e]'],
-    [class*='text-[#5e4f40]'],
-    [class*='text-[#5e5348]'],
-    [class*='text-[#5f554c]'],
-    [class*='text-[#61574d]'],
-    [class*='text-[#665a4e]'],
-    [class*='text-[#6C635B]'],
-    [class*='text-[#6c6258]'],
-    [class*='text-[#6c635b]'],
-    [class*='text-[#6e6359]'],
-    [class*='text-[#70655a]'],
-    [class*='text-[#73685d]'],
-    [class*='text-[#786d62]'],
-    [class*='text-[#7C7167]'],
-    [class*='text-[#7d7266]'],
-    [class*='text-[#85796f]'],
-    [class*='text-[#8a8075]'],
-    [class*='text-[#8c7b6f]'],
-    [class*='text-[#8c7e72]'],
-    [class*='text-[#8c7f73]'],
-    [class*='text-[#9b9188]']
-  ):not(#kallista-admin-dashboard *) {
-    color: #6b6459 !important;
-  }
-
-  /* Green accents mirror Velora's secondary accent. */
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root
-  :where(
-    [class*='text-[#738262]'],
-    [class*='text-[#5f6c50]'],
-    [class*='text-[#445636]'],
-    [class*='text-[#465738]'],
-    [class*='text-[#495b3a]'],
-    [class*='text-[#4e5e40]'],
-    [class*='text-[#4e633d]']
-  ):not(#kallista-admin-dashboard *) {
-    color: #7f8f6c !important;
-  }
-
-  /* Warm eyebrow / accent lines. */
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root
-  :where(
-    [class*='text-[#c6a585]'],
-    [class*='text-[#a5794f]']
-  ):not(#kallista-admin-dashboard *) {
-    color: #c6a585 !important;
+  #kallista-app-root [class~='bg-[#e6e1d6]/20'] {
+    background-color: rgba(230, 225, 214, 0.20) !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root
-  :where(
-    [class*='border-[#e6e1d6]'],
-    [class*='border-[#EAE3DA]'],
-    [class*='border-[#ded5c7]'],
-    [class*='border-[#d8cfc4]']
-  ):not(#kallista-admin-dashboard *) {
-    border-color: #e2ddd0 !important;
-  }
-
-  /* Primary Kallista dark buttons become Velora warm-orange buttons. */
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main button[class*='bg-[#24211e]'],
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main a[class*='bg-[#24211e]'],
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main button[class*='bg-[#c6a585]'],
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main a[class*='bg-[#c6a585]'] {
-    color: #ffffff !important;
-    background-color: #c6a585 !important;
-    border-color: #c6a585 !important;
+  #kallista-app-root [class~='bg-[#e6e1d6]/30'] {
+    background-color: rgba(230, 225, 214, 0.30) !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main button[class*='bg-[#24211e]']:hover,
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main a[class*='bg-[#24211e]']:hover,
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main button[class*='bg-[#c6a585]']:hover,
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main a[class*='bg-[#c6a585]']:hover {
-    color: #ffffff !important;
-    background-color: #b18f6f !important;
-  }
-
-  /* Green action states (filters/pills/secondary actions). */
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main [class*='bg-[#738262]'] {
-    color: #ffffff !important;
-    background-color: #afbb9c !important;
-    border-color: #afbb9c !important;
+  #kallista-app-root [class~='bg-[#e6e1d6]/40'] {
+    background-color: rgba(230, 225, 214, 0.40) !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main [class*='bg-[#738262]']:hover {
-    background-color: #7f8f6c !important;
-  }
-
-  /* Forms: off-white fields, soft border, orange focus — exactly Velora's hierarchy. */
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main :where(input, textarea, select) {
-    color: #2c2a26 !important;
-    background-color: #fffefb !important;
-    border-color: #e2ddd0 !important;
+  #kallista-app-root [class~='bg-[#e6e1d6]/50'] {
+    background-color: rgba(230, 225, 214, 0.50) !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #kallista-app-root > main :where(input, textarea, select):focus {
-    background-color: #ffffff !important;
-    border-color: #c6a585 !important;
-    outline-color: #c6a585 !important;
+  #kallista-app-root [class~='bg-[#e6e1d6]/95'] {
+    background-color: rgba(230, 225, 214, 0.95) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#fffefb]/55'] {
+    background-color: rgba(255, 254, 251, 0.55) !important;
   }
 
   /*
-   * Footer reproduces Velora's dark footer distribution:
-   * dark #2c2a26 background, white titles, #b7b1a3 body/links,
-   * #918b7d bottom copy and orange hover/accent.
+   * Green translucent surfaces — this is the main V1 bug fix.
+   * The FAQ helper, WhatsApp inquiry blocks, VIP cards, avatars and success icons
+   * stay translucent instead of becoming a solid green rectangle.
    */
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#738262]/10'] {
+    background-color: rgba(175, 187, 156, 0.10) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#738262]/15'] {
+    background-color: rgba(175, 187, 156, 0.15) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#738262]/20'] {
+    background-color: rgba(175, 187, 156, 0.20) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#738262]/25'] {
+    background-color: rgba(175, 187, 156, 0.25) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#738262]/30'] {
+    background-color: rgba(175, 187, 156, 0.30) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#afbb9c]/20'] {
+    background-color: rgba(175, 187, 156, 0.20) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#afbb9c]/25'] {
+    background-color: rgba(175, 187, 156, 0.25) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#afbb9c]/30'] {
+    background-color: rgba(175, 187, 156, 0.30) !important;
+  }
+
+  /* Warm translucent accents keep their opacity. */
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#c6a585]/10'] {
+    background-color: rgba(198, 165, 133, 0.10) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#c6a585]/15'] {
+    background-color: rgba(198, 165, 133, 0.15) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#c6a585]/20'] {
+    background-color: rgba(198, 165, 133, 0.20) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#c6a585]/30'] {
+    background-color: rgba(198, 165, 133, 0.30) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#c6a585]/40'] {
+    background-color: rgba(198, 165, 133, 0.40) !important;
+  }
+
+  /* Exact text mappings — hover:text-* classes are no longer captured. */
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root
+  :where(
+    [class~='text-[#1A1715]'],
+    [class~='text-[#1a1715]'],
+    [class~='text-[#24211e]'],
+    [class~='text-[#302a25]'],
+    [class~='text-[#38312b]'],
+    [class~='text-[#3d342d]'],
+    [class~='text-[#3d362f]'],
+    [class~='text-[#403831]'],
+    [class~='text-[#423d38]']
+  ):not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *) {
+    color: var(--velora-text) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root
+  :where(
+    [class~='text-[#4a4038]'],
+    [class~='text-[#4d443b]'],
+    [class~='text-[#524940]'],
+    [class~='text-[#524941]'],
+    [class~='text-[#594f45]'],
+    [class~='text-[#595046]'],
+    [class~='text-[#5C534C]'],
+    [class~='text-[#5a4f44]'],
+    [class~='text-[#5c5248]'],
+    [class~='text-[#5e4b3c]'],
+    [class~='text-[#5e4e3e]'],
+    [class~='text-[#5e4f40]'],
+    [class~='text-[#5e5348]'],
+    [class~='text-[#5f554c]'],
+    [class~='text-[#61574d]'],
+    [class~='text-[#665a4e]'],
+    [class~='text-[#6C635B]'],
+    [class~='text-[#6c6258]'],
+    [class~='text-[#6c635b]'],
+    [class~='text-[#6e6359]'],
+    [class~='text-[#70655a]'],
+    [class~='text-[#73685d]'],
+    [class~='text-[#786d62]'],
+    [class~='text-[#7C7167]'],
+    [class~='text-[#7d7266]'],
+    [class~='text-[#85796f]'],
+    [class~='text-[#8a8075]'],
+    [class~='text-[#8c7b6f]'],
+    [class~='text-[#8c7e72]'],
+    [class~='text-[#8c7f73]'],
+    [class~='text-[#9b9188]']
+  ):not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *) {
+    color: var(--velora-text-soft) !important;
+  }
+
+  /* Green is reserved for real accent text/icons, with a deeper readable tone. */
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root
+  :where(
+    [class~='text-[#738262]'],
+    [class~='text-[#5f6c50]'],
+    [class~='text-[#4e633d]']
+  ):not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *) {
+    color: var(--velora-green-deep) !important;
+  }
+
+  /* Body copy that was green in Kallista becomes Velora's soft text colour.
+     This fixes the low-contrast FAQ/booking helper copy visible in the screenshot. */
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root
+  :where(
+    [class~='text-[#445636]'],
+    [class~='text-[#465738]'],
+    [class~='text-[#495b3a]'],
+    [class~='text-[#4e5e40]']
+  ):not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *) {
+    color: var(--velora-text-soft) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root
+  :where(
+    [class~='text-[#c6a585]'],
+    [class~='text-[#a5794f]'],
+    [class~='text-[#8c6742]']
+  ):not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *) {
+    color: var(--velora-orange) !important;
+  }
+
+  /* Exact borders; hover:border-* is no longer permanently applied. */
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root
+  :where(
+    [class~='border-[#e6e1d6]'],
+    [class~='border-[#EAE3DA]'],
+    [class~='border-[#ded5c7]'],
+    [class~='border-[#d8cfc4]'],
+    [class~='border-[#e8dfd5]'],
+    [class~='border-[#e6ded3]']
+  ):not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *) {
+    border-color: var(--velora-border) !important;
+  }
+
+  /* Preserve translucent green borders. */
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='border-[#738262]/30'] {
+    border-color: rgba(175, 187, 156, 0.45) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='border-[#738262]/25'] {
+    border-color: rgba(175, 187, 156, 0.35) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='border-[#c6a585]/30'] {
+    border-color: rgba(198, 165, 133, 0.38) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='border-[#c6a585]/40'] {
+    border-color: rgba(198, 165, 133, 0.48) !important;
+  }
+
+  /*
+   * Primary actions:
+   * only elements with the exact solid bg classes are remapped.
+   * Photo overlays using bg-[#24211e]/80 or /90 remain dark translucent.
+   */
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root
+  :where(main, [role='dialog']:not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *))
+  :where(
+    button[class~='bg-[#24211e]'],
+    a[class~='bg-[#24211e]'],
+    button[class~='bg-[#c6a585]'],
+    a[class~='bg-[#c6a585]']
+  ) {
+    color: #ffffff !important;
+    background-color: var(--velora-orange) !important;
+    border-color: var(--velora-orange) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root
+  :where(main, [role='dialog']:not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *))
+  :where(
+    button[class~='bg-[#24211e]'],
+    a[class~='bg-[#24211e]'],
+    button[class~='bg-[#c6a585]'],
+    a[class~='bg-[#c6a585]']
+  ):hover {
+    color: #ffffff !important;
+    background-color: var(--velora-orange-hover) !important;
+  }
+
+  /* Solid green actions only. Translucent green helpers are handled above. */
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root
+  :where(main, [role='dialog']:not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *))
+  :where(
+    button[class~='bg-[#738262]'],
+    a[class~='bg-[#738262]']
+  ) {
+    color: #ffffff !important;
+    background-color: var(--velora-green) !important;
+    border-color: var(--velora-green) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root
+  :where(main, [role='dialog']:not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *))
+  :where(
+    button[class~='bg-[#738262]'],
+    a[class~='bg-[#738262]']
+  ):hover {
+    background-color: var(--velora-green-deep) !important;
+  }
+
+  /* Tailwind hover classes keep their stateful behaviour instead of becoming permanent. */
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='hover:text-[#c6a585]']:hover {
+    color: var(--velora-orange) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='hover:border-[#c6a585]']:hover {
+    border-color: var(--velora-orange) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='hover:border-[#738262]']:hover {
+    border-color: var(--velora-green-deep) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='hover:bg-[#738262]/25']:hover {
+    background-color: rgba(175, 187, 156, 0.25) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='hover:bg-[#e6e1d6]']:hover {
+    background-color: var(--velora-bg-alt) !important;
+  }
+
+  /* Forms reproduce Velora's off-white fields and orange focus state. */
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root
+  :where(main, [role='dialog']:not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *))
+  :where(input, textarea, select) {
+    color: var(--velora-text) !important;
+    background-color: var(--velora-bg) !important;
+    border-color: var(--velora-border) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root
+  :where(main, [role='dialog']:not(#kallista-admin-dashboard):not(#kallista-admin-dashboard *))
+  :where(input, textarea, select):focus {
+    background-color: #ffffff !important;
+    border-color: var(--velora-orange) !important;
+    outline-color: var(--velora-orange) !important;
+  }
+
+  /*
+   * FAQ / helper cards: explicit readable treatment.
+   * This targets the exact translucent green utility from the screenshot.
+   */
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#738262]/15'] {
+    color: var(--velora-text-soft) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #kallista-app-root [class~='bg-[#738262]/15'] p {
+    color: var(--velora-text-soft) !important;
+  }
+
+  /* Velora footer: intentionally dark, matching the source site's distribution. */
   html[data-kallista-theme='velora']:not([data-theme='dark'])
   #main-footer {
     color: #d8d3c8 !important;
@@ -1037,30 +1253,42 @@ const typographyCss = `
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #main-footer h1,
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #main-footer h2,
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #main-footer h3,
-  html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #main-footer h4 {
+  #main-footer :where(h1, h2, h3, h4) {
     color: #ffffff !important;
   }
 
+  /* Exact footer text tokens: opacity variants are handled separately. */
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #main-footer [class*='text-[#e6e1d6]'],
+  #main-footer [class~='text-[#e6e1d6]'],
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #main-footer [class*='text-[#afbb9c]'] {
-    color: #b7b1a3 !important;
+  #main-footer [class~='text-[#afbb9c]'] {
+    color: var(--velora-footer-text) !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #main-footer [class*='text-[#c6a585]'] {
-    color: #c6a585 !important;
+  #main-footer [class~='text-[#e6e1d6]/80'] {
+    color: rgba(183, 177, 163, 0.80) !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #main-footer [class*='border-[#3d3833]'] {
+  #main-footer [class~='text-[#e6e1d6]/60'] {
+    color: rgba(183, 177, 163, 0.72) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #main-footer [class~='text-[#e6e1d6]/55'] {
+    color: rgba(183, 177, 163, 0.66) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #main-footer [class~='text-[#c6a585]'],
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #main-footer [class~='text-[#c6a585]/90'] {
+    color: var(--velora-orange) !important;
+  }
+
+  html[data-kallista-theme='velora']:not([data-theme='dark'])
+  #main-footer [class~='border-[#3d3833]'] {
     border-color: rgba(255, 255, 255, 0.12) !important;
   }
 
@@ -1068,44 +1296,43 @@ const typographyCss = `
   #main-footer a,
   html[data-kallista-theme='velora']:not([data-theme='dark'])
   #main-footer button {
-    transition: color 0.28s ease, background-color 0.28s ease;
+    transition: color 0.28s ease, background-color 0.28s ease, border-color 0.28s ease;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
   #main-footer a:hover,
   html[data-kallista-theme='velora']:not([data-theme='dark'])
   #main-footer button:hover {
-    color: #c6a585 !important;
+    color: var(--velora-orange) !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #main-footer a[class*='bg-[#3d3833]'] {
+  #main-footer a[class~='bg-[#3d3833]'] {
     color: #d8d3c8 !important;
     background-color: #3d3833 !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
-  #main-footer a[class*='bg-[#3d3833]']:hover {
+  #main-footer a[class~='bg-[#3d3833]']:hover {
     color: #ffffff !important;
-    background-color: #c6a585 !important;
+    background-color: var(--velora-orange) !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
   #footer-final-inquire-btn {
     color: #ffffff !important;
-    background-color: #c6a585 !important;
+    background-color: var(--velora-orange) !important;
   }
 
   html[data-kallista-theme='velora']:not([data-theme='dark'])
   #footer-final-inquire-btn:hover {
     color: #ffffff !important;
-    background-color: #b18f6f !important;
+    background-color: var(--velora-orange-hover) !important;
   }
 
-  /* Final copyright/meta line uses Velora's muted footer tone. */
   html[data-kallista-theme='velora']:not([data-theme='dark'])
   #main-footer > div.max-w-7xl > div:last-child {
-    color: #918b7d !important;
+    color: var(--velora-footer-muted) !important;
   }
 
 `;

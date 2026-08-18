@@ -123,6 +123,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   const footerLogoInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingHeaderLogo, setIsUploadingHeaderLogo] = useState(false);
   const [isUploadingFooterLogo, setIsUploadingFooterLogo] = useState(false);
+  const [uploadingServiceImageId, setUploadingServiceImageId] = useState<string | null>(null);
 
   // Album creation / edit modal state
   const [editingAlbum, setEditingAlbum] = useState<Album | null>(null);
@@ -493,6 +494,32 @@ const greetableClients = clients.filter(
       ...current,
       services: current.services.filter((item) => item.id !== service.id),
     }));
+  };
+
+  // Service package cover image upload handler
+  const handleUploadServiceImage = async (serviceId: string, file: File) => {
+    if (!file) return;
+
+    setUploadingServiceImageId(serviceId);
+    try {
+      const res = await uploadImageToImgBB(file, settings.imgbbApiKey);
+
+      if (!res.success || !res.url) {
+        alert('فشل رفع صورة الباقة: ' + (res.error || 'يرجى التأكد من اتصال الإنترنت وصلاحية مفتاح ImgBB'));
+        return;
+      }
+
+      setEditableContent((current) => ({
+        ...current,
+        services: current.services.map((service) =>
+          service.id === serviceId
+            ? { ...service, coverImage: res.url }
+            : service
+        ),
+      }));
+    } finally {
+      setUploadingServiceImageId(null);
+    }
   };
 
   // Album Save / Delete Handlers
@@ -1659,6 +1686,100 @@ const greetableClients = clients.filter(
                                 <option key={category.id} value={category.slug}>{category.nameAr}</option>
                               ))}
                             </select>
+                          </div>
+
+                          {/* Service package cover image */}
+                          <div className="space-y-2 rounded-xl border border-[#e6e1d6] bg-[#FAF8F5]/60 p-3">
+                            <div className="flex items-center justify-between gap-3">
+                              <div>
+                                <label className="block text-[11px] font-semibold text-[#594f45]">صورة الباقة</label>
+                                <p className="mt-0.5 text-[10px] text-[#8c7f73]">
+                                  ارفع صورة من جهازك إلى ImgBB أو ضع رابط صورة مباشر، ثم اضغط حفظ كافة التعديلات في الموقع.
+                                </p>
+                              </div>
+                              {uploadingServiceImageId === srv.id && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#738262]">
+                                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                                  جاري الرفع...
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex flex-col gap-2 sm:flex-row">
+                              <input
+                                type="text"
+                                value={srv.coverImage || ''}
+                                onChange={(e) => {
+                                  const updated = [...editableContent.services];
+                                  updated[idx] = {
+                                    ...updated[idx],
+                                    coverImage: e.target.value,
+                                  };
+                                  setEditableContent({ ...editableContent, services: updated });
+                                }}
+                                placeholder="https://... رابط صورة الباقة"
+                                className="flex-1 rounded-lg border border-[#e6e1d6] bg-white px-2.5 py-1.5 text-xs text-[#24211e]"
+                              />
+
+                              <label
+                                className={`inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#24211e] px-4 py-2 text-xs font-semibold text-white transition-colors ${
+                                  uploadingServiceImageId === srv.id
+                                    ? 'cursor-wait opacity-60'
+                                    : 'cursor-pointer hover:bg-[#3d3833]'
+                                }`}
+                              >
+                                <Upload className="h-3.5 w-3.5 text-[#c6a585]" />
+                                <span>{uploadingServiceImageId === srv.id ? 'جاري الرفع...' : 'رفع صورة من الجهاز'}</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  disabled={uploadingServiceImageId === srv.id}
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) void handleUploadServiceImage(srv.id, file);
+                                    e.target.value = '';
+                                  }}
+                                />
+                              </label>
+                            </div>
+
+                            {srv.coverImage && (
+                              <div className="flex flex-col gap-3 rounded-xl border border-[#e6e1d6] bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex min-w-0 items-center gap-3">
+                                  <div className="h-20 w-28 flex-shrink-0 overflow-hidden rounded-lg border border-[#e6e1d6] bg-[#FAF8F5]">
+                                    <img
+                                      src={srv.coverImage}
+                                      alt={`معاينة صورة ${srv.titleAr}`}
+                                      className="h-full w-full object-cover"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <span className="block text-xs font-bold text-[#24211e]">معاينة صورة الباقة</span>
+                                    <span className="mt-0.5 block truncate text-[10px] text-[#8c7f73]" dir="ltr">
+                                      {srv.coverImage}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = [...editableContent.services];
+                                    updated[idx] = {
+                                      ...updated[idx],
+                                      coverImage: '',
+                                    };
+                                    setEditableContent({ ...editableContent, services: updated });
+                                  }}
+                                  className="inline-flex flex-shrink-0 items-center justify-center gap-1 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-[11px] font-semibold text-red-700 transition-colors hover:bg-red-100"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                  إزالة الصورة
+                                </button>
+                              </div>
+                            )}
                           </div>
 
                           <div>

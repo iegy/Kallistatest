@@ -237,6 +237,10 @@ export interface SiteSettings {
   adminPassword: string;
   adminPin: string;
   imgbbApiKey: string;
+  /** Cloudinary cloud name used for unsigned browser uploads. */
+  cloudinaryCloudName?: string;
+  /** Unsigned Cloudinary upload preset. Never store the Cloudinary API secret here. */
+  cloudinaryUploadPreset?: string;
   useFirebaseAuth: boolean;
   firebaseApiKey: string;
   firebaseAuthDomain: string;

@@ -88,6 +88,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   adminPassword: '',
   adminPin: '',
   imgbbApiKey: import.meta.env.VITE_IMGBB_API_KEY || '',
+  cloudinaryCloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'jsro6qxl',
+  cloudinaryUploadPreset: import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'kallista_unsigned',
   useFirebaseAuth: true,
   firebaseApiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
   firebaseAuthDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
@@ -658,42 +660,189 @@ export function saveSettings(settings: SiteSettings): void {
   }
 }
 
-// ImgBB API Direct Upload function
+// Image upload providers -------------------------------------------------------
+export type ImageUploadProvider = 'cloudinary' | 'imgbb';
+
+export interface ImageUploadResult {
+  success: boolean;
+  url?: string;
+  thumbUrl?: string;
+  deleteUrl?: string;
+  provider?: ImageUploadProvider;
+  error?: string;
+}
+
+const cloudinaryThumbnailUrl = (secureUrl: string): string => {
+  // Keep the original secure URL for full-size viewing, but use a lightweight
+  // CDN transformation for gallery/admin thumbnails.
+  return secureUrl.includes('/upload/')
+    ? secureUrl.replace('/upload/', '/upload/f_auto,q_auto,c_limit,w_800/')
+    : secureUrl;
+};
+
+/**
+ * Cloudinary unsigned browser upload.
+ * Only cloud name + an unsigned upload preset are required on the client.
+ * Never expose the Cloudinary API secret in this application.
+ */
+export async function uploadImageToCloudinary(
+  imageFile: File,
+  cloudName: string,
+  uploadPreset: string,
+): Promise<ImageUploadResult> {
+  const normalizedCloudName = cloudName.trim();
+  const normalizedPreset = uploadPreset.trim();
+
+  if (!normalizedCloudName || !normalizedPreset) {
+    return {
+      success: false,
+      provider: 'cloudinary',
+      error: 'إعدادات Cloudinary غير مكتملة (Cloud Name / Upload Preset).',
+    };
+  }
+
+  if (imageFile.type && !imageFile.type.startsWith('image/')) {
+    return {
+      success: false,
+      provider: 'cloudinary',
+      error: 'الملف المختار ليس صورة مدعومة.',
+    };
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append('file', imageFile);
+    formData.append('upload_preset', normalizedPreset);
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${encodeURIComponent(normalizedCloudName)}/image/upload`,
+      { method: 'POST', body: formData },
+    );
+
+    const data = await response.json().catch(() => null);
+
+    if (response.ok && data?.secure_url) {
+      return {
+        success: true,
+        provider: 'cloudinary',
+        url: data.secure_url,
+        thumbUrl: cloudinaryThumbnailUrl(data.secure_url),
+      };
+    }
+
+    return {
+      success: false,
+      provider: 'cloudinary',
+      error: data?.error?.message || `Cloudinary upload failed (${response.status})`,
+    };
+  } catch (error: unknown) {
+    console.error('Cloudinary upload error:', error);
+    return {
+      success: false,
+      provider: 'cloudinary',
+      error: error instanceof Error ? error.message : 'تعذر الاتصال بـ Cloudinary.',
+    };
+  }
+}
+
+// ImgBB remains available as the automatic fallback provider.
 export async function uploadImageToImgBB(
   imageFile: File,
-  apiKey: string = DEFAULT_SETTINGS.imgbbApiKey
-): Promise<{ success: boolean; url?: string; thumbUrl?: string; deleteUrl?: string; error?: string }> {
+  apiKey: string = DEFAULT_SETTINGS.imgbbApiKey,
+): Promise<ImageUploadResult> {
+  const normalizedApiKey = apiKey.trim();
+
+  if (!normalizedApiKey) {
+    return {
+      success: false,
+      provider: 'imgbb',
+      error: 'مفتاح ImgBB غير مضبوط.',
+    };
+  }
+
+  if (imageFile.type && !imageFile.type.startsWith('image/')) {
+    return {
+      success: false,
+      provider: 'imgbb',
+      error: 'الملف المختار ليس صورة مدعومة.',
+    };
+  }
+
   try {
     const formData = new FormData();
     formData.append('image', imageFile);
 
-    const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+    const response = await fetch(`https://api.imgbb.com/1/upload?key=${encodeURIComponent(normalizedApiKey)}`, {
       method: 'POST',
       body: formData,
     });
 
-    const data = await response.json();
+    const data = await response.json().catch(() => null);
 
-    if (data && data.success && data.data) {
+    if (response.ok && data?.success && data?.data) {
       return {
         success: true,
+        provider: 'imgbb',
         url: data.data.url,
-        thumbUrl: data.data.thumb?.url || data.data.display_url,
+        thumbUrl: data.data.thumb?.url || data.data.display_url || data.data.url,
         deleteUrl: data.data.delete_url,
       };
-    } else {
-      return {
-        success: false,
-        error: data?.error?.message || 'فشل رفع الصورة إلى ImgBB، تأكدي من مفتاح الـ API',
-      };
     }
-  } catch (err: any) {
-    console.error('ImgBB upload error:', err);
+
     return {
       success: false,
-      error: err.message || 'حدث خطأ في الاتصال بالسيرفر أثناء رفع الصورة',
+      provider: 'imgbb',
+      error: data?.error?.message || `ImgBB upload failed (${response.status})`,
+    };
+  } catch (error: unknown) {
+    console.error('ImgBB upload error:', error);
+    return {
+      success: false,
+      provider: 'imgbb',
+      error: error instanceof Error ? error.message : 'تعذر الاتصال بـ ImgBB.',
     };
   }
+}
+
+/**
+ * Primary upload path for Kallista:
+ * 1. Try Cloudinary when Cloud Name + unsigned preset are configured.
+ * 2. If Cloudinary is unavailable/fails, automatically fall back to ImgBB.
+ * 3. If Cloudinary is not configured yet, ImgBB continues to work exactly as before.
+ */
+export async function uploadImageWithFallback(
+  imageFile: File,
+  settings: Pick<SiteSettings, 'imgbbApiKey' | 'cloudinaryCloudName' | 'cloudinaryUploadPreset'> = DEFAULT_SETTINGS,
+): Promise<ImageUploadResult> {
+  const cloudName = settings.cloudinaryCloudName?.trim() || '';
+  const uploadPreset = settings.cloudinaryUploadPreset?.trim() || '';
+  let cloudinaryError = '';
+
+  if (cloudName && uploadPreset) {
+    const cloudinaryResult = await uploadImageToCloudinary(imageFile, cloudName, uploadPreset);
+    if (cloudinaryResult.success) return cloudinaryResult;
+    cloudinaryError = cloudinaryResult.error || 'فشل Cloudinary.';
+    console.warn('Cloudinary upload failed; trying ImgBB fallback:', cloudinaryError);
+  }
+
+  if (settings.imgbbApiKey?.trim()) {
+    const imgbbResult = await uploadImageToImgBB(imageFile, settings.imgbbApiKey);
+    if (imgbbResult.success) return imgbbResult;
+
+    return {
+      ...imgbbResult,
+      error: cloudinaryError
+        ? `تعذر الرفع عبر Cloudinary ثم ImgBB. Cloudinary: ${cloudinaryError} | ImgBB: ${imgbbResult.error || 'فشل الرفع'}`
+        : imgbbResult.error,
+    };
+  }
+
+  return {
+    success: false,
+    error: cloudinaryError
+      ? `تعذر الرفع عبر Cloudinary ولا يوجد مفتاح ImgBB احتياطي. ${cloudinaryError}`
+      : 'لا توجد خدمة رفع صور مضبوطة. أضف Cloudinary Cloud Name + Unsigned Upload Preset أو مفتاح ImgBB من الإعدادات.',
+  };
 }
 
 // Birthday Reminder Calculations

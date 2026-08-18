@@ -10,7 +10,7 @@ import {
   PortfolioCategory, SiteContent, ServiceItem, FAQItem, SocialLink
 } from '../types';
 import {
-  uploadImageToImgBB, getUpcomingBirthdayAlerts, createBirthdayWhatsAppLink,
+  uploadImageWithFallback, getUpcomingBirthdayAlerts, createBirthdayWhatsAppLink,
   createBookingInquiryWhatsAppLink,
   getUpcomingOccasionAlerts, createOccasionWhatsAppLink,
   buildClientsCsv, buildBookingsCsv, downloadCsv,
@@ -111,7 +111,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     displayOrder: categories.length + 1,
   });
 
-  // ImgBB Upload state
+  // Image upload state (Cloudinary primary + ImgBB fallback)
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedPhotos, setUploadedPhotos] = useState<PhotoItem[]>([]);
@@ -227,8 +227,8 @@ const greetableClients = clients.filter(
 
     for (let i = 0; i < uploadFiles.length; i++) {
       const file = uploadFiles[i];
-      setUploadProgressText(`جاري رفع صورة ${i + 1} من ${uploadFiles.length} إلى ImgBB...`);
-      const res = await uploadImageToImgBB(file, settings.imgbbApiKey);
+      setUploadProgressText(`جاري رفع صورة ${i + 1} من ${uploadFiles.length} عبر Cloudinary (ومع ImgBB احتياطيًا)...`);
+      const res = await uploadImageWithFallback(file, settings);
 
       if (res.success && res.url) {
         newItems.push({
@@ -269,8 +269,8 @@ const greetableClients = clients.filter(
     const file = e.target.files?.[0];
     if (!file) return;
     setIsUploadingAlbumCover(true);
-    setAlbumUploadProgress('جاري رفع صورة الغلاف إلى ImgBB...');
-    const res = await uploadImageToImgBB(file, settings.imgbbApiKey);
+    setAlbumUploadProgress('جاري رفع صورة الغلاف عبر Cloudinary (ومع ImgBB احتياطيًا)...');
+    const res = await uploadImageWithFallback(file, settings);
     setIsUploadingAlbumCover(false);
     setAlbumUploadProgress('');
 
@@ -280,7 +280,7 @@ const greetableClients = clients.filter(
         coverImage: res.url,
       }));
     } else {
-      alert('فشل رفع صورة الغلاف: ' + (res.error || 'تأكد من اتصال الإنترنت وصلاحية مفتاح ImgBB'));
+      alert('فشل رفع صورة الغلاف: ' + (res.error || 'تأكد من اتصال الإنترنت وإعدادات Cloudinary أو مفتاح ImgBB الاحتياطي'));
     }
   };
 
@@ -295,7 +295,7 @@ const greetableClients = clients.filter(
     for (let i = 0; i < fileArray.length; i++) {
       const file = fileArray[i];
       setAlbumUploadProgress(`جاري رفع صورة الألبوم (${i + 1} من ${fileArray.length})...`);
-      const res = await uploadImageToImgBB(file, settings.imgbbApiKey);
+      const res = await uploadImageWithFallback(file, settings);
 
       if (res.success && res.url) {
         newItems.push({
@@ -325,7 +325,7 @@ const greetableClients = clients.filter(
     const file = e.target.files?.[0];
     if (!file) return;
     setIsUploadingHeaderLogo(true);
-    const res = await uploadImageToImgBB(file, settings.imgbbApiKey);
+    const res = await uploadImageWithFallback(file, settings);
     setIsUploadingHeaderLogo(false);
 
     if (res.success && res.url) {
@@ -339,7 +339,7 @@ const greetableClients = clients.filter(
       }));
       alert('تم رفع لوجو أعلى الموقع. اضغط «حفظ كافة التعديلات في الموقع» لتثبيت الرابط في Firebase.');
     } else {
-      alert('فشل رفع لوجو أعلى الموقع: ' + (res.error || 'يرجى التأكد من اتصال الإنترنت وصلاحية مفتاح ImgBB'));
+      alert('فشل رفع لوجو أعلى الموقع: ' + (res.error || 'يرجى التأكد من اتصال الإنترنت وإعدادات Cloudinary أو مفتاح ImgBB الاحتياطي'));
     }
   };
 
@@ -348,7 +348,7 @@ const greetableClients = clients.filter(
     const file = e.target.files?.[0];
     if (!file) return;
     setIsUploadingFooterLogo(true);
-    const res = await uploadImageToImgBB(file, settings.imgbbApiKey);
+    const res = await uploadImageWithFallback(file, settings);
     setIsUploadingFooterLogo(false);
 
     if (res.success && res.url) {
@@ -362,7 +362,7 @@ const greetableClients = clients.filter(
       }));
       alert('تم رفع لوجو أسفل الموقع. اضغط «حفظ كافة التعديلات في الموقع» لتثبيت الرابط في Firebase.');
     } else {
-      alert('فشل رفع لوجو أسفل الموقع: ' + (res.error || 'يرجى التأكد من اتصال الإنترنت وصلاحية مفتاح ImgBB'));
+      alert('فشل رفع لوجو أسفل الموقع: ' + (res.error || 'يرجى التأكد من اتصال الإنترنت وإعدادات Cloudinary أو مفتاح ImgBB الاحتياطي'));
     }
   };
 
@@ -547,10 +547,10 @@ const greetableClients = clients.filter(
 
     setUploadingServiceImageId(serviceId);
     try {
-      const res = await uploadImageToImgBB(file, settings.imgbbApiKey);
+      const res = await uploadImageWithFallback(file, settings);
 
       if (!res.success || !res.url) {
-        alert('فشل رفع صورة الباقة: ' + (res.error || 'يرجى التأكد من اتصال الإنترنت وصلاحية مفتاح ImgBB'));
+        alert('فشل رفع صورة الباقة: ' + (res.error || 'يرجى التأكد من اتصال الإنترنت وإعدادات Cloudinary أو مفتاح ImgBB الاحتياطي'));
         return;
       }
 
@@ -577,10 +577,10 @@ const greetableClients = clients.filter(
     setUploadingContentImageKey(target);
 
     try {
-      const res = await uploadImageToImgBB(file, settings.imgbbApiKey);
+      const res = await uploadImageWithFallback(file, settings);
 
       if (!res.success || !res.url) {
-        alert('فشل رفع الصورة: ' + (res.error || 'يرجى التأكد من اتصال الإنترنت وصلاحية مفتاح ImgBB'));
+        alert('فشل رفع الصورة: ' + (res.error || 'يرجى التأكد من اتصال الإنترنت وإعدادات Cloudinary أو مفتاح ImgBB الاحتياطي'));
         return;
       }
 
@@ -967,7 +967,7 @@ const greetableClients = clients.filter(
                 </span>
               </button>
 
-              {/* 4. ImgBB Uploader */}
+              {/* 4. Cloudinary uploader with ImgBB fallback */}
               <button
                 onClick={() => setActiveTab('uploader')}
                 className={`w-full text-right px-4 py-3 rounded-2xl text-xs sm:text-sm font-semibold flex items-center justify-between transition-all ${
@@ -978,7 +978,7 @@ const greetableClients = clients.filter(
               >
                 <div className="flex items-center gap-2.5">
                   <Upload className="w-4 h-4 text-[#738262]" />
-                  <span>رفع الصور (ImgBB)</span>
+                  <span>رفع الصور (Cloudinary + ImgBB)</span>
                 </div>
                 <span className="text-[10px] opacity-70 font-mono">API</span>
               </button>
@@ -1510,7 +1510,7 @@ const greetableClients = clients.filter(
                         <div>
                           <label className="block text-xs font-semibold text-[#594f45] mb-1">صورة الهيرو المميزة</label>
                           <p className="text-[11px] text-[#8c7f73]">
-                            ارفع الصورة من جهازك إلى ImgBB أو ضع رابطاً مباشراً، ثم اضغط «حفظ كافة التعديلات في الموقع».
+                            ارفع الصورة من جهازك عبر خدمة الرفع (Cloudinary أولاً وImgBB احتياطيًا) أو ضع رابطاً مباشراً، ثم اضغط «حفظ كافة التعديلات في الموقع».
                           </p>
                         </div>
 
@@ -1853,7 +1853,7 @@ const greetableClients = clients.filter(
                               <div>
                                 <label className="block text-[11px] font-semibold text-[#594f45]">صورة الباقة</label>
                                 <p className="mt-0.5 text-[10px] text-[#8c7f73]">
-                                  ارفع صورة من جهازك إلى ImgBB أو ضع رابط صورة مباشر، ثم اضغط حفظ كافة التعديلات في الموقع.
+                                  ارفع صورة من جهازك عبر خدمة الرفع (Cloudinary أولاً وImgBB احتياطيًا) أو ضع رابط صورة مباشر، ثم اضغط حفظ كافة التعديلات في الموقع.
                                 </p>
                               </div>
                               {uploadingServiceImageId === srv.id && (
@@ -3483,16 +3483,16 @@ const greetableClients = clients.filter(
                 </div>
               )}
 
-              {/* TAB 4: IMGBB UPLOADER */}
+              {/* TAB 4: IMAGE UPLOADER */}
               {activeTab === 'uploader' && (
                 <div className="space-y-6 text-right">
                   <div className="border-b border-[#e6e1d6] pb-4">
                     <h3 className="font-arabic-editorial text-2xl font-bold text-[#24211e] flex items-center gap-2">
-                      <span>رفع وتخزين الصور الفورية عبر ImgBB API</span>
+                      <span>رفع الصور عبر Cloudinary مع ImgBB كخدمة احتياطية</span>
                       <Upload className="w-5 h-5 text-[#738262]" />
                     </h3>
                     <p className="text-xs text-[#73685d]">
-                      ارفع صور عالية الدقة بسهولة مع الحصول على روابط مباشرة للاستخدام في الألبومات
+                      يحاول الرفع إلى Cloudinary أولاً، وإذا تعذر تلقائياً ينتقل إلى ImgBB بدون تعطيل العمل
                     </p>
                   </div>
 
@@ -3989,7 +3989,7 @@ const greetableClients = clients.filter(
                       إعدادات الأمان والنسخ الاحتياطي
                     </h3>
                     <p className="text-xs text-[#73685d]">
-                      إدارة رفع الصور والنسخ الاحتياطي. بيانات دخول المدير تُدار من Firebase Authentication.
+                      إدارة رفع الصور والنسخ الاحتياطي. Cloudinary هو المزود الأساسي وImgBB احتياطي، وبيانات دخول المدير تُدار من Firebase Authentication.
                     </p>
                   </div>
 
@@ -4402,14 +4402,68 @@ const greetableClients = clients.filter(
                       </div>
                     </div>
 
-                    <div className="pt-2">
-                      <label className="block text-xs font-semibold text-[#594f45] mb-1">مفتاح ImgBB API Key لرفع الصور</label>
-                      <input
-                        type="text"
-                        value={tempSettings.imgbbApiKey}
-                        onChange={(e) => setTempSettings({ ...tempSettings, imgbbApiKey: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e] font-mono"
-                      />
+                    <div className="pt-2 space-y-4 rounded-2xl border border-[#e6e1d6] bg-white p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <h5 className="text-xs font-bold text-[#24211e]">خدمة رفع الصور</h5>
+                          <p className="mt-1 text-[11px] leading-5 text-[#73685d]">
+                            Cloudinary هو المزود الأساسي. إذا فشل الرفع ينتقل الموقع تلقائياً إلى ImgBB.
+                          </p>
+                        </div>
+                        <span className={`rounded-full px-3 py-1 text-[10px] font-bold ${
+                          tempSettings.cloudinaryCloudName?.trim() && tempSettings.cloudinaryUploadPreset?.trim()
+                            ? 'bg-[#738262]/15 text-[#4e633d]'
+                            : 'bg-[#c6a585]/15 text-[#8c6742]'
+                        }`}>
+                          {tempSettings.cloudinaryCloudName?.trim() && tempSettings.cloudinaryUploadPreset?.trim()
+                            ? 'Cloudinary جاهز + ImgBB احتياطي'
+                            : 'ImgBB فقط حتى إعداد Cloudinary'}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                          <label className="mb-1 block text-xs font-semibold text-[#594f45]">Cloudinary Cloud Name</label>
+                          <input
+                            type="text"
+                            value={tempSettings.cloudinaryCloudName || ''}
+                            onChange={(e) => setTempSettings({ ...tempSettings, cloudinaryCloudName: e.target.value.trim() })}
+                            placeholder="مثال: kallista-media"
+                            autoComplete="off"
+                            className="w-full rounded-xl border border-[#e6e1d6] bg-[#FAF8F5] px-3 py-2 text-xs text-[#24211e] font-mono"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="mb-1 block text-xs font-semibold text-[#594f45]">Cloudinary Unsigned Upload Preset</label>
+                          <input
+                            type="text"
+                            value={tempSettings.cloudinaryUploadPreset || ''}
+                            onChange={(e) => setTempSettings({ ...tempSettings, cloudinaryUploadPreset: e.target.value.trim() })}
+                            placeholder="مثال: kallista_unsigned"
+                            autoComplete="off"
+                            className="w-full rounded-xl border border-[#e6e1d6] bg-[#FAF8F5] px-3 py-2 text-xs text-[#24211e] font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <p className="rounded-xl bg-[#738262]/10 px-3 py-2 text-[10px] leading-5 text-[#4e633d]">
+                        استخدم Upload Preset من نوع <strong>Unsigned</strong> فقط. لا تضع Cloudinary API Secret داخل الموقع أو لوحة التحكم.
+                      </p>
+
+                      <div className="border-t border-[#e6e1d6] pt-3">
+                        <label className="mb-1 block text-xs font-semibold text-[#594f45]">ImgBB API Key — احتياطي تلقائي</label>
+                        <input
+                          type="text"
+                          value={tempSettings.imgbbApiKey}
+                          onChange={(e) => setTempSettings({ ...tempSettings, imgbbApiKey: e.target.value.trim() })}
+                          autoComplete="off"
+                          className="w-full rounded-xl border border-[#e6e1d6] bg-[#FAF8F5] px-3 py-2 text-xs text-[#24211e] font-mono"
+                        />
+                        <p className="mt-1 text-[10px] leading-5 text-[#8c7f73]">
+                          يظل المفتاح الحالي كما هو ويُستخدم فقط إذا لم يكن Cloudinary مضبوطاً أو تعذر الرفع إليه.
+                        </p>
+                      </div>
                     </div>
 
                     <div className="pt-3">

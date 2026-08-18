@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import {
   Lock, Key, Image as ImageIcon, Upload, Plus, Trash2, Edit3, CheckCircle2,
   Calendar, Users, Star, Settings, Download, RefreshCw, MessageCircle, AlertCircle,
-  Sparkles, Gift, Eye, Filter, ArrowUpRight, Phone, Mail, Check, Layers, FileText,
+  Sparkles, Gift, Eye, Filter, ArrowUpRight, ArrowUp, ArrowDown, Phone, Mail, Check, Layers, FileText,
   Sliders, Shield, Database, Globe, HelpCircle, UserCheck, ArrowRight, Type, Moon
 } from 'lucide-react';
 import {
@@ -100,6 +100,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   const [editingCategory, setEditingCategory] = useState<PortfolioCategory | null>(null);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [categorySavedSuccess, setCategorySavedSuccess] = useState(false);
+  const [movingCategoryId, setMovingCategoryId] = useState<string | null>(null);
   const categoryFormRef = useRef<HTMLDivElement>(null);
   const [categoryFormData, setCategoryFormData] = useState<Partial<PortfolioCategory>>({
     nameAr: '',
@@ -187,6 +188,17 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   () => getUpcomingOccasionAlerts(400),
   []
 );
+
+const orderedCategories = [...categories].sort((a, b) => {
+  if (a.slug === 'all' && b.slug !== 'all') return -1;
+  if (b.slug === 'all' && a.slug !== 'all') return 1;
+
+  const orderA = Number.isFinite(a.displayOrder) ? a.displayOrder : Number.MAX_SAFE_INTEGER;
+  const orderB = Number.isFinite(b.displayOrder) ? b.displayOrder : Number.MAX_SAFE_INTEGER;
+
+  if (orderA !== orderB) return orderA - orderB;
+  return a.nameAr.localeCompare(b.nameAr, 'ar');
+});
 
 if (!isOpen) return null;
 
@@ -425,6 +437,38 @@ const greetableClients = clients.filter(
     setCategoryFormData({ nameAr: '', nameEn: '', slug: '', description: '', active: true, displayOrder: categories.length + 1 });
     setCategorySavedSuccess(true);
     setTimeout(() => setCategorySavedSuccess(false), 3000);
+  };
+
+  const handleMoveCategory = async (catId: string, direction: 'up' | 'down') => {
+    const currentIndex = orderedCategories.findIndex((category) => category.id === catId);
+    if (currentIndex < 0) return;
+
+    const currentCategory = orderedCategories[currentIndex];
+    if (currentCategory.slug === 'all') return;
+
+    const firstMovableIndex = orderedCategories[0]?.slug === 'all' ? 1 : 0;
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+    if (targetIndex < firstMovableIndex || targetIndex >= orderedCategories.length) return;
+
+    const reordered = [...orderedCategories];
+    [reordered[currentIndex], reordered[targetIndex]] = [reordered[targetIndex], reordered[currentIndex]];
+
+    const normalized = reordered.map((category, index) => ({
+      ...category,
+      displayOrder: index + 1,
+    }));
+
+    setMovingCategoryId(catId);
+    try {
+      await onUpdateCategories(normalized);
+      setCategorySavedSuccess(true);
+      setTimeout(() => setCategorySavedSuccess(false), 2500);
+    } catch {
+      return;
+    } finally {
+      setMovingCategoryId(null);
+    }
   };
 
   const handleDeleteCategory = async (catId: string, slug: string, nameAr?: string) => {
@@ -2733,7 +2777,7 @@ const greetableClients = clients.filter(
                         <Sliders className="w-5 h-5 text-[#738262]" />
                       </h3>
                       <p className="text-xs text-[#73685d] mt-1">
-                        يمكنك إضافة تصنيفات جديدة، تعديل الأسماء والمعرفات البرمجية، أو حذف أي تصنيف بسهولة.
+                        يمكنك إضافة وتعديل التصنيفات وترتيب ظهورها بالأسهم. يبقى قسم «كافة الأعمال» ثابتاً في البداية.
                       </p>
                     </div>
 
@@ -2764,7 +2808,7 @@ const greetableClients = clients.filter(
                   {categorySavedSuccess && (
                     <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2 animate-in fade-in">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>تم حفظ وتحديث التصنيف بنجاح في المعرض!</span>
+                      <span>تم حفظ تغييرات التصنيفات وترتيبها بنجاح في المعرض!</span>
                     </div>
                   )}
 
@@ -2893,7 +2937,7 @@ const greetableClients = clients.filter(
 
                   {/* 1. Mobile & Tablet Cards View (Always clean and accessible on any screen) */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:hidden">
-                    {categories.map((cat) => {
+                    {orderedCategories.map((cat, categoryIndex) => {
                       const linkedAlbumsCount = cat.slug === 'all'
                         ? albums.length
                         : albums.filter((a) => a.category === cat.slug).length;
@@ -2922,6 +2966,43 @@ const greetableClients = clients.filter(
                             <span className="font-bold text-[#24211e]">
                               {linkedAlbumsCount} ألبوم
                             </span>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-3 rounded-xl border border-[#e6e1d6] bg-white p-2.5">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] text-[#73685d]">الترتيب</span>
+                              <span className="min-w-7 rounded-lg bg-[#e6e1d6] px-2 py-1 text-center text-xs font-bold text-[#24211e]">
+                                {categoryIndex + 1}
+                              </span>
+                              {cat.slug === 'all' && (
+                                <span className="text-[10px] font-semibold text-[#738262]">ثابت في البداية</span>
+                              )}
+                            </div>
+
+                            {cat.slug !== 'all' && (
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveCategory(cat.id, 'up')}
+                                  disabled={movingCategoryId !== null || categoryIndex <= (orderedCategories[0]?.slug === 'all' ? 1 : 0)}
+                                  className="rounded-lg border border-[#c6a585] bg-[#FAF8F5] p-2 text-[#24211e] transition-colors hover:bg-[#e6e1d6] disabled:cursor-not-allowed disabled:opacity-35"
+                                  title="تحريك لأعلى"
+                                  aria-label={`تحريك ${cat.nameAr} لأعلى`}
+                                >
+                                  <ArrowUp className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoveCategory(cat.id, 'down')}
+                                  disabled={movingCategoryId !== null || categoryIndex >= orderedCategories.length - 1}
+                                  className="rounded-lg border border-[#c6a585] bg-[#FAF8F5] p-2 text-[#24211e] transition-colors hover:bg-[#e6e1d6] disabled:cursor-not-allowed disabled:opacity-35"
+                                  title="تحريك لأسفل"
+                                  aria-label={`تحريك ${cat.nameAr} لأسفل`}
+                                >
+                                  <ArrowDown className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            )}
                           </div>
 
                           {cat.description && (
@@ -2972,7 +3053,7 @@ const greetableClients = clients.filter(
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-[#e6e1d6]/60">
-                          {categories.map((cat) => {
+                          {orderedCategories.map((cat, categoryIndex) => {
                             const linkedAlbumsCount = cat.slug === 'all'
                               ? albums.length
                               : albums.filter((a) => a.category === cat.slug).length;
@@ -2990,7 +3071,37 @@ const greetableClients = clients.filter(
                                   {linkedAlbumsCount} ألبوم
                                 </td>
                                 <td className="p-3.5 text-[#594f45]">
-                                  {cat.displayOrder || '-'}
+                                  <div className="flex items-center gap-2">
+                                    <span className="min-w-7 rounded-lg bg-[#FAF8F5] px-2 py-1 text-center font-bold text-[#24211e]">
+                                      {categoryIndex + 1}
+                                    </span>
+                                    {cat.slug === 'all' ? (
+                                      <span className="text-[10px] font-semibold text-[#738262]">ثابت</span>
+                                    ) : (
+                                      <div className="flex items-center gap-1">
+                                        <button
+                                          type="button"
+                                          onClick={() => handleMoveCategory(cat.id, 'up')}
+                                          disabled={movingCategoryId !== null || categoryIndex <= (orderedCategories[0]?.slug === 'all' ? 1 : 0)}
+                                          className="rounded-md border border-[#e6e1d6] bg-white p-1.5 hover:border-[#c6a585] hover:bg-[#FAF8F5] disabled:cursor-not-allowed disabled:opacity-35"
+                                          title="تحريك لأعلى"
+                                          aria-label={`تحريك ${cat.nameAr} لأعلى`}
+                                        >
+                                          <ArrowUp className="h-3.5 w-3.5" />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleMoveCategory(cat.id, 'down')}
+                                          disabled={movingCategoryId !== null || categoryIndex >= orderedCategories.length - 1}
+                                          className="rounded-md border border-[#e6e1d6] bg-white p-1.5 hover:border-[#c6a585] hover:bg-[#FAF8F5] disabled:cursor-not-allowed disabled:opacity-35"
+                                          title="تحريك لأسفل"
+                                          aria-label={`تحريك ${cat.nameAr} لأسفل`}
+                                        >
+                                          <ArrowDown className="h-3.5 w-3.5" />
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
                                 </td>
                                 <td className="p-3.5">
                                   <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${

@@ -22,7 +22,18 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
 }) => {
   const { t } = useLanguage();
 
-  const activeCategories = categories.filter((c) => c.active !== false);
+  const activeCategories = categories
+    .filter((c) => c.active !== false)
+    .sort((a, b) => {
+      if (a.slug === 'all' && b.slug !== 'all') return -1;
+      if (b.slug === 'all' && a.slug !== 'all') return 1;
+
+      const orderA = Number.isFinite(a.displayOrder) ? a.displayOrder : Number.MAX_SAFE_INTEGER;
+      const orderB = Number.isFinite(b.displayOrder) ? b.displayOrder : Number.MAX_SAFE_INTEGER;
+
+      if (orderA !== orderB) return orderA - orderB;
+      return a.nameAr.localeCompare(b.nameAr, 'ar');
+    });
 
   const filteredAlbums = selectedCategory === 'all'
     ? albums

@@ -59,12 +59,12 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
   return (
     <section id="reviews" className="py-24 sm:py-32 bg-[#fffefb] relative border-t border-[#e6e1d6]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="text-right space-y-3">
             <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block font-semibold">
-              {t('15 — تجارب وكلمات ثقة', '15 — Testimonials & Words of Trust')}
+              {t('تجارب وكلمات ثقة', 'Testimonials & Words of Trust')}
             </span>
             <h2
               id="reviews-headline"

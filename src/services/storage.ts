@@ -831,11 +831,19 @@ export function createOccasionWhatsAppLink(client: ClientContact, occasion: Occa
 
 function csvCell(value: unknown): string {
   const text = value === null || value === undefined ? '' : String(value);
-  return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  return /[";\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
 function toCsv(headers: string[], rows: unknown[][]): string {
-  return [headers, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n');
+  // Excel on Arabic/European regional settings often expects ";" as the
+  // list separator. The sep directive makes Excel split every field into
+  // its own column instead of treating the row as a single cell.
+  const separator = ';';
+  const content = [headers, ...rows]
+    .map((row) => row.map(csvCell).join(separator))
+    .join('\r\n');
+
+  return `sep=${separator}\r\n${content}`;
 }
 
 export function buildClientsCsv(clients: ClientContact[], language: 'ar' | 'en' = 'ar'): string {

@@ -18,11 +18,11 @@ export const IntroductionSection: React.FC<IntroductionSectionProps> = ({ conten
       className="py-24 sm:py-32 bg-[#fffefb] relative border-t border-[#e6e1d6]"
     >
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-10">
-        
+
         {/* Section Header Label */}
         <div className="inline-block">
           <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase font-semibold">
-            {t('05 — الفلسفة والرؤية', '05 — Philosophy & Vision')}
+            {t('الفلسفة والرؤية', 'Philosophy & Vision')}
           </span>
           <div className="w-12 h-[1px] bg-[#c6a585] mx-auto mt-2" />
         </div>

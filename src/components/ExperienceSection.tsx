@@ -17,10 +17,10 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ content, o
       {/* 13 — THE KALLISTA EXPERIENCE */}
       <section id="experience" className="py-24 sm:py-32 bg-[#fffefb] relative border-t border-[#e6e1d6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
             <span className="font-serif text-sm tracking-[0.25em] text-[#c6a585] uppercase block mb-3 font-semibold">
-              {t('13 — تجربة كاليستا', '13 — The Kallista Experience')}
+              {t('تجربة كاليستا', 'The Kallista Experience')}
             </span>
             <h2
               id="experience-headline"

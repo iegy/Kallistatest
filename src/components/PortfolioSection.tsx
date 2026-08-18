@@ -31,11 +31,11 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
   return (
     <section id="portfolio" className="relative border-b border-[#e6e1d6] bg-[#fffefb] py-16 sm:py-20 lg:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Section Header */}
         <div className="mx-auto mb-10 max-w-4xl text-center sm:mb-12">
           <span className="font-serif text-sm tracking-[0.25em] text-[#afbb9c] uppercase block mb-3 font-semibold">
-            {t('12 — معرض الأعمال', '12 — The Work / Portfolio')}
+            {t('معرض الأعمال', 'The Work / Portfolio')}
           </span>
           <h2
             id="portfolio-headline"
@@ -101,7 +101,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                       loading="lazy"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#24211e]/85 via-[#24211e]/20 to-transparent" />
-                    
+
                     {/* Category pill */}
                     <div className="absolute top-4 right-4 bg-[#fffefb]/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-serif font-medium text-[#24211e]">
                       {matchedCat ? matchedCat.nameAr : album.category}

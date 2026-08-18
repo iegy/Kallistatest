@@ -111,11 +111,11 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
   return (
     <section id="contact" className="py-24 sm:py-32 bg-[#fffefb] relative border-t border-[#e6e1d6]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
           <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block mb-3 font-semibold">
-            {t('17 — التواصل وطلب الحجز', '17 — Contact & Booking Inquiry')}
+            {t('التواصل وطلب الحجز', 'Contact & Booking Inquiry')}
           </span>
           <p className="font-serif text-2xl sm:text-3xl text-[#c6a585] italic mb-2">
             {t('دعونا نوثّق شيئًا جميلًا.', "Let's preserve something beautiful.")}
@@ -136,7 +136,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
 
         {/* Booking Form Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          
+
           {/* Left Info & Direct Channels */}
           <div className="lg:col-span-5 text-right space-y-8 order-2 lg:order-1">
             <div className="space-y-5 rounded-3xl border border-[#e6e1d6] bg-[#e6e1d6]/30 p-5 sm:p-7">
@@ -144,7 +144,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                 <span>{t('تواصل مباشر وسريع', 'Direct contact')}</span>
                 <Sparkles className="h-5 w-5 shrink-0 text-[#c6a585]" />
               </h3>
-              
+
               <p className="max-w-xl text-sm font-light leading-7 text-[#594f45]">
                 {t('نرحب بجميع استفساراتكم ومشاركتكم لتفاصيل مناسبتكم في أي وقت، ويسعدنا دائماً تقديم المشورة لاختيار أفضل وقت وإضاءة لجلسة التصوير.', 'Share your plans with us and we will help you choose the right service, setting and light for your session.')}
               </p>
@@ -239,7 +239,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                     <span>{t('يمكنكم أيضاً إرسال نسخة من التفاصيل عبر الواتساب:', 'You can also send the booking details through WhatsApp:')}</span>
                     <Sparkles className="w-4 h-4 text-[#c6a585]" />
                   </p>
-                  
+
                   <a
                     id="confirm-booking-email-btn"
                     href={createBookingInquiryWhatsAppLink(submittedBooking)}
@@ -261,7 +261,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6 text-right">
-                
+
                 {/* Personal Information */}
                 <div className="space-y-4">
                   <h4 className="font-arabic-editorial text-lg font-bold text-[#24211e] border-b border-[#e6e1d6] pb-2">

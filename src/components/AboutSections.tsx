@@ -16,13 +16,13 @@ export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExplore
 
   return (
     <div id="about" className="space-y-0">
-      
+
       {/* 10 — ABOUT KALLISTA */}
       <section className="py-24 sm:py-32 bg-[#fffefb] relative border-t border-[#e6e1d6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
+
             {/* Visual Column */}
             <div className="lg:col-span-5 relative">
               <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-xl border-4 border-[#fffefb] bg-[#e6e1d6]">
@@ -33,7 +33,7 @@ export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExplore
                   className="w-full h-full object-cover"
                 />
               </div>
-              
+
               <div className="absolute -bottom-6 -right-6 bg-[#24211e] text-[#fffefb] p-6 rounded-2xl shadow-xl max-w-xs text-right space-y-1">
                 <span className="text-xs uppercase tracking-widest text-[#c6a585] font-serif block">
                   {t('مساحة للفن الراقي', 'Fine Art Sanctuary')}
@@ -47,7 +47,7 @@ export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExplore
             {/* Typography Column */}
             <div className="lg:col-span-7 text-right space-y-6">
               <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block font-semibold">
-                {t(`10 — عن ${brand.studioName}`, `10 — About ${brand.studioName}`)}
+                {t(`عن ${brand.studioName}`, `About ${brand.studioName}`)}
               </span>
 
               <h2 className="font-arabic-editorial text-3xl sm:text-4xl md:text-5xl font-bold text-[#24211e] leading-tight">
@@ -81,14 +81,14 @@ export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExplore
       {/* 11 — ABOUT RONADISA (The Founder & Photographer) */}
       <section id="about-ronadisa" className="py-24 sm:py-32 bg-[#e6e1d6]/30 relative border-t border-[#e6e1d6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
+
             {/* Story & Philosophy */}
             <div className="lg:col-span-7 text-right space-y-6 order-2 lg:order-1">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c6a585]/20 text-[#8c6742] text-xs font-serif font-semibold">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>{t('11 — الفنانة خلف العدسة', '11 — The Artist Behind The Lens')}</span>
+                <span>{t('الفنانة خلف العدسة', 'The Artist Behind The Lens')}</span>
               </div>
 
               <h2 className="font-arabic-editorial text-3xl sm:text-4xl md:text-5xl font-bold text-[#24211e] leading-tight">
@@ -159,7 +159,7 @@ export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExplore
                   draggable={false}
                   className="w-full h-full object-cover object-top"
                 />
-                
+
                 <div className="absolute bottom-4 inset-x-4 bg-[#24211e]/90 backdrop-blur-md p-4 rounded-2xl border border-[#fffefb]/15 text-right text-[#fffefb]">
                   <span className="text-[10px] tracking-widest uppercase text-[#c6a585] font-serif block">
                     {t('المصورة الرئيسية والمؤسسة', 'Lead Photographer & Founder')}

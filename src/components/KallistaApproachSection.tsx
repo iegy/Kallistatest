@@ -18,14 +18,14 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
 
   return (
     <div id="approach-signature-wrapper" className="space-y-0">
-      
+
       {/* 07 — THE KALLISTA APPROACH */}
       <section id="approach" className="py-24 sm:py-32 bg-[#fffefb] relative border-t border-[#e6e1d6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
             <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block mb-3 font-semibold">
-              {t('07 — منهجية كاليستا', '07 — The Kallista Approach')}
+              {t('منهجية كاليستا', 'The Kallista Approach')}
             </span>
             <h2
               id="approach-headline"
@@ -78,9 +78,9 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
       {/* 08 & 09 — SIGNATURE IMAGE & WEDDING FEATURE */}
       <section id="signature-wedding" className="py-24 bg-[#24211e] text-[#fffefb] relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
+
             {/* Visual Frame */}
             <div className="lg:col-span-6 relative order-2 lg:order-1">
               <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-[#fffefb]/10 bg-[#3d3833] relative">
@@ -91,7 +91,7 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
                   className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#24211e]/90 via-transparent to-transparent" />
-                
+
                 <div className="absolute bottom-6 right-6 left-6 text-right space-y-1">
                   <span className="text-xs uppercase tracking-widest text-[#c6a585] font-serif block">
                     {signature.subtitle || 'Signature Atmosphere'}
@@ -106,7 +106,7 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
             {/* Editorial Content */}
             <div className="lg:col-span-6 text-right space-y-6 order-1 lg:order-2">
               <span className="font-serif text-sm tracking-[0.25em] text-[#c6a585] uppercase block font-semibold">
-                {t('09 — قصة الزفاف المميزة', '09 — Wedding Feature')}
+                {t('قصة الزفاف المميزة', 'Wedding Feature')}
               </span>
 
               <h2 className="font-arabic-editorial text-3xl sm:text-4xl md:text-5xl font-bold text-[#fffefb] leading-tight">

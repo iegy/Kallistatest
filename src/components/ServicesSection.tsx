@@ -35,11 +35,11 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
   return (
     <section id="services" className="py-24 sm:py-32 bg-[#fffefb] relative border-t border-[#e6e1d6]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
           <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block mb-3 font-semibold">
-            {t('06 — ما نوثقه ونحفظه', '06 — What We Preserve')}
+            {t('ما نوثقه ونحفظه', 'What We Preserve')}
           </span>
           <h2
             id="services-headline"

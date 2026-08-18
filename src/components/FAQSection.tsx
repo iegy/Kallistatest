@@ -20,11 +20,11 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ content, onContactClick 
   return (
     <section id="faq" className="py-24 sm:py-32 bg-[#fffefb] relative border-t border-[#e6e1d6]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
         <div className="text-center mb-16">
           <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block mb-3 font-semibold">
-            {t('16 — الأسئلة الشائعة', '16 — Frequently Asked Questions')}
+            {t('الأسئلة الشائعة', 'Frequently Asked Questions')}
           </span>
           <h2
             id="faq-headline"

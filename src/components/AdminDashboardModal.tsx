@@ -124,6 +124,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   const [isUploadingHeaderLogo, setIsUploadingHeaderLogo] = useState(false);
   const [isUploadingFooterLogo, setIsUploadingFooterLogo] = useState(false);
   const [uploadingServiceImageId, setUploadingServiceImageId] = useState<string | null>(null);
+  const [uploadingContentImageKey, setUploadingContentImageKey] = useState<'hero' | 'signature' | 'aboutKallista' | null>(null);
 
   // Album creation / edit modal state
   const [editingAlbum, setEditingAlbum] = useState<Album | null>(null);
@@ -519,6 +520,48 @@ const greetableClients = clients.filter(
       }));
     } finally {
       setUploadingServiceImageId(null);
+    }
+  };
+
+  // Reusable upload handler for editable content images
+  const handleUploadContentImage = async (
+    target: 'hero' | 'signature' | 'aboutKallista',
+    file: File
+  ) => {
+    if (!file) return;
+
+    setUploadingContentImageKey(target);
+
+    try {
+      const res = await uploadImageToImgBB(file, settings.imgbbApiKey);
+
+      if (!res.success || !res.url) {
+        alert('فشل رفع الصورة: ' + (res.error || 'يرجى التأكد من اتصال الإنترنت وصلاحية مفتاح ImgBB'));
+        return;
+      }
+
+      setEditableContent((current) => {
+        if (target === 'hero') {
+          return {
+            ...current,
+            hero: { ...current.hero, bgImageUrl: res.url },
+          };
+        }
+
+        if (target === 'signature') {
+          return {
+            ...current,
+            signature: { ...current.signature, imageUrl: res.url },
+          };
+        }
+
+        return {
+          ...current,
+          aboutKallista: { ...current.aboutKallista, coverImage: res.url },
+        };
+      });
+    } finally {
+      setUploadingContentImageKey(null);
     }
   };
 
@@ -1419,18 +1462,90 @@ const greetableClients = clients.filter(
                         />
                       </div>
 
-                      <div>
-                        <label className="block text-xs font-semibold text-[#594f45] mb-1">رابط صورة الهيرو المميزة (ألبوم الزفاف / صورة روناديسا)</label>
-                        <input
-                          type="text"
-                          value={editableContent.hero.bgImageUrl || ''}
-                          onChange={(e) => setEditableContent({
-                            ...editableContent,
-                            hero: { ...editableContent.hero, bgImageUrl: e.target.value }
-                          })}
-                          placeholder="اتركه فارغاً لاستخدام الصورة الافتراضية"
-                          className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e]"
-                        />
+                      <div className="space-y-3 rounded-xl border border-[#e6e1d6] bg-white p-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-[#594f45] mb-1">صورة الهيرو المميزة</label>
+                          <p className="text-[11px] text-[#8c7f73]">
+                            ارفع الصورة من جهازك إلى ImgBB أو ضع رابطاً مباشراً، ثم اضغط «حفظ كافة التعديلات في الموقع».
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col gap-2 sm:flex-row">
+                          <input
+                            type="text"
+                            value={editableContent.hero.bgImageUrl || ''}
+                            onChange={(e) => setEditableContent({
+                              ...editableContent,
+                              hero: { ...editableContent.hero, bgImageUrl: e.target.value }
+                            })}
+                            placeholder="https://... رابط صورة الهيرو"
+                            className="flex-1 px-3 py-2 rounded-xl bg-[#FAF8F5] border border-[#e6e1d6] text-xs text-[#24211e]"
+                          />
+
+                          <label className={`inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#24211e] px-4 py-2 text-xs font-semibold text-white transition-colors ${
+                            uploadingContentImageKey === 'hero'
+                              ? 'cursor-wait opacity-60'
+                              : 'cursor-pointer hover:bg-[#3d3833]'
+                          }`}>
+                            <Upload className="w-3.5 h-3.5 text-[#c6a585]" />
+                            <span>{uploadingContentImageKey === 'hero' ? 'جاري الرفع...' : 'رفع صورة'}</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              disabled={uploadingContentImageKey === 'hero'}
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) void handleUploadContentImage('hero', file);
+                                e.target.value = '';
+                              }}
+                            />
+                          </label>
+                        </div>
+
+                        {editableContent.hero.bgImageUrl && (
+                          <img
+                            src={editableContent.hero.bgImageUrl}
+                            alt="معاينة صورة الهيرو"
+                            className="h-40 w-full rounded-xl border border-[#e6e1d6] object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-[#594f45] mb-1">النص الصغير فوق الصورة — عربي</label>
+                          <input type="text" value={editableContent.hero.imageEyebrowAr || ''} onChange={(e) => setEditableContent({...editableContent, hero: {...editableContent.hero, imageEyebrowAr: e.target.value}})} placeholder="حكاية زفاف مميزة" className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e]" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-[#594f45] mb-1">النص الصغير فوق الصورة — إنجليزي</label>
+                          <input type="text" value={editableContent.hero.imageEyebrowEn || ''} onChange={(e) => setEditableContent({...editableContent, hero: {...editableContent.hero, imageEyebrowEn: e.target.value}})} placeholder="Signature Wedding Story" className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e]" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-[#594f45] mb-1">عنوان القصة على الصورة — عربي</label>
+                          <input type="text" value={editableContent.hero.imageStoryTitleAr || ''} onChange={(e) => setEditableContent({...editableContent, hero: {...editableContent.hero, imageStoryTitleAr: e.target.value}})} placeholder="حكاية نور وكريم — تصوير زفاف تحريري راقٍ" className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e]" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-[#594f45] mb-1">عنوان القصة على الصورة — إنجليزي</label>
+                          <input type="text" value={editableContent.hero.imageStoryTitleEn || ''} onChange={(e) => setEditableContent({...editableContent, hero: {...editableContent.hero, imageStoryTitleEn: e.target.value}})} placeholder="Noor & Kareem — a refined editorial wedding story" className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e]" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-[#594f45] mb-1">المكان — عربي</label>
+                          <input type="text" value={editableContent.hero.imageLocationAr || ''} onChange={(e) => setEditableContent({...editableContent, hero: {...editableContent.hero, imageLocationAr: e.target.value}})} placeholder="الإسكندرية، مصر" className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e]" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-[#594f45] mb-1">المكان — إنجليزي</label>
+                          <input type="text" value={editableContent.hero.imageLocationEn || ''} onChange={(e) => setEditableContent({...editableContent, hero: {...editableContent.hero, imageLocationEn: e.target.value}})} placeholder="Alexandria, Egypt" className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e]" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-[#594f45] mb-1">سطر التوفر — عربي</label>
+                          <input type="text" value={editableContent.hero.imageAvailabilityAr || ''} onChange={(e) => setEditableContent({...editableContent, hero: {...editableContent.hero, imageAvailabilityAr: e.target.value}})} placeholder="تصوير احترافي في جميع المحافظات" className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e]" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-[#594f45] mb-1">سطر التوفر — إنجليزي</label>
+                          <input type="text" value={editableContent.hero.imageAvailabilityEn || ''} onChange={(e) => setEditableContent({...editableContent, hero: {...editableContent.hero, imageAvailabilityEn: e.target.value}})} placeholder="Available across Egypt" className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e]" />
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1938,6 +2053,21 @@ const greetableClients = clients.filter(
                           </div>
                         ))}
                       </div>
+                      <div className="space-y-3 rounded-xl border border-[#c6a585]/60 bg-white p-4">
+                        <div>
+                          <h5 className="text-xs font-bold text-[#24211e]">صورة قسم «اللقطة التوقيعية / قصة الزفاف المميزة»</h5>
+                          <p className="mt-1 text-[11px] text-[#8c7f73]">هذه هي الصورة الكبيرة داخل القسم الداكن رقم 09.</p>
+                        </div>
+                        <div className="flex flex-col gap-2 sm:flex-row">
+                          <input type="text" value={editableContent.signature.imageUrl || ''} onChange={(e) => setEditableContent({...editableContent, signature: {...editableContent.signature, imageUrl: e.target.value}})} placeholder="https://... رابط صورة اللقطة التوقيعية" className="flex-1 rounded-xl border border-[#e6e1d6] bg-[#FAF8F5] px-3 py-2 text-xs text-[#24211e]" />
+                          <label className={`inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#24211e] px-4 py-2 text-xs font-semibold text-white transition-colors ${uploadingContentImageKey === 'signature' ? 'cursor-wait opacity-60' : 'cursor-pointer hover:bg-[#3d3833]'}`}>
+                            <Upload className="h-3.5 w-3.5 text-[#c6a585]" />
+                            <span>{uploadingContentImageKey === 'signature' ? 'جاري الرفع...' : 'رفع صورة'}</span>
+                            <input type="file" accept="image/*" disabled={uploadingContentImageKey === 'signature'} className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) void handleUploadContentImage('signature', file); e.target.value = ''; }} />
+                          </label>
+                        </div>
+                        {editableContent.signature.imageUrl && <img src={editableContent.signature.imageUrl} alt="معاينة صورة اللقطة التوقيعية" className="h-44 w-full rounded-xl border border-[#e6e1d6] object-cover" referrerPolicy="no-referrer" />}
+                      </div>
                     </div>
                   )}
 
@@ -1954,6 +2084,21 @@ const greetableClients = clients.filter(
                       {/* About Kallista Section */}
                       <div className="p-4 bg-white rounded-xl border border-[#e6e1d6] space-y-3">
                         <h5 className="font-bold text-xs text-[#24211e]">1. قسم استوديو كاليستا (About Kallista)</h5>
+                        <div className="space-y-3 rounded-xl border border-[#e6e1d6] bg-[#FAF8F5] p-3">
+                          <div>
+                            <label className="block text-[11px] font-semibold text-[#594f45] mb-1">صورة قسم «عن ستوديو كاليستا»</label>
+                            <p className="text-[10px] text-[#8c7f73]">الصورة الكبيرة التي تظهر بجانب نص التعريف بالاستوديو.</p>
+                          </div>
+                          <div className="flex flex-col gap-2 sm:flex-row">
+                            <input type="text" value={editableContent.aboutKallista.coverImage || ''} onChange={(e) => setEditableContent({...editableContent, aboutKallista: {...editableContent.aboutKallista, coverImage: e.target.value}})} placeholder="https://... رابط صورة القسم" className="flex-1 rounded-lg border border-[#e6e1d6] bg-white px-2.5 py-1.5 text-xs text-[#24211e]" />
+                            <label className={`inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#24211e] px-4 py-2 text-xs font-semibold text-white transition-colors ${uploadingContentImageKey === 'aboutKallista' ? 'cursor-wait opacity-60' : 'cursor-pointer hover:bg-[#3d3833]'}`}>
+                              <Upload className="h-3.5 w-3.5 text-[#c6a585]" />
+                              <span>{uploadingContentImageKey === 'aboutKallista' ? 'جاري الرفع...' : 'رفع صورة'}</span>
+                              <input type="file" accept="image/*" disabled={uploadingContentImageKey === 'aboutKallista'} className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) void handleUploadContentImage('aboutKallista', file); e.target.value = ''; }} />
+                            </label>
+                          </div>
+                          {editableContent.aboutKallista.coverImage && <img src={editableContent.aboutKallista.coverImage} alt="معاينة صورة قسم عن كاليستا" className="h-40 w-full rounded-xl border border-[#e6e1d6] object-cover" referrerPolicy="no-referrer" />}
+                        </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div>
                             <label className="block text-[11px] text-[#594f45] mb-0.5">عنوان القسم</label>

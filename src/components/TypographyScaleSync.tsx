@@ -369,9 +369,11 @@ const typographyCss = `
   }
 
   /*
-   * Kallista Glass Sage — a light sage glassmorphism theme.
-   * The blur is intentionally moderate and only applies to public cards/panels
-   * in light mode, keeping dark mode and the admin dashboard untouched.
+   * Kallista Glass Sage V2 — stronger, visible glassmorphism.
+   * The previous version looked too flat because the footer still used
+   * light-on-dark text colours after its dark background became translucent.
+   * This version adds visible background layers, stronger glass panels and
+   * explicit light-theme contrast fixes, while leaving the admin and dark mode untouched.
    */
   html[data-kallista-theme='glass-sage']:not([data-theme='dark']) {
     --color-offwhite: #fffdf7;
@@ -379,41 +381,62 @@ const typographyCss = `
     --color-gray-green: #b7c9a8;
     --color-gray-orange: #d7b38a;
     --color-dark: #2f332b;
+    --glass-sage-deep: #60704f;
+    --glass-sage-mid: #8fa278;
+    --glass-sage-light: #dce8d4;
+    --glass-sage-cream: #fffdf7;
+    --glass-sage-copper: #d7b38a;
+    --glass-border: rgba(143, 162, 120, 0.34);
+    --glass-shadow: rgba(70, 86, 58, 0.13);
   }
 
   html[data-kallista-theme='glass-sage']:not([data-theme='dark']) body,
   html[data-kallista-theme='glass-sage']:not([data-theme='dark']) #kallista-app-root {
     color: #2f332b;
-    background-color: #f5f8f1 !important;
+    background-color: #edf4e8 !important;
   }
 
+  /* Stronger backdrop so transparent cards have something visible to blur. */
   html[data-kallista-theme='glass-sage']:not([data-theme='dark']) #kallista-app-root {
     background-image:
-      radial-gradient(circle at 12% 10%, rgba(220, 232, 212, 0.88), transparent 31rem),
-      radial-gradient(circle at 88% 23%, rgba(183, 201, 168, 0.42), transparent 34rem),
-      radial-gradient(circle at 54% 82%, rgba(215, 179, 138, 0.15), transparent 30rem);
+      radial-gradient(circle at 8% 8%, rgba(183, 201, 168, 0.78) 0, rgba(183, 201, 168, 0.22) 21rem, transparent 38rem),
+      radial-gradient(circle at 92% 20%, rgba(220, 232, 212, 0.95) 0, rgba(220, 232, 212, 0.24) 24rem, transparent 42rem),
+      radial-gradient(circle at 18% 68%, rgba(215, 179, 138, 0.25) 0, rgba(215, 179, 138, 0.08) 18rem, transparent 34rem),
+      radial-gradient(circle at 82% 84%, rgba(143, 162, 120, 0.38) 0, rgba(143, 162, 120, 0.08) 22rem, transparent 38rem),
+      linear-gradient(145deg, #f5f8f1 0%, #eef5e9 48%, #f9f6ee 100%);
     background-attachment: fixed;
   }
 
+  /* Glass navigation bar. */
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > header {
-    background: rgba(255, 253, 247, 0.68) !important;
-    border-color: rgba(183, 201, 168, 0.42) !important;
-    backdrop-filter: blur(14px) saturate(118%);
-    -webkit-backdrop-filter: blur(14px) saturate(118%);
-    box-shadow: 0 10px 34px rgba(96, 112, 79, 0.08);
+    background:
+      linear-gradient(135deg, rgba(255, 253, 247, 0.78), rgba(220, 232, 212, 0.52)) !important;
+    border-color: rgba(143, 162, 120, 0.42) !important;
+    backdrop-filter: blur(20px) saturate(135%);
+    -webkit-backdrop-filter: blur(20px) saturate(135%);
+    box-shadow:
+      0 12px 36px rgba(70, 86, 58, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82);
   }
 
+  /* Alternating translucent sections with visible green depth behind the glass cards. */
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main > section:nth-of-type(even) {
-    background-color: rgba(220, 232, 212, 0.24) !important;
+    background:
+      linear-gradient(145deg, rgba(220, 232, 212, 0.42), rgba(255, 253, 247, 0.16)) !important;
   }
 
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main > section:nth-of-type(odd) {
-    background-color: rgba(255, 253, 247, 0.34) !important;
+    background:
+      linear-gradient(145deg, rgba(255, 253, 247, 0.46), rgba(183, 201, 168, 0.18)) !important;
   }
 
+  /*
+   * Primary glass panels. Keep the selector limited to elements that already
+   * have card/panel backgrounds so photo wrappers and layout containers are not altered.
+   */
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main
   :where(
@@ -423,6 +446,8 @@ const typographyCss = `
     div[class*='bg-[#faf8f5]'],
     div[class*='bg-[#faf7f2]'],
     div[class*='bg-[#fdfaf6]'],
+    div[class*='bg-[#f8f4ee]'],
+    div[class*='bg-[#F7F3EE]'],
     article[class*='bg-white'],
     article[class*='bg-[#fffefb]'],
     article[class*='bg-[#FAF8F5]'],
@@ -431,15 +456,34 @@ const typographyCss = `
     form[class*='bg-white'],
     form[class*='bg-[#fffefb]']
   ) {
-    background: rgba(255, 253, 247, 0.58) !important;
-    border-color: rgba(183, 201, 168, 0.46) !important;
-    backdrop-filter: blur(14px) saturate(122%);
-    -webkit-backdrop-filter: blur(14px) saturate(122%);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.69), rgba(220, 232, 212, 0.34)) !important;
+    border-color: rgba(143, 162, 120, 0.38) !important;
+    backdrop-filter: blur(20px) saturate(138%);
+    -webkit-backdrop-filter: blur(20px) saturate(138%);
     box-shadow:
-      0 14px 38px rgba(96, 112, 79, 0.09),
+      0 18px 44px rgba(70, 86, 58, 0.12),
+      0 4px 14px rgba(96, 112, 79, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.88),
+      inset 0 -1px 0 rgba(183, 201, 168, 0.14);
+  }
+
+  /* Make bordered rounded cards glassy even when their background is custom. */
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main
+  :where(
+    div[class*='rounded-2xl'][class*='border'],
+    div[class*='rounded-3xl'][class*='border'],
+    article[class*='rounded-2xl'][class*='border'],
+    article[class*='rounded-3xl'][class*='border']
+  ) {
+    border-color: rgba(143, 162, 120, 0.36) !important;
+    box-shadow:
+      0 16px 38px rgba(70, 86, 58, 0.10),
       inset 0 1px 0 rgba(255, 255, 255, 0.72);
   }
 
+  /* Green-tinted secondary glass surfaces. */
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main
   :where(
@@ -451,10 +495,14 @@ const typographyCss = `
     article[class*='bg-[#e6e1d6]'],
     article[class*='bg-[#EAE3DA]']
   ) {
-    background: rgba(220, 232, 212, 0.5) !important;
-    border-color: rgba(143, 162, 120, 0.34) !important;
-    backdrop-filter: blur(11px) saturate(116%);
-    -webkit-backdrop-filter: blur(11px) saturate(116%);
+    background:
+      linear-gradient(135deg, rgba(220, 232, 212, 0.66), rgba(183, 201, 168, 0.30)) !important;
+    border-color: rgba(143, 162, 120, 0.36) !important;
+    backdrop-filter: blur(16px) saturate(126%);
+    -webkit-backdrop-filter: blur(16px) saturate(126%);
+    box-shadow:
+      0 14px 34px rgba(70, 86, 58, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.70);
   }
 
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
@@ -463,64 +511,200 @@ const typographyCss = `
   #kallista-app-root > main [class*='border-[#EAE3DA]'],
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main [class*='border-[#ded5c7]'] {
-    border-color: rgba(183, 201, 168, 0.52) !important;
+    border-color: rgba(143, 162, 120, 0.42) !important;
   }
 
+  /* Public forms inherit the glass treatment without touching the admin. */
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main :where(input, textarea, select) {
+    background: rgba(255, 253, 247, 0.64) !important;
+    border-color: rgba(143, 162, 120, 0.42) !important;
+    color: #2f332b !important;
+    backdrop-filter: blur(10px) saturate(118%);
+    -webkit-backdrop-filter: blur(10px) saturate(118%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+
+  /* Strong, readable green actions. */
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main button[class*='bg-[#24211e]'],
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main a[class*='bg-[#24211e]'] {
-    background-color: rgba(96, 112, 79, 0.94) !important;
-    box-shadow: 0 8px 24px rgba(96, 112, 79, 0.16);
+    background:
+      linear-gradient(135deg, rgba(96, 112, 79, 0.98), rgba(122, 143, 102, 0.96)) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow:
+      0 10px 28px rgba(70, 86, 58, 0.20),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
   }
 
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main button[class*='bg-[#24211e]']:hover,
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main a[class*='bg-[#24211e]']:hover {
-    background-color: #8fa278 !important;
+    background:
+      linear-gradient(135deg, #71865d, #8fa278) !important;
   }
 
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main [class*='bg-[#738262]'] {
-    background-color: rgba(143, 162, 120, 0.92) !important;
+    background:
+      linear-gradient(135deg, rgba(117, 137, 96, 0.96), rgba(143, 162, 120, 0.94)) !important;
   }
 
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main [class*='text-[#738262]'],
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main [class*='text-[#5f6c50]'] {
-    color: #60704f !important;
+    color: #536545 !important;
   }
 
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main [class*='bg-[#c6a585]'] {
-    background-color: #d7b38a !important;
+    background:
+      linear-gradient(135deg, #d7b38a, #c99d6e) !important;
   }
 
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main [class*='border-[#c6a585]'] {
-    border-color: rgba(215, 179, 138, 0.78) !important;
+    border-color: rgba(199, 151, 103, 0.76) !important;
   }
 
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
   #kallista-app-root > main [class*='text-[#c6a585]'] {
-    color: #a8794d !important;
+    color: #9a6a3f !important;
+  }
+
+  /*
+   * Footer: the original footer was designed for a dark background, so when
+   * it became translucent its pale text lost contrast. This section explicitly
+   * remaps those colours for the light glass theme.
+   */
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #main-footer {
+    color: #2f332b !important;
+    background:
+      linear-gradient(145deg, rgba(255, 253, 247, 0.68), rgba(220, 232, 212, 0.46)) !important;
+    border-color: rgba(143, 162, 120, 0.46) !important;
+    backdrop-filter: blur(22px) saturate(136%);
+    -webkit-backdrop-filter: blur(22px) saturate(136%);
+    box-shadow:
+      0 -16px 46px rgba(70, 86, 58, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82);
   }
 
   html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
-  #kallista-app-root > footer {
-    background: rgba(255, 253, 247, 0.54) !important;
-    border-color: rgba(183, 201, 168, 0.38) !important;
-    backdrop-filter: blur(12px) saturate(118%);
-    -webkit-backdrop-filter: blur(12px) saturate(118%);
+  #main-footer > div:first-child {
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.42), rgba(183, 201, 168, 0.18));
+    border-color: rgba(143, 162, 120, 0.34) !important;
+    backdrop-filter: blur(18px) saturate(128%);
+    -webkit-backdrop-filter: blur(18px) saturate(128%);
   }
 
-  @media (max-width: 640px) {
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #main-footer > div.max-w-7xl {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(143, 162, 120, 0.32);
+    border-radius: 2rem;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.54), rgba(220, 232, 212, 0.28));
+    backdrop-filter: blur(18px) saturate(130%);
+    -webkit-backdrop-filter: blur(18px) saturate(130%);
+    box-shadow:
+      0 18px 48px rgba(70, 86, 58, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  }
+
+  /* Footer readable text hierarchy. */
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #main-footer [class*='text-[#e6e1d6]'] {
+    color: #4f5b46 !important;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #main-footer [class*='text-[#afbb9c]'] {
+    color: #60704f !important;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #main-footer [class*='text-[#c6a585]'] {
+    color: #9a6a3f !important;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #main-footer [class*='border-[#3d3833]'] {
+    border-color: rgba(143, 162, 120, 0.36) !important;
+  }
+
+  /* Social buttons stay dark enough for white icons. */
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #main-footer a[class*='bg-[#3d3833]'] {
+    color: #fffdf7 !important;
+    background:
+      linear-gradient(135deg, #536545, #71865d) !important;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    box-shadow: 0 8px 22px rgba(70, 86, 58, 0.16);
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #main-footer a[class*='bg-[#3d3833]']:hover {
+    color: #2f332b !important;
+    background:
+      linear-gradient(135deg, #d7b38a, #c99d6e) !important;
+  }
+
+  /* Footer CTA remains warm and legible. */
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #footer-final-inquire-btn {
+    color: #2f332b !important;
+    background:
+      linear-gradient(135deg, #d7b38a, #c99d6e) !important;
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    box-shadow:
+      0 12px 30px rgba(154, 106, 63, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #footer-final-inquire-btn:hover {
+    background:
+      linear-gradient(135deg, #cfa678, #bd8e60) !important;
+  }
+
+  /* Fallback for browsers without backdrop-filter. */
+  @supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
     html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
     #kallista-app-root > header,
     html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
-    #kallista-app-root > footer,
+    #main-footer,
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+    #kallista-app-root > main
+    :where(
+      div[class*='bg-white'],
+      div[class*='bg-[#fffefb]'],
+      div[class*='bg-[#FAF8F5]'],
+      article[class*='bg-white'],
+      form[class*='bg-white']
+    ) {
+      background-color: rgba(245, 248, 241, 0.95) !important;
+    }
+  }
+
+  /* Reduce GPU load on small screens while preserving the glass look. */
+  @media (max-width: 640px) {
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+    #kallista-app-root {
+      background-attachment: scroll;
+    }
+
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+    #kallista-app-root > header,
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+    #main-footer,
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+    #main-footer > div,
     html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
     #kallista-app-root > main
     :where(
@@ -532,12 +716,15 @@ const typographyCss = `
       form[class*='bg-white'],
       form[class*='bg-[#fffefb]']
     ) {
-      backdrop-filter: blur(8px) saturate(112%);
-      -webkit-backdrop-filter: blur(8px) saturate(112%);
+      backdrop-filter: blur(10px) saturate(118%);
+      -webkit-backdrop-filter: blur(10px) saturate(118%);
     }
 
-    html[data-kallista-theme='glass-sage']:not([data-theme='dark']) #kallista-app-root {
-      background-attachment: scroll;
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+    #main-footer > div.max-w-7xl {
+      margin-left: 0.75rem;
+      margin-right: 0.75rem;
+      border-radius: 1.5rem;
     }
   }
 
@@ -545,7 +732,9 @@ const typographyCss = `
     html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
     #kallista-app-root > header,
     html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
-    #kallista-app-root > footer,
+    #main-footer,
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+    #main-footer > div,
     html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
     #kallista-app-root > main :where(div, article, aside, form) {
       backdrop-filter: none !important;

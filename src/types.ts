@@ -252,5 +252,5 @@ export interface SiteSettings {
   /** Global public-site heading scale, as a percentage (85–125). */
   headingFontScale?: number;
   /** Global public-site colour palette selected from the admin dashboard. */
-  themeKey?: 'classic' | 'sage' | 'meadow' | 'olive-blush' | 'glass-sage';
+  themeKey?: 'classic' | 'sage' | 'meadow' | 'olive-blush' | 'glass-sage' | 'velora';
 }

@@ -3905,7 +3905,7 @@ const greetableClients = clients.filter(
                       <div className="mb-3">
                         <span className="block text-xs font-bold text-[#24211e]">ثيم ألوان الموقع</span>
                         <span className="mt-1 block text-[11px] leading-5 text-[#73685d]">
-                          اختر من خمسة ثيمات تحفظ هوية كاليستا، بما فيها ثيم زجاجي أخضر فاتح بتأثير Glass حقيقي.
+                          اختر من ستة ثيمات للموقع، بما فيها ثيم Velora بنفس توزيع الألوان ودرجات النصوص والأزرار.
                         </span>
                       </div>
 
@@ -4092,6 +4092,43 @@ const greetableClients = clients.filter(
                             <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#b7c9a8' }} />
                             <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#8fa278' }} />
                             <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#60704f' }} />
+                          </div>
+                        </label>
+
+                        <label
+                          className={`cursor-pointer rounded-2xl border p-4 transition-all ${
+                            tempSettings.themeKey === 'velora'
+                              ? 'border-[#c6a585] bg-[#fffefb] shadow-sm ring-1 ring-[#c6a585]/30'
+                              : 'border-[#e6e1d6] bg-white hover:border-[#c6a585]/75'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="siteTheme"
+                            value="velora"
+                            checked={tempSettings.themeKey === 'velora'}
+                            onChange={() => setTempSettings({ ...tempSettings, themeKey: 'velora' })}
+                            className="sr-only"
+                          />
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <span className="block text-xs font-bold text-[#2c2a26]">Kallista Velora</span>
+                              <span className="mt-1 block text-[10px] leading-4 text-[#6b6459]">
+                                توزيع Velora الأصلي: سكري وبيج، أخضر هادئ، برونزي دافئ، ونصوص بنية داكنة.
+                              </span>
+                            </div>
+                            <span className={`mt-0.5 h-4 w-4 rounded-full border-2 ${
+                              tempSettings.themeKey === 'velora'
+                                ? 'border-[#c6a585] bg-[#c6a585]'
+                                : 'border-[#e2ddd0] bg-white'
+                            }`} />
+                          </div>
+                          <div className="mt-4 flex gap-1.5" aria-hidden="true">
+                            <span className="h-7 flex-1 rounded-lg border border-[#e2ddd0]" style={{ backgroundColor: '#fffefb' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#e6e1d6' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#afbb9c' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#c6a585' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#2c2a26' }} />
                           </div>
                         </label>
                       </div>

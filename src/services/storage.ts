@@ -9,6 +9,7 @@ import {
   SiteContent,
 } from '../types';
 import { governorateLabel } from '../data/egyptGovernorates';
+import ExcelJS from 'exceljs';
 
 import ronadisaPhoto from '../assets/images/ronadisa_founder_1786838963744.jpg';
 import veiledWeddingPhoto from '../assets/images/veiled_bride_groom_1786838979487.jpg';
@@ -826,29 +827,111 @@ export function createOccasionWhatsAppLink(client: ClientContact, occasion: Occa
 }
 
 /* ------------------------------------------------------------------
-   CSV export (Excel-friendly)
+   Excel export
+   ------------------------------------------------------------------
+   We still build a small delimited payload because the admin dashboard
+   already calls buildClientsCsv/buildBookingsCsv -> downloadCsv.
+   downloadCsv now converts that payload into a REAL .xlsx workbook.
 ------------------------------------------------------------------ */
 
+function formatExportDate(value: unknown): string {
+  if (value === null || value === undefined || value === '') return '';
+
+  if (value instanceof Date) {
+    return value.toLocaleString('ar-EG');
+  }
+
+  if (typeof value === 'object') {
+    const candidate = value as {
+      toDate?: () => Date;
+      seconds?: number;
+      nanoseconds?: number;
+      _seconds?: number;
+      _nanoseconds?: number;
+    };
+
+    try {
+      if (typeof candidate.toDate === 'function') {
+        return candidate.toDate().toLocaleString('ar-EG');
+      }
+    } catch {
+      // Fall through to seconds-based conversion.
+    }
+
+    const seconds = candidate.seconds ?? candidate._seconds;
+    if (typeof seconds === 'number' && Number.isFinite(seconds)) {
+      return new Date(seconds * 1000).toLocaleString('ar-EG');
+    }
+
+    // Never export Firestore timestamp objects as "[object Object]".
+    return '';
+  }
+
+  const textValue = String(value).trim();
+  if (!textValue || textValue === '[object Object]') return '';
+
+  const parsed = new Date(textValue);
+  if (!Number.isNaN(parsed.getTime()) && /[T:-]/.test(textValue)) {
+    // Preserve YYYY-MM-DD dates as-is; format timestamps readably.
+    if (/^\d{4}-\d{2}-\d{2}$/.test(textValue)) return textValue;
+    return parsed.toLocaleString('ar-EG');
+  }
+
+  return textValue;
+}
+
+function serviceLabel(value: unknown, language: 'ar' | 'en'): string {
+  const key = String(value || '');
+  const labels: Record<string, { ar: string; en: string }> = {
+    weddings: { ar: 'حفلات الزفاف والعرائس', en: 'Weddings' },
+    wedding: { ar: 'حفلات الزفاف والعرائس', en: 'Weddings' },
+    fashion: { ar: 'تصوير الأزياء', en: 'Fashion' },
+    children: { ar: 'الأطفال والعائلة', en: 'Children & Family' },
+    portraits: { ar: 'البورتريه الشخصي', en: 'Portraits' },
+    portrait: { ar: 'البورتريه الشخصي', en: 'Portraits' },
+  };
+  return labels[key]?.[language] || key;
+}
+
+function bookingStatusLabel(value: unknown, language: 'ar' | 'en'): string {
+  const key = String(value || '');
+  const labels: Record<string, { ar: string; en: string }> = {
+    pending: { ar: 'قيد المراجعة', en: 'Pending' },
+    confirmed: { ar: 'مؤكد', en: 'Confirmed' },
+    completed: { ar: 'مكتمل', en: 'Completed' },
+    cancelled: { ar: 'ملغي', en: 'Cancelled' },
+  };
+  return labels[key]?.[language] || key;
+}
+
+function sourceLabel(value: unknown, language: 'ar' | 'en'): string {
+  const key = String(value || '');
+  const labels: Record<string, { ar: string; en: string }> = {
+    booking: { ar: 'طلب حجز', en: 'Booking' },
+    'stay-in-touch': { ar: 'ابقوا على تواصل', en: 'Stay in touch' },
+    manual: { ar: 'إضافة يدوية', en: 'Manual' },
+  };
+  return labels[key]?.[language] || key;
+}
+
 function csvCell(value: unknown): string {
-  const text = value === null || value === undefined ? '' : String(value);
-  return /[";\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  const cell = value === null || value === undefined ? '' : String(value);
+  return /[";\n\r]/.test(cell) ? `"${cell.replace(/"/g, '""')}"` : cell;
 }
 
 function toCsv(headers: string[], rows: unknown[][]): string {
-  // Excel on Arabic/European regional settings often expects ";" as the
-  // list separator. The sep directive makes Excel split every field into
-  // its own column instead of treating the row as a single cell.
-  const separator = ';';
-  const content = [headers, ...rows]
-    .map((row) => row.map(csvCell).join(separator))
+  return [headers, ...rows]
+    .map((row) => row.map(csvCell).join(';'))
     .join('\r\n');
-
-  return `sep=${separator}\r\n${content}`;
 }
 
 export function buildClientsCsv(clients: ClientContact[], language: 'ar' | 'en' = 'ar'): string {
+  const headers = language === 'ar'
+    ? ['الاسم', 'رقم الهاتف', 'واتساب', 'البريد الإلكتروني', 'تاريخ الميلاد', 'ذكرى الزواج', 'المحافظة', 'المدينة', 'الخدمات المهتم بها', 'المصدر', 'استقبال التحديثات', 'عدد الحجوزات', 'ملاحظات', 'تاريخ الإضافة']
+    : ['Name', 'Phone', 'WhatsApp', 'Email', 'Birthday', 'Anniversary', 'Governorate', 'City', 'Interests', 'Source', 'Subscribed', 'Bookings', 'Notes', 'Created'];
+
   return toCsv(
-    ['Name', 'Phone', 'WhatsApp', 'Email', 'Birthday', 'Anniversary', 'Governorate', 'City', 'Interests', 'Source', 'Subscribed', 'Bookings', 'Notes', 'Created'],
+    headers,
     clients.map((client) => [
       client.name,
       client.phone,
@@ -858,50 +941,204 @@ export function buildClientsCsv(clients: ClientContact[], language: 'ar' | 'en' 
       client.weddingAnniversary,
       governorateLabel(client.governorate, language),
       client.city,
-      (client.serviceInterests || []).join(' | '),
-      client.source || '',
-      client.subscribeUpdates ? 'yes' : 'no',
+      (client.serviceInterests || []).map((item) => serviceLabel(item, language)).join(' | '),
+      sourceLabel(client.source, language),
+      client.subscribeUpdates ? (language === 'ar' ? 'نعم' : 'Yes') : (language === 'ar' ? 'لا' : 'No'),
       client.totalBookings ?? 0,
       client.notes,
-      client.createdAt,
+      formatExportDate(client.createdAt),
     ]),
   );
 }
 
 export function buildBookingsCsv(bookings: Booking[], language: 'ar' | 'en' = 'ar'): string {
+  const headers = language === 'ar'
+    ? ['اسم العميل', 'رقم الهاتف', 'واتساب', 'البريد الإلكتروني', 'الخدمة', 'تاريخ المناسبة', 'الوقت', 'المكان', 'المحافظة', 'المدينة', 'الحالة', 'الميزانية', 'ملاحظات', 'تاريخ الطلب']
+    : ['Client', 'Phone', 'WhatsApp', 'Email', 'Service', 'Date', 'Time', 'Venue', 'Governorate', 'City', 'Status', 'Budget', 'Notes', 'Created'];
+
   return toCsv(
-    ['Client', 'Phone', 'WhatsApp', 'Email', 'Service', 'Date', 'Time', 'Venue', 'Governorate', 'City', 'Status', 'Budget', 'Notes', 'Created'],
+    headers,
     bookings.map((booking) => [
       booking.clientName,
       booking.phone,
       booking.whatsapp,
       booking.email,
-      booking.serviceType,
+      serviceLabel(booking.serviceType, language),
       booking.date,
       booking.timeSlot,
       booking.location,
       governorateLabel(booking.governorate, language),
       booking.city,
-      booking.status,
+      bookingStatusLabel(booking.status, language),
       booking.budget,
       booking.storyNotes,
-      booking.createdAt,
+      formatExportDate(booking.createdAt),
     ]),
   );
 }
 
-/** Triggers a CSV download. The UTF-8 BOM is what makes Excel read Arabic
- *  correctly instead of showing mojibake. */
-export function downloadCsv(filename: string, csv: string): void {
-  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
+function parseDelimitedPayload(payload: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = '';
+  let quoted = false;
+
+  for (let index = 0; index < payload.length; index += 1) {
+    const char = payload[index];
+
+    if (char === '"') {
+      if (quoted && payload[index + 1] === '"') {
+        cell += '"';
+        index += 1;
+      } else {
+        quoted = !quoted;
+      }
+      continue;
+    }
+
+    if (!quoted && char === ';') {
+      row.push(cell);
+      cell = '';
+      continue;
+    }
+
+    if (!quoted && (char === '\n' || char === '\r')) {
+      if (char === '\r' && payload[index + 1] === '\n') index += 1;
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = '';
+      continue;
+    }
+
+    cell += char;
+  }
+
+  if (cell.length > 0 || row.length > 0) {
+    row.push(cell);
+    rows.push(row);
+  }
+
+  return rows.filter((item) => item.some((value) => value !== ''));
+}
+
+/**
+ * Downloads a real Excel .xlsx workbook.
+ *
+ * The public function name is kept as downloadCsv so AdminDashboardModal.tsx
+ * does not need to change. The downloaded filename is automatically changed
+ * from .csv to .xlsx.
+ */
+export function downloadCsv(filename: string, payload: string): void {
+  void (async () => {
+    const rows = parseDelimitedPayload(payload);
+    if (rows.length === 0) return;
+
+    const isArabic = /[\u0600-\u06FF]/.test(rows[0].join(' '));
+    const isClients = filename.toLowerCase().includes('client');
+    const sheetName = isClients
+      ? (isArabic ? 'سجل العملاء' : 'Clients')
+      : (isArabic ? 'طلبات الحجز' : 'Bookings');
+
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'KALLISTA by Ronadisa';
+    workbook.created = new Date();
+
+    const worksheet = workbook.addWorksheet(sheetName, {
+      views: [{ state: 'frozen', ySplit: 1, rightToLeft: isArabic }],
+    });
+
+    rows.forEach((values) => worksheet.addRow(values));
+
+    // Professional header.
+    const header = worksheet.getRow(1);
+    header.height = 26;
+    header.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
+    header.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF738262' },
+    };
+    header.alignment = {
+      horizontal: 'center',
+      vertical: 'middle',
+      wrapText: true,
+    };
+
+    // Body formatting and RTL-friendly alignment.
+    worksheet.eachRow((currentRow, rowNumber) => {
+      if (rowNumber === 1) return;
+      currentRow.height = 22;
+      currentRow.eachCell({ includeEmpty: true }, (cell) => {
+        cell.font = { size: 10 };
+        cell.alignment = {
+          horizontal: isArabic ? 'right' : 'left',
+          vertical: 'middle',
+          wrapText: true,
+        };
+        cell.border = {
+          bottom: { style: 'hair', color: { argb: 'FFE6E1D6' } },
+        };
+      });
+    });
+
+    // Phone and WhatsApp MUST be strings so Excel never removes the leading 0
+    // or turns them into scientific notation.
+    [2, 3].forEach((columnNumber) => {
+      const column = worksheet.getColumn(columnNumber);
+      column.numFmt = '@';
+      column.eachCell({ includeEmpty: false }, (cell, rowNumber) => {
+        if (rowNumber === 1) return;
+        cell.value = cell.value === null || cell.value === undefined ? '' : String(cell.value);
+        cell.numFmt = '@';
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      });
+    });
+
+    // Dates are kept as visible text to avoid regional day/month swapping.
+    const dateColumns = isClients ? [5, 6, 14] : [6, 14];
+    dateColumns.forEach((columnNumber) => {
+      const column = worksheet.getColumn(columnNumber);
+      column.numFmt = '@';
+      column.eachCell({ includeEmpty: false }, (cell, rowNumber) => {
+        if (rowNumber === 1) return;
+        cell.value = cell.value === null || cell.value === undefined ? '' : String(cell.value);
+        cell.numFmt = '@';
+      });
+    });
+
+    // Sensible widths for the 14 exported columns.
+    const widths = isClients
+      ? [24, 16, 16, 30, 15, 15, 18, 18, 28, 18, 18, 14, 34, 24]
+      : [24, 16, 16, 30, 25, 15, 20, 28, 18, 18, 16, 18, 38, 24];
+
+    widths.forEach((width, index) => {
+      worksheet.getColumn(index + 1).width = width;
+    });
+
+    worksheet.autoFilter = {
+      from: { row: 1, column: 1 },
+      to: { row: 1, column: rows[0].length },
+    };
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob(
+      [buffer],
+      { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename.replace(/\.csv$/i, '.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  })().catch((error) => {
+    console.error('Excel export failed:', error);
+    alert('تعذر إنشاء ملف Excel. حاول مرة أخرى.');
+  });
 }
 
 // WhatsApp Message Builders

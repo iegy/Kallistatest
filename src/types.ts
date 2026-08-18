@@ -141,6 +141,14 @@ export interface SiteContent {
     primaryCtaText: string;
     secondaryCtaText: string;
     bgImageUrl?: string;
+    imageEyebrowAr?: string;
+    imageEyebrowEn?: string;
+    imageStoryTitleAr?: string;
+    imageStoryTitleEn?: string;
+    imageLocationAr?: string;
+    imageLocationEn?: string;
+    imageAvailabilityAr?: string;
+    imageAvailabilityEn?: string;
     stats: { number: string; label: string }[];
   };
   intro: {

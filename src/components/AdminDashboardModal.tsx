@@ -3893,10 +3893,10 @@ const greetableClients = clients.filter(
                       <div>
                         <h4 className="flex items-center gap-2 text-sm font-bold text-[#24211e]">
                           <Type className="h-4 w-4 text-[#738262]" />
-                          خطوط الموقع
+                          خطوط الموقع وأحجامها
                         </h4>
                         <p className="mt-1 text-xs leading-5 text-[#73685d]">
-                          اختر خط النصوص وخط العناوين. يتم تحميل الخط المختار فقط للحفاظ على سرعة الموقع.
+                          اختر نوع خط النصوص والعناوين، وتحكم في حجم كل منهما بشكل مستقل على واجهة الموقع.
                         </p>
                       </div>
                     </div>
@@ -3929,16 +3929,96 @@ const greetableClients = clients.filter(
                       </label>
                     </div>
 
+                    <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div className="rounded-2xl border border-[#e6e1d6] bg-white p-4">
+                        <div className="mb-3 flex items-center justify-between gap-3">
+                          <div>
+                            <span className="block text-xs font-semibold text-[#594f45]">حجم النصوص والمحتوى</span>
+                            <span className="mt-0.5 block text-[10px] text-[#8c7f73]">يطبّق على نصوص أقسام الموقع والمحتوى العام.</span>
+                          </div>
+                          <span className="min-w-[52px] rounded-full bg-[#738262]/15 px-2.5 py-1 text-center text-xs font-bold text-[#4e633d]">
+                            {tempSettings.bodyFontScale ?? 100}%
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="85"
+                          max="125"
+                          step="1"
+                          value={tempSettings.bodyFontScale ?? 100}
+                          onChange={(event) => setTempSettings({
+                            ...tempSettings,
+                            bodyFontScale: Number(event.target.value),
+                          })}
+                          className="appearance-range w-full"
+                          aria-label="حجم نصوص ومحتوى الموقع"
+                        />
+                        <div className="mt-2 flex items-center justify-between text-[10px] text-[#8c7f73]">
+                          <span>85%</span>
+                          <button
+                            type="button"
+                            onClick={() => setTempSettings({ ...tempSettings, bodyFontScale: 100 })}
+                            className="rounded-lg px-2 py-1 font-semibold text-[#738262] hover:bg-[#738262]/10"
+                          >
+                            افتراضي 100%
+                          </button>
+                          <span>125%</span>
+                        </div>
+                      </div>
+
+                      <div className="rounded-2xl border border-[#e6e1d6] bg-white p-4">
+                        <div className="mb-3 flex items-center justify-between gap-3">
+                          <div>
+                            <span className="block text-xs font-semibold text-[#594f45]">حجم العناوين</span>
+                            <span className="mt-0.5 block text-[10px] text-[#8c7f73]">يطبّق على العناوين الرئيسية والفرعية داخل أقسام الموقع.</span>
+                          </div>
+                          <span className="min-w-[52px] rounded-full bg-[#c6a585]/20 px-2.5 py-1 text-center text-xs font-bold text-[#8c6742]">
+                            {tempSettings.headingFontScale ?? 100}%
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="85"
+                          max="125"
+                          step="1"
+                          value={tempSettings.headingFontScale ?? 100}
+                          onChange={(event) => setTempSettings({
+                            ...tempSettings,
+                            headingFontScale: Number(event.target.value),
+                          })}
+                          className="appearance-range w-full"
+                          aria-label="حجم عناوين الموقع"
+                        />
+                        <div className="mt-2 flex items-center justify-between text-[10px] text-[#8c7f73]">
+                          <span>85%</span>
+                          <button
+                            type="button"
+                            onClick={() => setTempSettings({ ...tempSettings, headingFontScale: 100 })}
+                            className="rounded-lg px-2 py-1 font-semibold text-[#c6a585] hover:bg-[#c6a585]/10"
+                          >
+                            افتراضي 100%
+                          </button>
+                          <span>125%</span>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="mt-4 grid grid-cols-1 gap-3 rounded-2xl bg-[#f4f0e9] p-4 sm:grid-cols-2">
                       <p
                         className="rounded-xl bg-white px-4 py-3 text-sm leading-7 text-[#4d443b]"
-                        style={{ fontFamily: getBodyFontOption(tempSettings.bodyFontKey).stack }}
+                        style={{
+                          fontFamily: getBodyFontOption(tempSettings.bodyFontKey).stack,
+                          fontSize: `${14 * ((tempSettings.bodyFontScale ?? 100) / 100)}px`,
+                        }}
                       >
                         نص تجريبي لعرض وضوح خط الموقع المختار.
                       </p>
                       <p
                         className="rounded-xl bg-white px-4 py-3 text-xl font-bold leading-8 text-[#24211e]"
-                        style={{ fontFamily: getHeadingFontOption(tempSettings.headingFontKey).stack }}
+                        style={{
+                          fontFamily: getHeadingFontOption(tempSettings.headingFontKey).stack,
+                          fontSize: `${20 * ((tempSettings.headingFontScale ?? 100) / 100)}px`,
+                        }}
                       >
                         لحظات تستحق أن تبقى
                       </p>
@@ -3950,7 +4030,7 @@ const greetableClients = clients.filter(
                       disabled={isSavingSettings}
                       className="mt-4 w-full rounded-xl bg-[#738262] px-5 py-3 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#5f6c50] disabled:cursor-wait disabled:opacity-60 sm:w-auto"
                     >
-                      {isSavingSettings ? 'جاري حفظ الخطوط في Firebase...' : 'حفظ الخطوط وتطبيقها على الموقع'}
+                      {isSavingSettings ? 'جاري حفظ إعدادات الخطوط في Firebase...' : 'حفظ الخطوط والأحجام وتطبيقها على الموقع'}
                     </button>
                   </div>
 

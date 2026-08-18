@@ -247,4 +247,8 @@ export interface SiteSettings {
   currency: string;
   bodyFontKey: string;
   headingFontKey: string;
+  /** Global public-site content text scale, as a percentage (85–125). */
+  bodyFontScale?: number;
+  /** Global public-site heading scale, as a percentage (85–125). */
+  headingFontScale?: number;
 }

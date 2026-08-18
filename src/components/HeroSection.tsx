@@ -25,10 +25,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ content, onExplore, on
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          
+
           {/* Main Typography Column */}
           <div className="lg:col-span-7 text-right space-y-8">
-            
+
             {/* Header Brand Tag */}
             <div className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-[#c6a585]/40 bg-[#e6e1d6]/60 px-4 py-2 text-[#24211e]">
               <Sparkles className="w-4 h-4 text-[#c6a585]" />
@@ -101,7 +101,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ content, onExplore, on
           {/* Editorial Visual Composition */}
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto max-w-md lg:max-w-none">
-              
+
               {/* Main Image Frame with Veiled Wedding Asset */}
               <div className="aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl border-4 border-[#fffefb] bg-[#e6e1d6] relative">
                 <img
@@ -111,14 +111,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ content, onExplore, on
                   draggable={false}
                   className="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-700"
                 />
-                
+
                 {/* Visual Label Tag */}
                 <div className="absolute bottom-4 right-4 left-4 bg-[#24211e]/85 backdrop-blur-md p-4 rounded-2xl border border-[#fffefb]/10 text-right text-[#fffefb] space-y-1">
                   <span className="text-[10px] uppercase tracking-widest text-[#c6a585] font-serif block">
-                    {t('حكاية زفاف مميزة', 'Signature Wedding Story')}
+                    {t(
+                      hero.imageEyebrowAr || 'حكاية زفاف مميزة',
+                      hero.imageEyebrowEn || 'Signature Wedding Story'
+                    )}
                   </span>
                   <h3 className="font-arabic-editorial text-sm sm:text-base font-bold">
-                    {t('حكاية نور وكريم — تصوير زفاف تحريري راقٍ', 'Noor & Kareem — a refined editorial wedding story')}
+                    {t(
+                      hero.imageStoryTitleAr || 'حكاية نور وكريم — تصوير زفاف تحريري راقٍ',
+                      hero.imageStoryTitleEn || 'Noor & Kareem — a refined editorial wedding story'
+                    )}
                   </h3>
                 </div>
               </div>
@@ -126,10 +132,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ content, onExplore, on
               {/* Floating Aesthetic Accent Badge */}
               <div className="absolute -top-4 -left-4 bg-[#fffefb] p-4 rounded-2xl border border-[#e6e1d6] shadow-xl text-center hidden sm:block">
                 <span className="font-serif text-xs uppercase tracking-widest text-[#738262] block font-semibold">
-                  {t('الإسكندرية، مصر', 'Alexandria, Egypt')}
+                  {t(
+                    hero.imageLocationAr || 'الإسكندرية، مصر',
+                    hero.imageLocationEn || 'Alexandria, Egypt'
+                  )}
                 </span>
                 <span className="font-arabic-editorial text-xs text-[#24211e] font-medium">
-                  {t('تصوير احترافي في جميع المحافظات', 'Available across Egypt')}
+                  {t(
+                    hero.imageAvailabilityAr || 'تصوير احترافي في جميع المحافظات',
+                    hero.imageAvailabilityEn || 'Available across Egypt'
+                  )}
                 </span>
               </div>
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Calendar, ChevronDown, Camera } from 'lucide-react';
+import { Calendar, ChevronDown, Camera } from 'lucide-react';
 import { SiteContent } from '../types';
 import { veiledWeddingPhoto } from '../services/storage';
 import { useLanguage } from '../i18n';
@@ -28,14 +28,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ content, onExplore, on
 
           {/* Main Typography Column */}
           <div className="lg:col-span-7 text-right space-y-8">
-
-            {/* Header Brand Tag */}
-            <div className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-[#c6a585]/40 bg-[#e6e1d6]/60 px-4 py-2 text-[#24211e]">
-              <Sparkles className="w-4 h-4 text-[#c6a585]" />
-              <span className="text-center font-serif text-[10px] font-semibold uppercase leading-relaxed tracking-[0.12em] sm:text-xs sm:tracking-[0.2em]">
-                {brand.studioName} • {hero.preTitle || 'Fine Art Photography'}
-              </span>
-            </div>
 
             {/* Editorial Headlines */}
             <div className="space-y-4">

@@ -3905,7 +3905,7 @@ const greetableClients = clients.filter(
                       <div className="mb-3">
                         <span className="block text-xs font-bold text-[#24211e]">ثيم ألوان الموقع</span>
                         <span className="mt-1 block text-[11px] leading-5 text-[#73685d]">
-                          اختر من أربعة ثيمات تحفظ هوية كاليستا، من الكلاسيكي إلى الأخضر الدافئ والزيتوني التحريري.
+                          اختر من خمسة ثيمات تحفظ هوية كاليستا، بما فيها ثيم زجاجي أخضر فاتح بتأثير Glass حقيقي.
                         </span>
                       </div>
 
@@ -4055,6 +4055,43 @@ const greetableClients = clients.filter(
                             <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#b6be9d' }} />
                             <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#d8b3a8' }} />
                             <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#606b4d' }} />
+                          </div>
+                        </label>
+
+                        <label
+                          className={`cursor-pointer rounded-2xl border p-4 transition-all ${
+                            tempSettings.themeKey === 'glass-sage'
+                              ? 'border-[#8fa278] bg-[#f7fbf4] shadow-sm ring-1 ring-[#b7c9a8]/45'
+                              : 'border-[#e6e1d6] bg-white hover:border-[#b7c9a8]/80'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="siteTheme"
+                            value="glass-sage"
+                            checked={tempSettings.themeKey === 'glass-sage'}
+                            onChange={() => setTempSettings({ ...tempSettings, themeKey: 'glass-sage' })}
+                            className="sr-only"
+                          />
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <span className="block text-xs font-bold text-[#2f332b]">Kallista Glass Sage</span>
+                              <span className="mt-1 block text-[10px] leading-4 text-[#73685d]">
+                                أخضر فاتح زجاجي مع Blur وحدود شفافة ولمسة نحاسية خفيفة — عصري وهادئ.
+                              </span>
+                            </div>
+                            <span className={`mt-0.5 h-4 w-4 rounded-full border-2 ${
+                              tempSettings.themeKey === 'glass-sage'
+                                ? 'border-[#8fa278] bg-[#8fa278]'
+                                : 'border-[#d8cfc4] bg-white'
+                            }`} />
+                          </div>
+                          <div className="mt-4 flex gap-1.5" aria-hidden="true">
+                            <span className="h-7 flex-1 rounded-lg border border-[#e7eee1]" style={{ backgroundColor: '#fffdf7' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#dce8d4' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#b7c9a8' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#8fa278' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#60704f' }} />
                           </div>
                         </label>
                       </div>

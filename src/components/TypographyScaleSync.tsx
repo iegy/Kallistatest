@@ -22,6 +22,7 @@ const applyTypographyScales = (settings?: Partial<SiteSettings> | null) => {
     settings?.themeKey === 'sage'
     || settings?.themeKey === 'meadow'
     || settings?.themeKey === 'olive-blush'
+    || settings?.themeKey === 'glass-sage'
   ) ? settings.themeKey : 'classic';
 
   document.documentElement.style.setProperty('--kallista-body-font-scale', String(bodyScale));
@@ -365,6 +366,191 @@ const typographyCss = `
   html[data-kallista-theme='olive-blush']:not([data-theme='dark'])
   #kallista-app-root > main [class*='text-[#c6a585]'] {
     color: #a76f61 !important;
+  }
+
+  /*
+   * Kallista Glass Sage — a light sage glassmorphism theme.
+   * The blur is intentionally moderate and only applies to public cards/panels
+   * in light mode, keeping dark mode and the admin dashboard untouched.
+   */
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark']) {
+    --color-offwhite: #fffdf7;
+    --color-light-warm: #ede5d8;
+    --color-gray-green: #b7c9a8;
+    --color-gray-orange: #d7b38a;
+    --color-dark: #2f332b;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark']) body,
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark']) #kallista-app-root {
+    color: #2f332b;
+    background-color: #f5f8f1 !important;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark']) #kallista-app-root {
+    background-image:
+      radial-gradient(circle at 12% 10%, rgba(220, 232, 212, 0.88), transparent 31rem),
+      radial-gradient(circle at 88% 23%, rgba(183, 201, 168, 0.42), transparent 34rem),
+      radial-gradient(circle at 54% 82%, rgba(215, 179, 138, 0.15), transparent 30rem);
+    background-attachment: fixed;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > header {
+    background: rgba(255, 253, 247, 0.68) !important;
+    border-color: rgba(183, 201, 168, 0.42) !important;
+    backdrop-filter: blur(14px) saturate(118%);
+    -webkit-backdrop-filter: blur(14px) saturate(118%);
+    box-shadow: 0 10px 34px rgba(96, 112, 79, 0.08);
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main > section:nth-of-type(even) {
+    background-color: rgba(220, 232, 212, 0.24) !important;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main > section:nth-of-type(odd) {
+    background-color: rgba(255, 253, 247, 0.34) !important;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main
+  :where(
+    div[class*='bg-white'],
+    div[class*='bg-[#fffefb]'],
+    div[class*='bg-[#FAF8F5]'],
+    div[class*='bg-[#faf8f5]'],
+    div[class*='bg-[#faf7f2]'],
+    div[class*='bg-[#fdfaf6]'],
+    article[class*='bg-white'],
+    article[class*='bg-[#fffefb]'],
+    article[class*='bg-[#FAF8F5]'],
+    aside[class*='bg-white'],
+    aside[class*='bg-[#fffefb]'],
+    form[class*='bg-white'],
+    form[class*='bg-[#fffefb]']
+  ) {
+    background: rgba(255, 253, 247, 0.58) !important;
+    border-color: rgba(183, 201, 168, 0.46) !important;
+    backdrop-filter: blur(14px) saturate(122%);
+    -webkit-backdrop-filter: blur(14px) saturate(122%);
+    box-shadow:
+      0 14px 38px rgba(96, 112, 79, 0.09),
+      inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main
+  :where(
+    div[class*='bg-[#e6e1d6]'],
+    div[class*='bg-[#EAE3DA]'],
+    div[class*='bg-[#f2ede4]'],
+    div[class*='bg-[#efe9e0]'],
+    div[class*='bg-[#EFE9E0]'],
+    article[class*='bg-[#e6e1d6]'],
+    article[class*='bg-[#EAE3DA]']
+  ) {
+    background: rgba(220, 232, 212, 0.5) !important;
+    border-color: rgba(143, 162, 120, 0.34) !important;
+    backdrop-filter: blur(11px) saturate(116%);
+    -webkit-backdrop-filter: blur(11px) saturate(116%);
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='border-[#e6e1d6]'],
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='border-[#EAE3DA]'],
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='border-[#ded5c7]'] {
+    border-color: rgba(183, 201, 168, 0.52) !important;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main button[class*='bg-[#24211e]'],
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main a[class*='bg-[#24211e]'] {
+    background-color: rgba(96, 112, 79, 0.94) !important;
+    box-shadow: 0 8px 24px rgba(96, 112, 79, 0.16);
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main button[class*='bg-[#24211e]']:hover,
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main a[class*='bg-[#24211e]']:hover {
+    background-color: #8fa278 !important;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#738262]'] {
+    background-color: rgba(143, 162, 120, 0.92) !important;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='text-[#738262]'],
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='text-[#5f6c50]'] {
+    color: #60704f !important;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#c6a585]'] {
+    background-color: #d7b38a !important;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='border-[#c6a585]'] {
+    border-color: rgba(215, 179, 138, 0.78) !important;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='text-[#c6a585]'] {
+    color: #a8794d !important;
+  }
+
+  html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+  #kallista-app-root > footer {
+    background: rgba(255, 253, 247, 0.54) !important;
+    border-color: rgba(183, 201, 168, 0.38) !important;
+    backdrop-filter: blur(12px) saturate(118%);
+    -webkit-backdrop-filter: blur(12px) saturate(118%);
+  }
+
+  @media (max-width: 640px) {
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+    #kallista-app-root > header,
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+    #kallista-app-root > footer,
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+    #kallista-app-root > main
+    :where(
+      div[class*='bg-white'],
+      div[class*='bg-[#fffefb]'],
+      div[class*='bg-[#FAF8F5]'],
+      article[class*='bg-white'],
+      article[class*='bg-[#fffefb]'],
+      form[class*='bg-white'],
+      form[class*='bg-[#fffefb]']
+    ) {
+      backdrop-filter: blur(8px) saturate(112%);
+      -webkit-backdrop-filter: blur(8px) saturate(112%);
+    }
+
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark']) #kallista-app-root {
+      background-attachment: scroll;
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+    #kallista-app-root > header,
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+    #kallista-app-root > footer,
+    html[data-kallista-theme='glass-sage']:not([data-theme='dark'])
+    #kallista-app-root > main :where(div, article, aside, form) {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
   }
 `;
 

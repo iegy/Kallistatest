@@ -3893,11 +3893,96 @@ const greetableClients = clients.filter(
                       <div>
                         <h4 className="flex items-center gap-2 text-sm font-bold text-[#24211e]">
                           <Type className="h-4 w-4 text-[#738262]" />
-                          خطوط الموقع وأحجامها
+                          المظهر والخطوط
                         </h4>
                         <p className="mt-1 text-xs leading-5 text-[#73685d]">
-                          اختر نوع خط النصوص والعناوين، وتحكم في حجم كل منهما بشكل مستقل على واجهة الموقع.
+                          اختر ثيم ألوان الموقع، ونوع الخطوط، وحجم النصوص والعناوين من مكان واحد.
                         </p>
+                      </div>
+                    </div>
+
+                    <div className="mb-5 rounded-2xl border border-[#e6e1d6] bg-[#FAF8F5] p-4">
+                      <div className="mb-3">
+                        <span className="block text-xs font-bold text-[#24211e]">ثيم ألوان الموقع</span>
+                        <span className="mt-1 block text-[11px] leading-5 text-[#73685d]">
+                          الثيم الثاني يحافظ على هوية كاليستا الحالية مع زيادة حضور الأخضر بدرجاته الهادئة والعميقة.
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <label
+                          className={`cursor-pointer rounded-2xl border p-4 transition-all ${
+                            (tempSettings.themeKey ?? 'classic') === 'classic'
+                              ? 'border-[#c6a585] bg-white shadow-sm ring-1 ring-[#c6a585]/25'
+                              : 'border-[#e6e1d6] bg-white hover:border-[#c6a585]/70'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="siteTheme"
+                            value="classic"
+                            checked={(tempSettings.themeKey ?? 'classic') === 'classic'}
+                            onChange={() => setTempSettings({ ...tempSettings, themeKey: 'classic' })}
+                            className="sr-only"
+                          />
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <span className="block text-xs font-bold text-[#24211e]">Kallista Classic</span>
+                              <span className="mt-1 block text-[10px] leading-4 text-[#73685d]">
+                                الثيم الحالي — أوف وايت وبيج مع الأخضر والنحاسي.
+                              </span>
+                            </div>
+                            <span className={`mt-0.5 h-4 w-4 rounded-full border-2 ${
+                              (tempSettings.themeKey ?? 'classic') === 'classic'
+                                ? 'border-[#c6a585] bg-[#c6a585]'
+                                : 'border-[#d8cfc4] bg-white'
+                            }`} />
+                          </div>
+                          <div className="mt-4 flex gap-1.5" aria-hidden="true">
+                            <span className="h-7 flex-1 rounded-lg border border-[#e6e1d6]" style={{ backgroundColor: '#fffefb' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#e6e1d6' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#afbb9c' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#c6a585' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#24211e' }} />
+                          </div>
+                        </label>
+
+                        <label
+                          className={`cursor-pointer rounded-2xl border p-4 transition-all ${
+                            tempSettings.themeKey === 'sage'
+                              ? 'border-[#738262] bg-[#f6f8f2] shadow-sm ring-1 ring-[#738262]/25'
+                              : 'border-[#e6e1d6] bg-white hover:border-[#738262]/70'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="siteTheme"
+                            value="sage"
+                            checked={tempSettings.themeKey === 'sage'}
+                            onChange={() => setTempSettings({ ...tempSettings, themeKey: 'sage' })}
+                            className="sr-only"
+                          />
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <span className="block text-xs font-bold text-[#24211e]">Kallista Sage</span>
+                              <span className="mt-1 block text-[10px] leading-4 text-[#73685d]">
+                                نفس الهوية مع أخضر أكثر بحوالي 30% ودرجات أغمق للأزرار والتفاصيل.
+                              </span>
+                            </div>
+                            <span className={`mt-0.5 h-4 w-4 rounded-full border-2 ${
+                              tempSettings.themeKey === 'sage'
+                                ? 'border-[#738262] bg-[#738262]'
+                                : 'border-[#d8cfc4] bg-white'
+                            }`} />
+                          </div>
+                          <div className="mt-4 flex gap-1.5" aria-hidden="true">
+                            <span className="h-7 flex-1 rounded-lg border border-[#dce3d3]" style={{ backgroundColor: '#f8faf5' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#afbb9c' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#8fa278' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#738262' }} />
+                            <span className="h-7 flex-1 rounded-lg" style={{ backgroundColor: '#4e633d' }} />
+                          </div>
+                        </label>
                       </div>
                     </div>
 
@@ -4030,7 +4115,7 @@ const greetableClients = clients.filter(
                       disabled={isSavingSettings}
                       className="mt-4 w-full rounded-xl bg-[#738262] px-5 py-3 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#5f6c50] disabled:cursor-wait disabled:opacity-60 sm:w-auto"
                     >
-                      {isSavingSettings ? 'جاري حفظ إعدادات الخطوط في Firebase...' : 'حفظ الخطوط والأحجام وتطبيقها على الموقع'}
+                      {isSavingSettings ? 'جاري حفظ إعدادات المظهر في Firebase...' : 'حفظ المظهر والخطوط وتطبيقها على الموقع'}
                     </button>
                   </div>
 

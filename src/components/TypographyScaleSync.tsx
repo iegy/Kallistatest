@@ -18,9 +18,11 @@ const applyTypographyScales = (settings?: Partial<SiteSettings> | null) => {
 
   const bodyScale = normalizeScale(settings?.bodyFontScale) / 100;
   const headingScale = normalizeScale(settings?.headingFontScale) / 100;
+  const themeKey = settings?.themeKey === 'sage' ? 'sage' : 'classic';
 
   document.documentElement.style.setProperty('--kallista-body-font-scale', String(bodyScale));
   document.documentElement.style.setProperty('--kallista-heading-font-scale', String(headingScale));
+  document.documentElement.dataset.kallistaTheme = themeKey;
 };
 
 const typographyCss = `
@@ -38,6 +40,103 @@ const typographyCss = `
   #kallista-app-root :where(main, footer, [role='dialog'])
   :where(p, li, label, input, textarea, select, button, small):not(#kallista-admin-dashboard *) {
     zoom: var(--kallista-body-font-scale, 1);
+  }
+
+  /*
+   * Kallista Sage — the same warm palette with a visibly stronger green
+   * presence. It is scoped to the public light theme so the existing
+   * dark-mode design and the admin dashboard stay untouched.
+   */
+  html[data-kallista-theme='sage']:not([data-theme='dark']) {
+    --color-offwhite: #f8faf5;
+    --color-light-warm: #dbe3d1;
+    --color-gray-green: #afbb9c;
+    --color-gray-orange: #c6a585;
+    --color-dark: #24211e;
+  }
+
+  html[data-kallista-theme='sage']:not([data-theme='dark']) body,
+  html[data-kallista-theme='sage']:not([data-theme='dark']) #kallista-app-root {
+    background-color: #f8faf5 !important;
+  }
+
+  html[data-kallista-theme='sage']:not([data-theme='dark']) #kallista-app-root {
+    background-image:
+      radial-gradient(circle at 8% 12%, rgba(115, 130, 98, 0.18), transparent 28rem),
+      radial-gradient(circle at 92% 28%, rgba(143, 162, 120, 0.14), transparent 32rem);
+  }
+
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main > section:nth-of-type(even) {
+    background-color: color-mix(in srgb, #afbb9c 32%, #fffefb) !important;
+  }
+
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main > section:nth-of-type(odd) {
+    background-color: color-mix(in srgb, #fffefb 92%, #afbb9c) !important;
+  }
+
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#e6e1d6]'],
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#EAE3DA]'],
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#f2ede4]'],
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#efe9e0]'],
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#EFE9E0]'] {
+    background-color: #dbe3d1 !important;
+  }
+
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#FAF8F5]'],
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#faf8f5]'],
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#faf7f2]'],
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#fdfaf6]'],
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#f8f4ee]'],
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#F7F3EE]'] {
+    background-color: #f3f7ee !important;
+  }
+
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='border-[#e6e1d6]'],
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='border-[#EAE3DA]'],
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='border-[#ded5c7]'] {
+    border-color: #c8d4bb !important;
+  }
+
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main button[class*='bg-[#24211e]'],
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main a[class*='bg-[#24211e]'] {
+    background-color: #4e633d !important;
+  }
+
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main button[class*='bg-[#24211e]']:hover,
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main a[class*='bg-[#24211e]']:hover {
+    background-color: #738262 !important;
+  }
+
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='bg-[#738262]'] {
+    background-color: #738262 !important;
+  }
+
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='text-[#738262]'],
+  html[data-kallista-theme='sage']:not([data-theme='dark'])
+  #kallista-app-root > main [class*='text-[#5f6c50]'] {
+    color: #4e633d !important;
   }
 `;
 

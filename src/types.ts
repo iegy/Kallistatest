@@ -251,4 +251,6 @@ export interface SiteSettings {
   bodyFontScale?: number;
   /** Global public-site heading scale, as a percentage (85–125). */
   headingFontScale?: number;
+  /** Global public-site colour palette selected from the admin dashboard. */
+  themeKey?: 'classic' | 'sage';
 }

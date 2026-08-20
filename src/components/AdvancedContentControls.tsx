@@ -183,6 +183,22 @@ export const AdvancedContentControls: React.FC = () => {
     return () => window.removeEventListener('hashchange', syncRoute);
   }, []);
 
+  // history.replaceState does not emit a hashchange event.
+  // When the admin modal closes, App removes #/admin with replaceState,
+  // so keep this tiny guard active only while the editor thinks it is on the admin route.
+  useEffect(() => {
+    if (!isAdminRoute) return;
+
+    const timer = window.setInterval(() => {
+      if (window.location.hash !== '#/admin') {
+        setIsAdminRoute(false);
+        setIsOpen(false);
+      }
+    }, 150);
+
+    return () => window.clearInterval(timer);
+  }, [isAdminRoute]);
+
   useEffect(() => subscribeToFirebaseAuthState(async (user) => {
     setIsAuthorizedAdmin(await isFirebaseAdmin(user).catch(() => false));
   }), []);

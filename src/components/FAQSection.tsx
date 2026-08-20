@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, HelpCircle, Sparkles, MessageCircle } from 'lucide-react';
+import { ChevronDown, Sparkles } from 'lucide-react';
 import { SiteContent } from '../types';
 import { useLanguage } from '../i18n';
 
@@ -12,6 +12,11 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ content, onContactClick 
   const { t } = useLanguage();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const { faq } = content;
+
+  const helperText = content.faqSettings?.helperText
+    || t('لديكم أي استفسار آخر لم نذكره هنا؟ يسعدنا دائماً الإجابة على جميع أسئلتكم.', 'Have another question? We would be delighted to help.');
+  const helperCta = content.faqSettings?.helperCta
+    || t('تواصلوا معنا مباشرة عبر الواتساب أو نموذج الحجز', 'Contact us on WhatsApp or through the enquiry form');
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -80,18 +85,20 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ content, onContactClick 
           })}
         </div>
 
-        {/* Bottom Helper */}
-        <div className="mt-12 text-center p-6 bg-[#738262]/15 rounded-2xl border border-[#738262]/30">
-          <p className="text-sm text-[#465738] font-arabic-editorial">
-            {t('لديكم أي استفسار آخر لم نذكره هنا؟ يسعدنا دائماً الإجابة على جميع أسئلتكم.', 'Have another question? We would be delighted to help.')}
-          </p>
-          <button
-            onClick={onContactClick}
-            className="mt-3 text-xs font-bold text-[#24211e] hover:text-[#c6a585] inline-flex items-center gap-1 border-b border-[#24211e] pb-0.5"
-          >
-            <span>{t('تواصلوا معنا مباشرة عبر الواتساب أو نموذج الحجز', 'Contact us on WhatsApp or through the enquiry form')}</span>
-            <Sparkles className="w-3.5 h-3.5 text-[#c6a585]" />
-          </button>
+        {/* Bottom Helper — same visual family as the FAQ cards */}
+        <div className="mt-6 overflow-hidden rounded-2xl border border-[#e6e1d6] bg-[#fffefb] shadow-sm">
+          <div className="p-6 text-center">
+            <p className="text-sm text-[#4d443b] font-arabic-editorial leading-7">
+              {helperText}
+            </p>
+            <button
+              onClick={onContactClick}
+              className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#c6a585]/45 bg-[#fffefb]/70 px-5 py-2.5 text-xs font-bold text-[#24211e] shadow-sm backdrop-blur-md transition-all hover:border-[#c6a585] hover:bg-[#e6e1d6]/40"
+            >
+              <span>{helperCta}</span>
+              <Sparkles className="w-3.5 h-3.5 text-[#c6a585]" />
+            </button>
+          </div>
         </div>
 
       </div>

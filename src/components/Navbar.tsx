@@ -45,7 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'home', labelAr: 'الرئيسية', labelEn: 'Home' },
     { id: 'portfolio', labelAr: 'الأعمال', labelEn: 'Portfolio' },
     { id: 'services', labelAr: 'الخدمات', labelEn: 'Services' },
-    { id: 'about', labelAr: 'عن كاليستا وروناديسا', labelEn: 'About' },
+    { id: 'about', labelAr: 'عنا', labelEn: 'About' },
     { id: 'experience', labelAr: 'التجربة', labelEn: 'Experience' },
     { id: 'reviews', labelAr: 'الآراء', labelEn: 'Reviews' },
     { id: 'faq', labelAr: 'الأسئلة', labelEn: 'FAQ' },
@@ -134,6 +134,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Languages className="h-4 w-4" />
               <span>{language === 'ar' ? 'EN' : 'عربي'}</span>
             </button>
+
             <button
               onClick={onOpenAccount}
               className="flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-2 text-xs text-[#6c635b] hover:bg-[#efe9e0]/70 hover:text-[#1a1715]"
@@ -142,6 +143,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <UserRound className="h-4 w-4" />
               <span className="hidden 2xl:inline">{t('حسابي', 'Account')}</span>
             </button>
+
             {/* Admin Dashboard Access */}
             <button
               id="admin-dashboard-btn"
@@ -184,6 +186,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Languages className="h-3.5 w-3.5" />
               <span>{language === 'ar' ? 'EN' : 'ع'}</span>
             </button>
+
             <button
               onClick={onOpenAccount}
               className="p-2 text-[#7C7167] hover:text-[#1A1715] focus:outline-none"
@@ -191,6 +194,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <UserRound className="h-4 w-4" />
             </button>
+
             <button
               id="mobile-admin-btn"
               onClick={onOpenAdmin}
@@ -226,21 +230,21 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="mx-auto max-w-5xl">
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {defaultNavItems.map((item) => {
-              const isActive = activeSection === item.id;
-              return (
-                <button
-                  key={item.id}
-                  id={`mobile-nav-${item.id}`}
-                  onClick={() => handleItemClick(item.id)}
-                  className={`flex items-center justify-between rounded-xl px-4 py-3 text-right text-sm transition-colors ${
-                    isActive
-                      ? 'bg-[#EAE3DA]/70 font-semibold text-[#1A1715]'
-                      : 'text-[#5C534C] hover:bg-[#EFE9E0]/40'
-                  }`}
-                >
-                  <span>{language === 'ar' ? item.labelAr : item.labelEn}</span>
-                </button>
-              );
+                const isActive = activeSection === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    id={`mobile-nav-${item.id}`}
+                    onClick={() => handleItemClick(item.id)}
+                    className={`flex items-center justify-between rounded-xl px-4 py-3 text-right text-sm transition-colors ${
+                      isActive
+                        ? 'bg-[#EAE3DA]/70 font-semibold text-[#1A1715]'
+                        : 'text-[#5C534C] hover:bg-[#EFE9E0]/40'
+                    }`}
+                  >
+                    <span>{language === 'ar' ? item.labelAr : item.labelEn}</span>
+                  </button>
+                );
               })}
             </div>
 

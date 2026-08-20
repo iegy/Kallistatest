@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, Sparkles, Award, MapPin, Heart, Instagram, CheckCircle2 } from 'lucide-react';
+import { Camera, Sparkles, Instagram, CheckCircle2 } from 'lucide-react';
 import { SiteContent } from '../types';
 import { ronadisaPhoto, veiledWeddingPhoto } from '../services/storage';
 import { useLanguage } from '../i18n';
@@ -34,14 +34,6 @@ export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExplore
                 />
               </div>
 
-              <div className="absolute -bottom-6 -right-6 bg-[#24211e] text-[#fffefb] p-6 rounded-2xl shadow-xl max-w-xs text-right space-y-1">
-                <span className="text-xs uppercase tracking-widest text-[#c6a585] font-serif block">
-                  {t('مساحة للفن الراقي', 'Fine Art Sanctuary')}
-                </span>
-                <p className="font-arabic-editorial text-sm font-bold">
-                  {t('مساحة فنية مخصصة لتوثيق الجمال والوقار التحريري', 'A creative space devoted to refined, meaningful imagery')}
-                </p>
-              </div>
             </div>
 
             {/* Typography Column */}
@@ -160,17 +152,6 @@ export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExplore
                   className="w-full h-full object-cover object-top"
                 />
 
-                <div className="absolute bottom-4 inset-x-4 bg-[#24211e]/90 backdrop-blur-md p-4 rounded-2xl border border-[#fffefb]/15 text-right text-[#fffefb]">
-                  <span className="text-[10px] tracking-widest uppercase text-[#c6a585] font-serif block">
-                    {t('المصورة الرئيسية والمؤسسة', 'Lead Photographer & Founder')}
-                  </span>
-                  <h3 className="font-arabic-editorial text-base font-bold">
-                    {aboutRonadisa.founderName || t('روناديسا', 'Ronadisa')}
-                  </h3>
-                  <p className="text-[11px] text-[#e6e1d6]/80 font-serif">
-                    {t('التصوير الفني والتحريري', 'Fine Art & Editorial Photography')}
-                  </p>
-                </div>
               </div>
             </div>
 

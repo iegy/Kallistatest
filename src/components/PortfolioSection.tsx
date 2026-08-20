@@ -193,7 +193,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                           {album.images.length > 3 && (
                             <button
                               onClick={() => onOpenAlbumModal(album)}
-                              className="w-12 h-12 rounded-lg bg-[#e6e1d6] text-[#24211e] text-xs font-serif font-bold flex items-center justify-center flex-shrink-0 hover:bg-[#c6a585] hover:text-white transition-colors"
+                              className="w-12 h-12 rounded-lg border border-[#c6a585]/40 bg-[#fffefb]/55 backdrop-blur-md text-[#24211e] text-xs font-serif font-bold flex items-center justify-center flex-shrink-0 hover:bg-[#fffefb]/80 transition-colors"
                             >
                               +{album.images.length - 3}
                             </button>
@@ -207,7 +207,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                       <button
                         id={`view-full-album-${album.id}`}
                         onClick={() => onOpenAlbumModal(album)}
-                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#e6e1d6] py-2.5 text-xs font-medium tracking-wide text-[#24211e] transition-colors hover:bg-[#c6a585] hover:text-white sm:text-sm"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#c6a585]/45 bg-[#fffefb]/55 py-2.5 text-xs font-semibold tracking-wide text-[#24211e] shadow-[0_8px_24px_rgba(36,33,30,0.06)] backdrop-blur-md transition-all hover:border-[#c6a585] hover:bg-[#fffefb]/82 hover:shadow-[0_10px_30px_rgba(36,33,30,0.10)] sm:text-sm"
                       >
                         <span>{t('مشاهدة الألبوم والمناسبة كاملة', 'View the complete story')}</span>
                         <ArrowLeft className="w-3.5 h-3.5" />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, Sparkles, Heart, Shield, Award, CheckCircle2, Camera } from 'lucide-react';
+import { Sparkles, CheckCircle2, Camera } from 'lucide-react';
 import { SiteContent } from '../types';
 import { veiledWeddingPhoto } from '../services/storage';
 import { useLanguage } from '../i18n';
@@ -15,6 +15,14 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
 }) => {
   const { t } = useLanguage();
   const { approach, signature } = content;
+
+  const signatureBenefits = signature.benefits?.length
+    ? signature.benefits
+    : [
+        t('تغطية سينمائية وفوتوغرافية متكاملة للعروسين والعائلة', 'Complete editorial coverage for the couple and family'),
+        t('معالجة لونية تحريرية دقيقة تحافظ على طبيعية الملامح ونضارة البشرة', 'Careful colour finishing that preserves natural features and skin'),
+        t('تسليم ألبومات فاخرة مطبوعة يدوياً بأرقى الخامات الإيطالية', 'Luxury hand-finished albums made with archival materials'),
+      ];
 
   return (
     <div id="approach-signature-wrapper" className="space-y-0">
@@ -76,6 +84,7 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
       </section>
 
       {/* 08 & 09 — SIGNATURE IMAGE & WEDDING FEATURE */}
+      {signature.visible === true && (
       <section id="signature-wedding" className="py-24 bg-[#24211e] text-[#fffefb] relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -106,7 +115,7 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
             {/* Editorial Content */}
             <div className="lg:col-span-6 text-right space-y-6 order-1 lg:order-2">
               <span className="font-serif text-sm tracking-[0.25em] text-[#c6a585] uppercase block font-semibold">
-                {t('قصة الزفاف المميزة', 'Wedding Feature')}
+                {signature.eyebrow || t('قصة الزفاف المميزة', 'Wedding Feature')}
               </span>
 
               <h2 className="font-arabic-editorial text-3xl sm:text-4xl md:text-5xl font-bold text-[#fffefb] leading-tight">
@@ -114,32 +123,26 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
               </h2>
 
               <p className="text-[#e6e1d6]/80 text-base sm:text-lg leading-relaxed font-light">
-                {t('حفل الزفاف ليس مجرد جلسة تصوير، بل هو بداية فصل جديد في حياتكم. نحن نتواجد معكم بهدوء لنوثق كل لحظة تفيض بالمشاعر: نظرة اللقاء الأولى، دعوات الوالدين، تفاصيل فستان العروس المحتشم وطرحتها، وأناقة العريس.', 'A wedding is more than a photography session; it is the beginning of a new chapter. We stay quietly attentive to every meaningful glance, family blessing, considered detail and honest emotion.')}
+                {signature.description || t('حفل الزفاف ليس مجرد جلسة تصوير، بل هو بداية فصل جديد في حياتكم. نحن نتواجد معكم بهدوء لنوثق كل لحظة تفيض بالمشاعر: نظرة اللقاء الأولى، دعوات الوالدين، تفاصيل فستان العروس المحتشم وطرحتها، وأناقة العريس.', 'A wedding is more than a photography session; it is the beginning of a new chapter. We stay quietly attentive to every meaningful glance, family blessing, considered detail and honest emotion.')}
               </p>
 
               <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-start gap-3 text-sm text-[#e6e1d6]">
-                  <span>{t('تغطية سينمائية وفوتوغرافية متكاملة للعروسين والعائلة', 'Complete editorial coverage for the couple and family')}</span>
-                  <CheckCircle2 className="w-4 h-4 text-[#738262]" />
-                </div>
-                <div className="flex items-center justify-start gap-3 text-sm text-[#e6e1d6]">
-                  <span>{t('معالجة لونية تحريرية دقيقة تحافظ على طبيعية الملامح ونضارة البشرة', 'Careful colour finishing that preserves natural features and skin')}</span>
-                  <CheckCircle2 className="w-4 h-4 text-[#738262]" />
-                </div>
-                <div className="flex items-center justify-start gap-3 text-sm text-[#e6e1d6]">
-                  <span>{t('تسليم ألبومات فاخرة مطبوعة يدوياً بأرقى الخامات الإيطالية', 'Luxury hand-finished albums made with archival materials')}</span>
-                  <CheckCircle2 className="w-4 h-4 text-[#738262]" />
-                </div>
+                {signatureBenefits.map((benefit, index) => (
+                  <div key={`${benefit}-${index}`} className="flex items-center justify-start gap-3 text-sm text-[#e6e1d6]">
+                    <span>{benefit}</span>
+                    <CheckCircle2 className="w-4 h-4 text-[#afbb9c]" />
+                  </div>
+                ))}
               </div>
 
               <div className="pt-4">
                 <button
                   id="signature-wedding-inquire-btn"
                   onClick={onInquireWedding}
-                  className="bg-[#c6a585] hover:bg-[#b5926f] text-[#24211e] px-8 py-3.5 rounded-full text-sm font-semibold tracking-wider transition-all duration-300 shadow-xl inline-flex items-center gap-2"
+                  className="border border-[#fffefb]/25 bg-[#fffefb]/10 hover:bg-[#fffefb]/20 backdrop-blur-md text-[#fffefb] px-8 py-3.5 rounded-full text-sm font-semibold tracking-wider transition-all duration-300 shadow-xl inline-flex items-center gap-2"
                 >
                   <Camera className="w-4 h-4" />
-                  <span>{t('احجزوا استشارة وتغطية زفافكم', 'Book a wedding consultation')}</span>
+                  <span>{signature.ctaText || t('احجزوا استشارة وتغطية زفافكم', 'Book a wedding consultation')}</span>
                 </button>
               </div>
 
@@ -149,6 +152,7 @@ export const ApproachAndSignatureSection: React.FC<ApproachAndSignatureSectionPr
 
         </div>
       </section>
+      )}
 
     </div>
   );

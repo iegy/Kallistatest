@@ -55,8 +55,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
       !formData.date ||
       !formData.location.trim() ||
       !formData.governorate ||
-      !formData.city.trim() ||
-      !formData.storyNotes.trim()
+      !formData.city.trim()
     ) {
       alert(t('جميع الحقول المحددة بعلامة (*) إجبارية. يرجى استكمال كافة بيانات الحجز.', 'Please complete all required booking fields marked with (*).'));
       return;
@@ -115,10 +114,10 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
           <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block mb-3 font-semibold">
-            {t('التواصل وطلب الحجز', 'Contact & Booking Inquiry')}
+            {contact.eyebrow || t('التواصل وطلب الحجز', 'Contact & Booking Inquiry')}
           </span>
           <p className="font-serif text-2xl sm:text-3xl text-[#c6a585] italic mb-2">
-            {t('دعونا نوثّق شيئًا جميلًا.', "Let's preserve something beautiful.")}
+            {contact.kicker || t('دعونا نوثّق شيئًا جميلًا.', "Let's preserve something beautiful.")}
           </p>
           <h2
             id="contact-main-headline"
@@ -139,14 +138,14 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
 
           {/* Left Info & Direct Channels */}
           <div className="lg:col-span-5 text-right space-y-8 order-2 lg:order-1">
-            <div className="space-y-5 rounded-3xl border border-[#e6e1d6] bg-[#e6e1d6]/30 p-5 sm:p-7">
+            <div className="space-y-5 rounded-3xl border border-[#e6e1d6] bg-[#fffefb]/72 p-5 shadow-sm backdrop-blur-md sm:p-7">
               <h3 className="flex items-center gap-2 font-arabic-editorial text-2xl font-bold leading-tight text-[#24211e]">
-                <span>{t('تواصل مباشر وسريع', 'Direct contact')}</span>
+                <span>{contact.directTitle || t('تواصل مباشر وسريع', 'Direct contact')}</span>
                 <Sparkles className="h-5 w-5 shrink-0 text-[#c6a585]" />
               </h3>
 
               <p className="max-w-xl text-sm font-light leading-7 text-[#594f45]">
-                {t('نرحب بجميع استفساراتكم ومشاركتكم لتفاصيل مناسبتكم في أي وقت، ويسعدنا دائماً تقديم المشورة لاختيار أفضل وقت وإضاءة لجلسة التصوير.', 'Share your plans with us and we will help you choose the right service, setting and light for your session.')}
+                {contact.directDescription || t('نرحب بجميع استفساراتكم ومشاركتكم لتفاصيل مناسبتكم في أي وقت، ويسعدنا دائماً تقديم المشورة لاختيار أفضل وقت وإضاءة لجلسة التصوير.', 'Share your plans with us and we will help you choose the right service, setting and light for your session.')}
               </p>
 
               <div className="space-y-3 border-t border-[#d8cfc4]/80 pt-5">
@@ -154,9 +153,9 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                   href={`https://wa.me/${contact.whatsapp.replace(/[^0-9+]/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-start gap-4 rounded-2xl border border-[#e6e1d6] bg-[#fffefb] p-4 transition-all hover:border-[#738262] hover:shadow-md"
+                  className="group flex items-start gap-4 rounded-2xl border border-[#e6e1d6] bg-[#fffefb]/78 p-4 backdrop-blur-md transition-all hover:border-[#c6a585] hover:shadow-md"
                 >
-                  <span className="min-w-[5.75rem] shrink-0 rounded-full bg-[#738262]/20 px-3 py-1.5 text-center font-serif text-[11px] font-semibold leading-5 text-[#4e633d]">
+                  <span className="min-w-[5.75rem] shrink-0 rounded-full border border-[#d8cfc4] bg-[#fffefb]/75 px-3 py-1.5 text-center font-serif text-[11px] font-semibold leading-5 text-[#24211e] backdrop-blur-md">
                     {t('محادثة واتساب', 'WhatsApp chat')}
                   </span>
                   <div className="min-w-0 flex-1 text-right">
@@ -167,8 +166,8 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                   </div>
                 </a>}
 
-                <div className="flex items-start gap-4 rounded-2xl border border-[#e6e1d6] bg-[#fffefb] p-4">
-                  <span className="min-w-[5.75rem] shrink-0 rounded-full bg-[#e6e1d6] px-3 py-1.5 text-center font-serif text-[11px] leading-5 text-[#5e4f40]">
+                <div className="flex items-start gap-4 rounded-2xl border border-[#e6e1d6] bg-[#fffefb]/78 p-4 backdrop-blur-md">
+                  <span className="min-w-[5.75rem] shrink-0 rounded-full border border-[#d8cfc4] bg-[#fffefb]/75 px-3 py-1.5 text-center font-serif text-[11px] font-semibold leading-5 text-[#24211e] backdrop-blur-md">
                     {t('موقع الاستوديو', 'Studio location')}
                   </span>
                   <div className="min-w-0 flex-1 text-right">
@@ -179,8 +178,8 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 rounded-2xl border border-[#e6e1d6] bg-[#fffefb] p-4">
-                  <span className="min-w-[5.75rem] shrink-0 rounded-full bg-[#c6a585]/20 px-3 py-1.5 text-center font-serif text-[11px] leading-5 text-[#8c6742]">
+                <div className="flex items-start gap-4 rounded-2xl border border-[#e6e1d6] bg-[#fffefb]/78 p-4 backdrop-blur-md">
+                  <span className="min-w-[5.75rem] shrink-0 rounded-full border border-[#d8cfc4] bg-[#fffefb]/75 px-3 py-1.5 text-center font-serif text-[11px] font-semibold leading-5 text-[#24211e] backdrop-blur-md">
                     {t('البريد', 'Email')}
                   </span>
                   <div className="min-w-0 flex-1 text-right">
@@ -195,7 +194,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
               {contact.socialLinks && contact.socialLinks.filter((link) => link.label && link.url).length > 0 && (
                 <div className="flex flex-wrap justify-center gap-2 border-t border-[#d8cfc4]/70 pt-4">
                   {contact.socialLinks.filter((link) => link.label && link.url).map((link) => (
-                    <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-[#d8cfc4] bg-[#fffefb] px-3 py-2 text-xs font-semibold text-[#5a4f44] hover:border-[#c6a585]">
+                    <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-[#d8cfc4] bg-[#fffefb]/78 px-3 py-2 text-xs font-semibold text-[#24211e] backdrop-blur-md hover:border-[#c6a585]">
                       <SocialPlatformIcon platform={link.icon} label={link.label} url={link.url} className="h-3.5 w-3.5" />
                       {link.label}
                     </a>
@@ -205,11 +204,11 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
 
               {/* VIP Perks */}
               <div className="space-y-3 rounded-2xl border border-[#738262]/30 bg-[#738262]/15 p-4 text-right sm:p-5">
-                <div className="inline-flex items-center gap-2 rounded-full bg-[#fffefb]/55 px-3 py-1.5 text-[#445636]">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#fffefb]/65 bg-[#fffefb]/65 px-3 py-1.5 text-[#24211e] backdrop-blur-md">
                   <span className="font-bold text-xs font-arabic-editorial">{t('ميزة كاليستا لعملائنا الكرام', 'A thoughtful Kallista touch')}</span>
-                  <Gift className="h-4 w-4 shrink-0 text-[#738262]" />
+                  <Gift className="h-4 w-4 shrink-0 text-[#60704f]" />
                 </div>
-                <p className="max-w-md text-xs leading-6 text-[#4e5e40]">
+                <p className="max-w-md text-xs leading-6 text-[#24211e]">
                   {t('عند تسجيل تاريخ ميلادكم أو ذكرى زواجكم، نرسل لكم تهنئة خاصة وهدية خصم مميزة في شهر مناسبتكم السعيدة!', 'Optionally share a birthday or anniversary to receive a personal greeting and seasonal client gift.')}
                 </p>
               </div>
@@ -217,10 +216,10 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
           </div>
 
           {/* Right Form Card */}
-          <div className="lg:col-span-7 bg-[#fffefb] p-8 sm:p-10 rounded-3xl border border-[#e6e1d6] shadow-xl order-1 lg:order-2">
+          <div className="lg:col-span-7 bg-[#fffefb]/82 p-8 sm:p-10 rounded-3xl border border-[#e6e1d6] shadow-xl backdrop-blur-md order-1 lg:order-2">
             {isSuccess && submittedBooking ? (
               <div className="text-center py-10 space-y-6">
-                <div className="w-16 h-16 bg-[#738262]/20 text-[#4e633d] rounded-full flex items-center justify-center mx-auto animate-bounce">
+                <div className="w-16 h-16 bg-[#738262]/20 text-[#24211e] rounded-full flex items-center justify-center mx-auto animate-bounce">
                   <CheckCircle2 className="w-10 h-10" />
                 </div>
 
@@ -245,7 +244,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                     href={createBookingInquiryWhatsAppLink(submittedBooking)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full bg-[#738262] hover:bg-[#5f6c50] text-[#fffefb] py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-md transition-all"
+                    className="w-full bg-[#738262] hover:bg-[#5f6c50] text-white py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-md transition-all"
                   >
                     <Send className="w-5 h-5" />
                     <span>{t('إرسال تفاصيل الحجز', 'Send booking details')}</span>
@@ -435,11 +434,10 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                 {/* Tell us about your story */}
                 <div>
                   <label className="block text-xs font-semibold text-[#403831] mb-1.5">
-                    {t('أخبرونا عن حكايتكم وتفاصيل يومكم *', 'Tell us about your story and plans *')}
+                    {t('أخبرونا عن حكايتكم وتفاصيل يومكم (اختياري)', 'Tell us about your story and plans (optional)')}
                   </label>
                   <textarea
                     rows={4}
-                    required
                     id="booking-story-input"
                     value={formData.storyNotes}
                     onChange={(e) => setFormData({ ...formData, storyNotes: e.target.value })}
@@ -500,7 +498,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                   <button
                     type="submit"
                     id="submit-inquiry-btn"
-                    className="w-full bg-[#24211e] hover:bg-[#3d3833] text-[#fffefb] py-4 rounded-full text-base font-medium tracking-wide shadow-lg transition-all duration-300 flex items-center justify-center gap-2 active:scale-98"
+                    className="w-full bg-[#24211e] hover:bg-[#3d3833] text-white py-4 rounded-full text-base font-medium tracking-wide shadow-lg transition-all duration-300 flex items-center justify-center gap-2 active:scale-98"
                   >
                     <Send className="w-4 h-4 text-[#c6a585]" />
                     <span>{t('إرسال طلب الحجز', 'Send enquiry')}</span>

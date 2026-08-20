@@ -176,7 +176,17 @@ export interface SiteContent {
     }[];
   };
   signature: {
+    /** Controls public visibility of the signature / wedding feature section. */
+    visible?: boolean;
+    /** Small eyebrow above the main signature heading. */
+    eyebrow?: string;
     title: string;
+    /** Main explanatory paragraph beside the signature image. */
+    description?: string;
+    /** Editable benefit lines shown under the signature paragraph. */
+    benefits?: string[];
+    /** CTA button text. */
+    ctaText?: string;
     subtitle: string;
     quote: string;
     imageUrl?: string;
@@ -209,9 +219,21 @@ export interface SiteContent {
     guarantees: { title: string; desc: string }[];
   };
   faq: FAQItem[];
+  /** Editable helper copy shown beneath the FAQ accordion. */
+  faqSettings?: {
+    helperText?: string;
+    helperCta?: string;
+  };
   contact: {
+    /** Small label above the contact heading. */
+    eyebrow?: string;
+    /** Editorial italic line above the main contact title. */
+    kicker?: string;
     title: string;
     subtitle: string;
+    /** Direct-contact card heading and description. */
+    directTitle?: string;
+    directDescription?: string;
     address: string;
     workingHours: string;
     phone: string;
@@ -230,6 +252,11 @@ export interface SiteContent {
     privacyNotice: string;
     developerCredit?: string;
   };
+  /**
+   * Text-only English overrides managed from the bilingual content editor.
+   * Media URLs, contact numbers, Firebase settings and other system values stay shared.
+   */
+  english?: Record<string, unknown>;
 }
 
 export interface SiteSettings {

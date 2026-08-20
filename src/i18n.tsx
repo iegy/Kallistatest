@@ -46,6 +46,33 @@ const englishServices: Record<string, { description: string; inclusions: string[
   },
 };
 
+function deepMerge<T>(base: T, override?: Partial<T> | null): T {
+  if (!override) return base;
+  if (Array.isArray(base) || Array.isArray(override)) return override as T;
+  if (typeof base !== 'object' || base === null || typeof override !== 'object' || override === null) {
+    return override as T;
+  }
+
+  const result: Record<string, unknown> = { ...(base as Record<string, unknown>) };
+  Object.entries(override as Record<string, unknown>).forEach(([key, value]) => {
+    if (value === undefined) return;
+    const current = result[key];
+    if (
+      current &&
+      value &&
+      typeof current === 'object' &&
+      typeof value === 'object' &&
+      !Array.isArray(current) &&
+      !Array.isArray(value)
+    ) {
+      result[key] = deepMerge(current, value as Record<string, unknown>);
+    } else {
+      result[key] = value;
+    }
+  });
+  return result as T;
+}
+
 export function localizeContent(content: SiteContent, language: Language): SiteContent {
   if (language === 'ar') {
     const approachSubtitles = ['الرؤية الإبداعية', 'الموقع وتوقيت الضوء', 'تجربة التصوير', 'المعالجة والتسليم'];
@@ -56,12 +83,11 @@ export function localizeContent(content: SiteContent, language: Language): SiteC
         ...content.approach,
         steps: content.approach.steps.map((step, index) => ({ ...step, subtitle: approachSubtitles[index] || step.subtitle })),
       },
-      signature: { ...content.signature, subtitle: 'اللقطة التوقيعية لكاليستا' },
       experience: { ...content.experience, subtitle: 'تجربة واضحة ومريحة ومدروسة في كل مرحلة' },
     };
   }
 
-  return {
+  const localized: SiteContent = {
     ...content,
     brand: {
       ...content.brand,
@@ -123,7 +149,15 @@ export function localizeContent(content: SiteContent, language: Language): SiteC
     },
     signature: {
       ...content.signature,
+      eyebrow: 'Wedding Feature',
       title: 'The signature frame — timeless harmony of light and grace',
+      description: 'A wedding is more than a photography session; it is the beginning of a new chapter. We stay quietly attentive to every meaningful glance, family blessing, considered detail and honest emotion.',
+      benefits: [
+        'Complete editorial coverage for the couple and family',
+        'Careful colour finishing that preserves natural features and skin',
+        'Luxury hand-finished albums made with archival materials',
+      ],
+      ctaText: 'Book a wedding consultation',
       subtitle: 'The Signature Kallista Frame',
       quote: 'Elegance is not excess; it is beauty expressed with confidence, balance and intention.',
       imageCaption: 'A refined wedding story — Alexandria, Egypt',
@@ -173,10 +207,18 @@ export function localizeContent(content: SiteContent, language: Language): SiteC
       { id: 'faq-4', question: 'What kind of albums do you offer?', answer: 'Our albums use archival fine-art paper and premium linen or leather finishes, created to preserve colour and detail for generations.', category: 'deliverables' },
       { id: 'faq-5', question: 'How are photographs delivered?', answer: 'Final images are delivered through a private password-protected gallery in high resolution, with printed albums and keepsake presentation options available.', category: 'deliverables' },
     ],
+    faqSettings: {
+      helperText: 'Have another question? We would be delighted to help.',
+      helperCta: 'Contact us on WhatsApp or through the enquiry form',
+    },
     contact: {
       ...content.contact,
+      eyebrow: 'Contact & Booking Inquiry',
+      kicker: "Let's preserve something beautiful.",
       title: 'Let us preserve a story worth remembering',
       subtitle: 'Tell us about your celebration, family, portrait or brand project and we will shape a thoughtful experience around it.',
+      directTitle: 'Direct contact',
+      directDescription: 'Share your plans with us and we will help you choose the right service, setting and light for your session.',
       address: 'Alexandria, Egypt — Laurent / San Stefano',
       workingHours: 'Saturday–Thursday, 11:00 AM–9:00 PM — by appointment',
       depositPolicy: 'A 30% deposit confirms the booking. Date changes remain possible with advance coordination and subject to availability.',
@@ -189,6 +231,8 @@ export function localizeContent(content: SiteContent, language: Language): SiteC
       privacyNotice: 'We protect client privacy, creative rights and every entrusted image.',
     },
   };
+
+  return deepMerge(localized, (content.english || {}) as unknown as Partial<SiteContent>);
 }
 
 export function localizeCategories(categories: PortfolioCategory[], language: Language): PortfolioCategory[] {

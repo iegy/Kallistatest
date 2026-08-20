@@ -85,6 +85,16 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // Prevent the public UI from flashing stale local/default content before
+  // Firestore sends the first authoritative snapshot.
+  const [firebaseHydration, setFirebaseHydration] = useState({
+    content: false,
+    settings: false,
+    categories: false,
+    albums: false,
+  });
+  const [hydrationFallbackReached, setHydrationFallbackReached] = useState(false);
+
   // UI Navigation & Filters
   const [activeSection, setActiveSection] = useState<string>('home');
   const [portfolioCategory, setPortfolioCategory] = useState<string>('all');
@@ -129,12 +139,14 @@ export default function App() {
   useEffect(() => {
     const unsubscribers = [
       watchDocument<SiteContent>(FIRESTORE_COLLECTIONS.CONTENT, 'main', (value) => {
+        setFirebaseHydration((current) => ({ ...current, content: true }));
         if (!value) return;
         const normalizedContent = mergeSiteContent(value);
         setContent(normalizedContent);
         saveSiteContent(normalizedContent);
       }),
       watchDocument<SiteSettings>(FIRESTORE_COLLECTIONS.SETTINGS, 'public', (value) => {
+        setFirebaseHydration((current) => ({ ...current, settings: true }));
         if (!value) return;
         const normalizedSettings = mergeSettings(value);
         setSettings(normalizedSettings);
@@ -144,10 +156,12 @@ export default function App() {
     if (!isAdmin) {
       unsubscribers.push(
         watchCollection<PortfolioCategory>(FIRESTORE_COLLECTIONS.CATEGORIES, (values) => {
+          setFirebaseHydration((current) => ({ ...current, categories: true }));
           setCategories(values);
           savePortfolioCategories(values);
         }, where('active', '==', true)),
         watchCollection<Album>(FIRESTORE_COLLECTIONS.ALBUMS, (values) => {
+          setFirebaseHydration((current) => ({ ...current, albums: true }));
           setAlbums(values);
           saveAlbums(values);
         }, where('published', '==', true)),
@@ -170,15 +184,37 @@ export default function App() {
     root.style.setProperty('--font-arabic-serif', headingFont.stack);
   }, [settings.bodyFontKey, settings.headingFontKey]);
 
+  const isFirebaseHydrated =
+    firebaseHydration.content
+    && firebaseHydration.settings
+    && firebaseHydration.categories
+    && firebaseHydration.albums;
+
+  const isInitialSiteReady = isFirebaseHydrated || hydrationFallbackReached;
+
+  useEffect(() => {
+    if (isFirebaseHydrated) return;
+
+    const timeoutId = window.setTimeout(() => {
+      // Safety fallback only: if Firebase is unavailable, do not leave the site
+      // permanently blocked. Local/default content can still be used after 4s.
+      setHydrationFallbackReached(true);
+    }, 4000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isFirebaseHydrated]);
+
   useEffect(() => {
     if (!isAdmin) return;
     void seedDefaults({ content, settings, categories, albums });
     const unsubscribers = [
       watchCollection<PortfolioCategory>(FIRESTORE_COLLECTIONS.CATEGORIES, (values) => {
+        setFirebaseHydration((current) => ({ ...current, categories: true }));
         setCategories(values);
         savePortfolioCategories(values);
       }),
       watchCollection<Album>(FIRESTORE_COLLECTIONS.ALBUMS, (values) => {
+        setFirebaseHydration((current) => ({ ...current, albums: true }));
         setAlbums(values);
         saveAlbums(values);
       }),
@@ -340,7 +376,7 @@ export default function App() {
   // Navigation Scrolling Handler
   const handleNavigate = (sectionId: string) => {
     setActiveSection(sectionId);
-    
+
     // Check if category matching
     const matchingCat = categories.find((c) => c.slug === sectionId);
     if (matchingCat) {
@@ -432,6 +468,32 @@ export default function App() {
     event.preventDefault();
   };
 
+  if (!isInitialSiteReady) {
+    return (
+      <div
+        className="fixed inset-0 z-[9999] flex min-h-screen items-center justify-center bg-[#fffefb] text-[#24211e]"
+        role="status"
+        aria-live="polite"
+        aria-label={language === 'ar' ? 'جاري تحميل كاليستا' : 'Loading Kallista'}
+      >
+        <div className="flex flex-col items-center px-6 text-center">
+          <div className="font-serif text-[clamp(2rem,7vw,4.5rem)] font-semibold tracking-[0.18em] sm:tracking-[0.24em]">
+            KALLISTA
+          </div>
+          <div className="mt-1 font-serif text-sm italic tracking-[0.16em] text-[#8c6742] sm:text-base">
+            by Ronadisa
+          </div>
+
+          <div className="mt-8 flex items-center gap-2" aria-hidden="true">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#c6a585]" />
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#738262] [animation-delay:180ms]" />
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#c6a585] [animation-delay:360ms]" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <LanguageProvider value={{
       language,
@@ -446,7 +508,7 @@ export default function App() {
       onContextMenu={preventPublicImageAction}
       onDragStart={preventPublicImageAction}
     >
-      
+
       {/* 03 — HEADER / NAVIGATION */}
       <Navbar
         settings={settings}

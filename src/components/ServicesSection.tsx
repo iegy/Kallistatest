@@ -1,5 +1,5 @@
-import React from 'react';
-import { ArrowLeft, Sparkle, MessageCircle, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Sparkle, MessageCircle, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 import { SiteContent, PortfolioCategory } from '../types';
 import { veiledWeddingPhoto, veiledFashionPhoto, veiledFamilyPhoto } from '../services/storage';
 import { useLanguage } from '../i18n';
@@ -19,11 +19,11 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
 }) => {
   const { language, t } = useLanguage();
   const { services, servicesSettings, contact } = content;
+  const [expandedServiceId, setExpandedServiceId] = useState<string | null>(null);
   const globalShowPricing = servicesSettings?.showPricing ?? true;
   const hidePriceText = servicesSettings?.hidePriceCustomText || t('طلب عرض السعر', 'Request a quotation');
   const whatsappNumber = (contact?.whatsapp || '').replace(/[^0-9+]/g, '');
 
-  // Fallback image mapper
   const getImageForCategory = (catSlug: string, customImg?: string) => {
     if (customImg) return customImg;
     if (catSlug === 'weddings') return veiledWeddingPhoto;
@@ -33,29 +33,31 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
   };
 
   return (
-    <section id="services" className="py-24 sm:py-32 bg-[#fffefb] relative border-t border-[#e6e1d6]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="services" className="relative border-t border-[#e6e1d6] bg-[#fffefb] py-14 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8 xl:px-10">
 
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
-          <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block mb-3 font-semibold">
-            {t('ما نوثقه ونحفظه', 'What We Preserve')}
-          </span>
+        {/* Compact section header — duplicate small eyebrow intentionally removed */}
+        <div className="mx-auto mb-8 max-w-4xl text-center sm:mb-10 lg:mb-12">
           <h2
             id="services-headline"
-            className="font-arabic-editorial text-3xl sm:text-4xl md:text-5xl font-bold text-[#24211e] mb-4"
+            className="mb-3 font-arabic-editorial text-3xl font-bold leading-tight text-[#24211e] sm:text-4xl lg:text-5xl"
           >
             {t('ما نقوم بتوثيقه وحفظه لكم', 'Stories and moments we preserve')}
           </h2>
-          <p className="text-[#524941] text-base sm:text-lg font-light">
+          <p className="mx-auto max-w-3xl text-sm font-light leading-7 text-[#524941] sm:text-base lg:text-lg">
             {t('باقات وجلسات تصوير فنية مخصصة تمنحكم أعمالاً تزداد قيمة ورونقاً مع مرور السنين.', 'Tailored photography experiences designed to become more meaningful with time.')}
           </p>
         </div>
 
-        {/* Dynamic Services Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Wider, tighter service grid */}
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:gap-6">
           {services.map((srv) => {
             const isPriceVisible = globalShowPricing && (srv.showPrice !== false);
+            const isExpanded = expandedServiceId === srv.id;
+            const visibleInclusions = srv.inclusions?.slice(0, 2) || [];
+            const extraInclusions = srv.inclusions?.slice(2) || [];
+            const hasMore = extraInclusions.length > 0;
+
             const inquiryMessage = language === 'ar'
               ? `مرحباً استوديو كاليستا، أود الاستفسار عن باقات وأسعار جلسة: ${srv.titleAr}`
               : `Hello Kallista Studio, I would like to enquire about: ${srv.titleAr}`;
@@ -67,44 +69,42 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
               <div
                 key={srv.id}
                 id={`service-card-${srv.id}`}
-                className="bg-[#fffefb] rounded-3xl border border-[#e6e1d6] overflow-hidden flex flex-col justify-between hover:border-[#c6a585] transition-all duration-300 hover:shadow-xl group"
+                className="group flex flex-col overflow-hidden rounded-3xl border border-[#e6e1d6] bg-[#fffefb] transition-all duration-300 hover:border-[#c6a585] hover:shadow-xl"
               >
                 <div>
-                  {/* Image Frame */}
-                  <div className="relative aspect-[4/3] overflow-hidden bg-[#e6e1d6]">
+                  {/* Shorter visual frame keeps cards compact */}
+                  <div className="relative aspect-[16/10] overflow-hidden bg-[#e6e1d6]">
                     <img
                       src={getImageForCategory(srv.categorySlug, srv.coverImage)}
                       alt={srv.titleAr}
                       draggable={false}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
-                    <div className="absolute top-4 right-4">
-                      <span className="px-3 py-1 rounded-full text-xs font-serif font-medium bg-[#24211e]/80 text-[#fffefb] backdrop-blur-md">
+                    <div className="absolute right-4 top-4">
+                      <span className="rounded-full bg-[#24211e]/80 px-3 py-1 font-serif text-xs font-medium text-[#fffefb] backdrop-blur-md">
                         {categories.find((category) => category.slug === srv.categorySlug)?.nameAr || srv.titleEn}
                       </span>
                     </div>
                     {srv.badge && (
                       <div className="absolute bottom-4 right-4 left-4">
-                        <span className="inline-block px-3 py-1 rounded-full text-[11px] font-semibold bg-[#e6e1d6]/95 text-[#24211e] backdrop-blur-sm">
+                        <span className="inline-block rounded-full bg-[#e6e1d6]/95 px-3 py-1 text-[11px] font-semibold text-[#24211e] backdrop-blur-sm">
                           {srv.badge}
                         </span>
                       </div>
                     )}
                   </div>
 
-                  {/* Content */}
-                  <div className="p-6 sm:p-8 text-right space-y-4">
-                    <h3 className="font-arabic-editorial text-2xl font-bold text-[#24211e]">
+                  <div className="space-y-3 p-5 text-right sm:p-6">
+                    <h3 className="font-arabic-editorial text-xl font-bold leading-snug text-[#24211e] sm:text-2xl">
                       {srv.titleAr}
                     </h3>
 
-                    <p className="text-[#594f45] text-sm leading-relaxed font-light">
+                    <p className="text-sm font-light leading-relaxed text-[#594f45]">
                       {srv.descriptionAr}
                     </p>
 
-                    {/* Pricing or WhatsApp inquiry block */}
                     {isPriceVisible && srv.priceStarting ? (
-                      <div className="text-xs font-semibold text-[#8c6742] bg-[#f8f4ee] px-3.5 py-2 rounded-xl inline-block border border-[#e6ded3]">
+                      <div className="inline-block rounded-xl border border-[#e6ded3] bg-[#f8f4ee] px-3.5 py-2 text-xs font-semibold text-[#8c6742]">
                         {srv.priceStarting}
                       </div>
                     ) : (
@@ -112,46 +112,74 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                         href={whatsappInquiryUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-xs font-semibold text-[#4e633d] bg-[#738262]/15 hover:bg-[#738262]/25 px-3.5 py-2 rounded-xl border border-[#738262]/30 transition-colors"
+                        className="inline-flex items-center gap-2 rounded-xl border border-[#738262] bg-[#738262] px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-[#657654]"
                       >
-                        <MessageCircle className="w-4 h-4 text-[#738262]" />
+                        <MessageCircle className="h-4 w-4 text-white" />
                         <span>{hidePriceText}</span>
                       </a>
                     )}
 
                     {srv.inclusions && srv.inclusions.length > 0 && (
-                      <div className="pt-3 space-y-2 border-t border-[#e6e1d6]/60">
-                        {srv.inclusions.map((feat, idx) => (
-                          <div key={idx} className="flex items-center justify-start gap-2 text-xs text-[#524941]">
-                            <span>{feat}</span>
-                            <Sparkle className="w-3 h-3 text-[#c6a585] flex-shrink-0" />
-                          </div>
-                        ))}
+                      <div className="border-t border-[#e6e1d6]/60 pt-3">
+                        <div className="space-y-2">
+                          {visibleInclusions.map((feat, idx) => (
+                            <div key={`visible-${idx}`} className="flex items-start justify-start gap-2 text-xs leading-5 text-[#524941]">
+                              <span className="flex-1">{feat}</span>
+                              <Sparkle className="mt-0.5 h-3 w-3 flex-shrink-0 text-[#c6a585]" />
+                            </div>
+                          ))}
+                        </div>
+
+                        {hasMore && (
+                          <>
+                            <div className={`grid transition-[grid-template-rows,opacity] duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                              <div className="overflow-hidden">
+                                <div className="space-y-2 pt-2">
+                                  {extraInclusions.map((feat, idx) => (
+                                    <div key={`extra-${idx}`} className="flex items-start justify-start gap-2 text-xs leading-5 text-[#524941]">
+                                      <span className="flex-1">{feat}</span>
+                                      <Sparkle className="mt-0.5 h-3 w-3 flex-shrink-0 text-[#c6a585]" />
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => setExpandedServiceId(isExpanded ? null : srv.id)}
+                              className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-[#c6a585]/45 bg-[#fffefb]/75 px-3.5 py-2 text-[11px] font-bold text-[#594f45] shadow-sm backdrop-blur-md transition-all hover:border-[#c6a585] hover:bg-[#e6e1d6]/35"
+                              aria-expanded={isExpanded}
+                            >
+                              <span>{isExpanded ? t('إخفاء التفاصيل', 'Hide details') : t('عرض كل المميزات', 'Show all features')}</span>
+                              {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                            </button>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Action Buttons in card footer */}
-                <div className="p-6 pt-0 flex items-center justify-between gap-3 border-t border-[#e6e1d6]/40 mt-4">
+                {/* Footer actions always remain visible */}
+                <div className="mt-auto flex items-center justify-between gap-3 border-t border-[#e6e1d6]/60 p-5 pt-4 sm:p-6 sm:pt-4">
                   <button
                     onClick={() => onInquire(srv.categorySlug || srv.id)}
-                    className="flex-1 bg-[#24211e] hover:bg-[#3d3833] text-[#fffefb] py-2.5 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#24211e] py-2.5 text-xs font-semibold text-[#fffefb] transition-colors hover:bg-[#3d3833]"
                   >
-                    <Calendar className="w-3.5 h-3.5 text-[#c6a585]" />
+                    <Calendar className="h-3.5 w-3.5 text-[#c6a585]" />
                     <span>{t('احجزوا هذه الجلسة', 'Book this session')}</span>
                   </button>
 
                   <button
                     onClick={() => onSelectCategory(srv.categorySlug || 'all')}
-                    className="px-4 py-2.5 rounded-xl bg-[#e6e1d6]/50 hover:bg-[#e6e1d6] text-[#24211e] text-xs font-semibold flex items-center gap-1 transition-colors"
+                    className="flex items-center gap-1 rounded-xl border border-[#e6e1d6] bg-[#fffefb]/65 px-4 py-2.5 text-xs font-semibold text-[#24211e] backdrop-blur-md transition-colors hover:border-[#c6a585] hover:bg-[#e6e1d6]/45"
                     title={t('عرض الألبومات', 'View albums')}
                   >
                     <span>{t('الألبومات', 'Albums')}</span>
-                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <ArrowLeft className="h-3.5 w-3.5" />
                   </button>
                 </div>
-
               </div>
             );
           })}

@@ -11,7 +11,7 @@ interface AboutSectionsProps {
 
 export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExploreWork }) => {
   const { t } = useLanguage();
-  const { aboutKallista, aboutRonadisa, brand } = content;
+  const { aboutKallista, aboutRonadisa } = content;
   const instagramUrl = content.contact.socialLinks?.find((link) => link.icon === 'instagram' || link.label.toLowerCase().includes('instagram'))?.url || content.contact.instagram || 'https://instagram.com';
 
   return (
@@ -38,9 +38,10 @@ export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExplore
 
             {/* Typography Column */}
             <div className="lg:col-span-7 text-right space-y-6">
-              <span className="font-serif text-sm tracking-[0.25em] text-[#738262] uppercase block font-semibold">
-                {t(`عن ${brand.studioName}`, `About ${brand.studioName}`)}
-              </span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c6a585]/20 text-[#8c6742] text-xs font-serif font-semibold">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{t('عن كاليستا', 'About Kallista')}</span>
+              </div>
 
               <h2 className="font-arabic-editorial text-3xl sm:text-4xl md:text-5xl font-bold text-[#24211e] leading-tight">
                 {aboutKallista.title}

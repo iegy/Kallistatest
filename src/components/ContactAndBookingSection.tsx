@@ -203,12 +203,12 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
               )}
 
               {/* VIP Perks */}
-              <div className="space-y-3 rounded-2xl border border-[#738262]/30 bg-[#738262]/15 p-4 text-right sm:p-5">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#fffefb]/65 bg-[#fffefb]/65 px-3 py-1.5 text-[#24211e] backdrop-blur-md">
+              <div className="space-y-3 rounded-2xl border border-[#738262]/35 bg-[#738262] p-4 text-right text-white shadow-sm sm:p-5">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/12 px-3 py-1.5 text-white backdrop-blur-md">
                   <span className="font-bold text-xs font-arabic-editorial">{t('ميزة كاليستا لعملائنا الكرام', 'A thoughtful Kallista touch')}</span>
-                  <Gift className="h-4 w-4 shrink-0 text-[#60704f]" />
+                  <Gift className="h-4 w-4 shrink-0 text-white" />
                 </div>
-                <p className="max-w-md text-xs leading-6 text-[#24211e]">
+                <p className="max-w-md text-xs leading-6 text-white">
                   {t('عند تسجيل تاريخ ميلادكم أو ذكرى زواجكم، نرسل لكم تهنئة خاصة وهدية خصم مميزة في شهر مناسبتكم السعيدة!', 'Optionally share a birthday or anniversary to receive a personal greeting and seasonal client gift.')}
                 </p>
               </div>

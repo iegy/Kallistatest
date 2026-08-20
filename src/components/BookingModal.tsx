@@ -28,7 +28,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     email: '',
     serviceType: preselectedService || 'weddings',
     date: '',
-    timeSlot: '04:00 PM (Golden Hour)',
+    timeSlot: '04:00 PM (Sunset Golden Hour)',
     location: t('الإسكندرية', 'Alexandria'),
     governorate: '',
     city: '',
@@ -51,13 +51,13 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       !formData.date ||
       !formData.location.trim() ||
       !formData.governorate ||
-      !formData.city.trim() ||
-      !formData.storyNotes.trim()
+      !formData.city.trim()
     ) {
       alert(t('يرجى استكمال جميع بيانات الحجز المطلوبة.', 'Please complete all required booking details.'));
       return;
     }
 
+    // Keep the quick modal payload aligned with the working contact form.
     const payload = {
       clientName: formData.clientName,
       phone: formData.phone,
@@ -70,6 +70,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       governorate: formData.governorate,
       city: formData.city,
       storyNotes: formData.storyNotes,
+      budget: '',
     };
 
     const saved = await onSaveBooking(payload, {
@@ -78,8 +79,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       whatsapp: formData.whatsapp,
       email: formData.email,
       birthday: formData.birthday,
+      weddingAnniversary: '',
       governorate: formData.governorate,
       city: formData.city,
+      subscribeUpdates: true,
       serviceInterests: [formData.serviceType as any],
     });
 
@@ -296,11 +299,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-[#403831] mb-1">
-                {t('تفاصيل ورؤيتكم للجلسة *', 'Tell us about your vision *')}
+                {t('تفاصيل ورؤيتكم للجلسة (اختياري)', 'Tell us about your vision (optional)')}
               </label>
               <textarea
                 rows={3}
-                required
                 value={formData.storyNotes}
                 onChange={(e) => setFormData({ ...formData, storyNotes: e.target.value })}
                 placeholder={t('أخبرونا عن تفاصيل يومكم وتطلعاتكم الخاصة...', 'Share the important details and what you hope to preserve...')}

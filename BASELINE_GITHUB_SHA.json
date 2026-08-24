@@ -1,0 +1,9 @@
+{
+  "src/App.tsx": "8dffa70bef1d17589e9dcd808d6e336b6e348095",
+  "src/types.ts": "4d74c2a82f26eff4a39e650fd9075ff165f5e44e",
+  "src/i18n.tsx": "f04d017070506068a20278d419e583b639b94f45",
+  "src/components/AdminDashboardModal.tsx": "2592854fa52e208adaa86e21a5b4b6dd42387572",
+  "src/components/ContactAndBookingSection.tsx": "3272969e3c5befe5b7903cba64850acd2947181b",
+  "src/components/TestimonialsSection.tsx": "6f3d372c1aceb5c75f6f03849a1081863aa78980",
+  "src/components/AboutSections.tsx": "a289ab7844bc0d3617e91c2dee725533136280aa"
+}

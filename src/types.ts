@@ -30,6 +30,8 @@ export interface Album {
   date: string;
   location?: string;
   story?: string;
+  /** Optional English translation of the album/session story shown on English pages. */
+  storyEn?: string;
   featured?: boolean;
   published?: boolean;
   tags?: string[];

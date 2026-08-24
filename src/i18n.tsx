@@ -265,7 +265,7 @@ export function localizeAlbums(albums: Album[], language: Language): Album[] {
       ...album,
       title: album.titleEn || album.title,
       location: copy?.location || album.location,
-      story: copy?.story || album.story,
+      story: album.storyEn || copy?.story || album.story,
       images: album.images.map((photo, index) => ({
         ...photo,
         title: `Editorial frame ${String(index + 1).padStart(2, '0')}`,

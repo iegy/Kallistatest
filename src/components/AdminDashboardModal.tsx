@@ -144,6 +144,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     date: new Date().toISOString().split('T')[0],
     location: 'الإسكندرية',
     story: '',
+    storyEn: '',
     featured: true,
     images: [],
   });
@@ -638,6 +639,7 @@ const greetableClients = clients.filter(
         date: albumFormData.date || new Date().toISOString().split('T')[0],
         location: albumFormData.location || 'الإسكندرية',
         story: albumFormData.story || '',
+        storyEn: albumFormData.storyEn || '',
         featured: albumFormData.featured ?? true,
         tags: albumFormData.tags || ['Editorial', 'Kallista'],
         images: albumFormData.images || [],
@@ -657,6 +659,7 @@ const greetableClients = clients.filter(
       date: new Date().toISOString().split('T')[0],
       location: 'الإسكندرية',
       story: '',
+      storyEn: '',
       featured: true,
       images: [],
     });
@@ -3169,6 +3172,7 @@ const greetableClients = clients.filter(
                           date: new Date().toISOString().split('T')[0],
                           location: 'الإسكندرية',
                           story: '',
+                          storyEn: '',
                           featured: true,
                           images: [],
                         });
@@ -3379,17 +3383,33 @@ const greetableClients = clients.filter(
                         )}
                       </div>
 
-                      <div>
-                        <label className="block text-xs font-semibold text-[#594f45] mb-1">
-                          قصة وكواليس الجلسة (Story)
-                        </label>
-                        <textarea
-                          rows={2}
-                          value={albumFormData.story}
-                          onChange={(e) => setAlbumFormData({ ...albumFormData, story: e.target.value })}
-                          placeholder="وصف تفصيلي للأجواء، الإضاءة، وتفاصيل الحجاب والفستان..."
-                          className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e]"
-                        />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-[#594f45] mb-1">
+                            وصف الألبوم / قصة الجلسة — عربي
+                          </label>
+                          <textarea
+                            rows={3}
+                            value={albumFormData.story || ''}
+                            onChange={(e) => setAlbumFormData({ ...albumFormData, story: e.target.value })}
+                            placeholder="وصف تفصيلي للأجواء، الإضاءة، وتفاصيل الجلسة..."
+                            className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e]"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-[#594f45] mb-1">
+                            English album description / story
+                          </label>
+                          <textarea
+                            rows={3}
+                            dir="ltr"
+                            value={albumFormData.storyEn || ''}
+                            onChange={(e) => setAlbumFormData({ ...albumFormData, storyEn: e.target.value })}
+                            placeholder="English description shown when the site language is English..."
+                            className="w-full px-3 py-2 rounded-xl bg-white border border-[#e6e1d6] text-xs text-[#24211e] text-left"
+                          />
+                        </div>
                       </div>
 
                       <div className="flex items-center justify-between pt-2">

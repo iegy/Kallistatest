@@ -124,7 +124,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                 {/* Client info footer */}
                 <div className="pt-4 border-t border-[#e6e1d6]/60 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-full bg-[#738262]/20 text-[#4e633d] flex items-center justify-center font-bold text-xs">
+                    <div className="w-9 h-9 rounded-full bg-[#738262] text-white flex items-center justify-center font-bold text-xs shadow-sm">
                       {rev.clientName.charAt(0)}
                     </div>
                     <div>

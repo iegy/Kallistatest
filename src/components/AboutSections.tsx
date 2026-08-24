@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, Sparkles, Instagram, CheckCircle2 } from 'lucide-react';
+import { Sparkles, CheckCircle2 } from 'lucide-react';
 import { SiteContent } from '../types';
 import { ronadisaPhoto, veiledWeddingPhoto } from '../services/storage';
 import { useLanguage } from '../i18n';
@@ -9,10 +9,9 @@ interface AboutSectionsProps {
   onExploreWork: () => void;
 }
 
-export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExploreWork }) => {
+export const AboutSections: React.FC<AboutSectionsProps> = ({ content }) => {
   const { t } = useLanguage();
   const { aboutKallista, aboutRonadisa } = content;
-  const instagramUrl = content.contact.socialLinks?.find((link) => link.icon === 'instagram' || link.label.toLowerCase().includes('instagram'))?.url || content.contact.instagram || 'https://instagram.com';
 
   return (
     <div id="about" className="space-y-0">
@@ -121,25 +120,7 @@ export const AboutSections: React.FC<AboutSectionsProps> = ({ content, onExplore
                 </div>
               )}
 
-              <div className="pt-4 flex flex-wrap items-center gap-4">
-                <button
-                  onClick={onExploreWork}
-                  className="bg-[#24211e] hover:bg-[#3d3833] text-[#fffefb] px-8 py-3.5 rounded-full text-sm font-semibold tracking-wide shadow-md transition-all flex items-center gap-2"
-                >
-                  <Camera className="w-4 h-4 text-[#c6a585]" />
-                  <span>{t('استكشفوا أعمالي وقصص الجلسات', 'Explore my work and session stories')}</span>
-                </button>
 
-                <a
-                  href={instagramUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-semibold text-[#24211e] hover:text-[#c6a585] inline-flex items-center gap-1.5 p-3 rounded-full bg-[#fffefb] border border-[#e6e1d6]"
-                >
-                  <Instagram className="w-4 h-4 text-[#c6a585]" />
-                  <span>@ronadisa</span>
-                </a>
-              </div>
             </div>
 
             {/* Real Ronadisa Founder Image Frame - preserved pure and untouched */}

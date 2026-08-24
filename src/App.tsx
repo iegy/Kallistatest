@@ -458,6 +458,33 @@ export default function App() {
     if (window.location.hash === '#/admin' && user && isAdmin) setIsAdminOpen(true);
   }, [user, isAdmin]);
 
+  // Support shareable section links such as https://kallista.work/#reviews.
+  // The public UI mounts only after Firebase hydration, so perform the fragment
+  // scroll after the real sections exist in the DOM and keep it working on
+  // later hash changes too.
+  useEffect(() => {
+    if (!isInitialSiteReady) return;
+
+    const scrollToPublicHash = () => {
+      const rawHash = window.location.hash;
+      if (!rawHash || rawHash === '#/admin' || rawHash.startsWith('#/')) return;
+
+      const sectionId = decodeURIComponent(rawHash.slice(1));
+      if (!sectionId) return;
+
+      window.setTimeout(() => {
+        const section = document.getElementById(sectionId);
+        if (!section) return;
+        section.style.scrollMarginTop = '96px';
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 60);
+    };
+
+    scrollToPublicHash();
+    window.addEventListener('hashchange', scrollToPublicHash);
+    return () => window.removeEventListener('hashchange', scrollToPublicHash);
+  }, [isInitialSiteReady]);
+
   // Birthday alerts count
   const birthdayAlerts = getUpcomingBirthdayAlerts(clients);
 

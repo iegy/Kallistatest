@@ -23,6 +23,8 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
 }) => {
   const { language, t } = useLanguage();
   const { contact } = content;
+  const directChannelClass = 'group flex items-start gap-4 rounded-2xl border border-[#c6a585]/60 bg-[#fffefb]/78 p-4 backdrop-blur-md transition-all hover:border-[#c6a585] hover:shadow-md';
+  const directChannelBadgeClass = 'min-w-[5.75rem] shrink-0 rounded-full border border-[#c6a585]/60 bg-[#fffefb]/75 px-3 py-1.5 text-center font-serif text-[11px] font-semibold leading-5 text-[#24211e] backdrop-blur-md';
 
   const [formData, setFormData] = useState({
     clientName: '',
@@ -153,9 +155,9 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                   href={`https://wa.me/${contact.whatsapp.replace(/[^0-9+]/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-start gap-4 rounded-2xl border border-[#e6e1d6] bg-[#fffefb]/78 p-4 backdrop-blur-md transition-all hover:border-[#c6a585] hover:shadow-md"
+                  className={directChannelClass}
                 >
-                  <span className="min-w-[5.75rem] shrink-0 rounded-full border border-[#d8cfc4] bg-[#fffefb]/75 px-3 py-1.5 text-center font-serif text-[11px] font-semibold leading-5 text-[#24211e] backdrop-blur-md">
+                  <span className={directChannelBadgeClass}>
                     {t('محادثة واتساب', 'WhatsApp chat')}
                   </span>
                   <div className="min-w-0 flex-1 text-right">
@@ -166,8 +168,8 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                   </div>
                 </a>}
 
-                <div className="flex items-start gap-4 rounded-2xl border border-[#e6e1d6] bg-[#fffefb]/78 p-4 backdrop-blur-md">
-                  <span className="min-w-[5.75rem] shrink-0 rounded-full border border-[#d8cfc4] bg-[#fffefb]/75 px-3 py-1.5 text-center font-serif text-[11px] font-semibold leading-5 text-[#24211e] backdrop-blur-md">
+                <div className={directChannelClass}>
+                  <span className={directChannelBadgeClass}>
                     {t('موقع الاستوديو', 'Studio location')}
                   </span>
                   <div className="min-w-0 flex-1 text-right">
@@ -178,17 +180,21 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 rounded-2xl border border-[#e6e1d6] bg-[#fffefb]/78 p-4 backdrop-blur-md">
-                  <span className="min-w-[5.75rem] shrink-0 rounded-full border border-[#d8cfc4] bg-[#fffefb]/75 px-3 py-1.5 text-center font-serif text-[11px] font-semibold leading-5 text-[#24211e] backdrop-blur-md">
+                <a
+                  href={`mailto:${contact.email || 'hello@kallistaphoto.com'}`}
+                  className={directChannelClass}
+                  aria-label={t('إرسال بريد إلكتروني إلى كاليستا', 'Email Kallista')}
+                >
+                  <span className={directChannelBadgeClass}>
                     {t('البريد', 'Email')}
                   </span>
                   <div className="min-w-0 flex-1 text-right">
                     <span className="mb-1 block text-xs text-[#73685d]">{t('البريد الإلكتروني', 'Email')}</span>
-                    <span dir="ltr" className="block break-all text-right font-serif text-sm font-semibold leading-6 text-[#24211e]">
+                    <span dir="ltr" className="block break-all text-right font-serif text-sm font-semibold leading-6 text-[#24211e] group-hover:text-[#8c6742]">
                       {contact.email || 'hello@kallistaphoto.com'}
                     </span>
                   </div>
-                </div>
+                </a>
               </div>
 
               {contact.socialLinks && contact.socialLinks.filter((link) => link.label && link.url).length > 0 && (

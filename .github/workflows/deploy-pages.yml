@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    # Refresh the crawler-ready snapshot from live Firebase every 6 hours.
+    - cron: '17 */6 * * *'
 
 permissions:
   contents: read
@@ -19,13 +22,44 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/configure-pages@v5
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install
-      - run: npm run lint
-      - run: npm run build
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: TypeScript check
+        run: npm run lint
+
+      - name: Build Vite site
+        run: npm run build
+
+      - name: Detect installed Chrome
+        shell: bash
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME_BIN" ]; then
+            echo "A Chromium-based browser was not found on the GitHub runner."
+            exit 1
+          fi
+          echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
+          "$CHROME_BIN" --version
+
+      - name: Prerender current Firebase-backed homepage
+        run: node scripts/prerender.mjs
+
+      - name: Verify crawler-ready output
+        shell: bash
+        run: |
+          grep -q 'data-kallista-prerendered="true"' dist/index.html
+          grep -q 'id="kallista-app-root"' dist/index.html
+          grep -q 'kallista-prerender-handoff' dist/index.html
+          echo "Crawler-ready homepage verified."
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
@@ -39,5 +73,6 @@ jobs:
     steps:
       - name: Wait for legacy Pages build
         run: sleep 45
+
       - id: deployment
         uses: actions/deploy-pages@v4

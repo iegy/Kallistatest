@@ -112,29 +112,52 @@ async function fetchDocument({ projectId, apiKey, collection, documentId }) {
   return decodeFirestoreDocument(payload);
 }
 
-async function fetchCollection({ projectId, apiKey, collection }) {
-  const documents = [];
-  let pageToken = '';
+async function runPublicBooleanQuery({
+  projectId,
+  apiKey,
+  collection,
+  fieldPath,
+}) {
+  const url = new URL(
+    `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(projectId)}`
+    + '/databases/(default)/documents:runQuery',
+  );
+  url.searchParams.set('key', apiKey);
 
-  do {
-    const url = new URL(
-      `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(projectId)}`
-      + `/databases/(default)/documents/${encodeURIComponent(collection)}`,
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      'user-agent': 'Kallista-Prerender/3.0',
+    },
+    body: JSON.stringify({
+      structuredQuery: {
+        from: [{ collectionId: collection }],
+        where: {
+          fieldFilter: {
+            field: { fieldPath },
+            op: 'EQUAL',
+            value: { booleanValue: true },
+          },
+        },
+        limit: 1000,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const body = await response.text().catch(() => '');
+    throw new Error(
+      `${collection} public query failed with HTTP ${response.status}: ${body.slice(0, 500)}`,
     );
-    url.searchParams.set('key', apiKey);
-    url.searchParams.set('pageSize', '1000');
-    if (pageToken) url.searchParams.set('pageToken', pageToken);
+  }
 
-    const payload = await fetchJson(url, collection);
+  const payload = await response.json();
 
-    for (const document of payload.documents || []) {
-      documents.push(decodeFirestoreDocument(document));
-    }
-
-    pageToken = payload.nextPageToken || '';
-  } while (pageToken);
-
-  return documents.filter(Boolean);
+  return payload
+    .map((row) => decodeFirestoreDocument(row.document))
+    .filter(Boolean);
 }
 
 async function fetchCurrentPublicState() {
@@ -168,13 +191,15 @@ async function fetchCurrentPublicState() {
       collection: 'kallista_settings',
       documentId: 'public',
     }),
-    fetchCollection({
+    runPublicBooleanQuery({
       ...common,
       collection: 'kallista_categories',
+      fieldPath: 'active',
     }),
-    fetchCollection({
+    runPublicBooleanQuery({
       ...common,
       collection: 'kallista_albums',
+      fieldPath: 'published',
     }),
   ]);
 
@@ -182,8 +207,8 @@ async function fetchCurrentPublicState() {
     throw new Error('The public content/settings documents could not be loaded.');
   }
 
-  const publicCategories = categories.filter((item) => item.active !== false);
-  const publicAlbums = albums.filter((item) => item.published !== false);
+  const publicCategories = categories.filter((item) => item.active === true);
+  const publicAlbums = albums.filter((item) => item.published === true);
 
   if (!publicCategories.length) {
     throw new Error('No active portfolio categories were returned from Firestore.');

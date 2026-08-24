@@ -23,6 +23,8 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
 }) => {
   const { language, t } = useLanguage();
   const { contact } = content;
+  const studioAddress = contact.address || t('الإسكندرية، مصر', 'Alexandria, Egypt');
+  const studioMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(studioAddress)}`;
   const directChannelClass = 'group flex items-start gap-4 rounded-2xl border border-[#c6a585]/60 bg-[#fffefb]/78 p-4 backdrop-blur-md transition-all hover:border-[#c6a585] hover:shadow-md';
   const directChannelBadgeClass = 'min-w-[5.75rem] shrink-0 rounded-full border border-[#c6a585]/60 bg-[#fffefb]/75 px-3 py-1.5 text-center font-serif text-[11px] font-semibold leading-5 text-[#24211e] backdrop-blur-md';
 
@@ -162,23 +164,29 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                   </span>
                   <div className="min-w-0 flex-1 text-right">
                     <span className="mb-1 block text-xs text-[#73685d]">{t('واتساب مباشر', 'WhatsApp')}</span>
-                    <span dir="ltr" className="block break-all text-right font-serif text-sm font-semibold leading-6 text-[#24211e]">
+                    <span dir="ltr" className="block break-all text-right text-base font-semibold leading-6 text-[#24211e]">
                       {contact.whatsapp}
                     </span>
                   </div>
                 </a>}
 
-                <div className={directChannelClass}>
+                <a
+                  href={studioMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={directChannelClass}
+                  aria-label={t('فتح موقع الاستوديو على خرائط جوجل', 'Open studio location in Google Maps')}
+                >
                   <span className={directChannelBadgeClass}>
                     {t('موقع الاستوديو', 'Studio location')}
                   </span>
                   <div className="min-w-0 flex-1 text-right">
                     <span className="mb-1 block text-xs text-[#73685d]">{t('المقر والمدينة', 'Studio location')}</span>
-                    <span dir="auto" className="block break-words text-sm font-semibold leading-6 text-[#24211e] [unicode-bidi:plaintext]">
-                      {contact.address || 'الإسكندرية، مصر'}
+                    <span dir="auto" className="block break-words text-base font-semibold leading-6 text-[#24211e] [unicode-bidi:plaintext] group-hover:text-[#8c6742]">
+                      {studioAddress}
                     </span>
                   </div>
-                </div>
+                </a>
 
                 <a
                   href={`mailto:${contact.email || 'hello@kallistaphoto.com'}`}
@@ -190,7 +198,7 @@ export const ContactAndBookingSection: React.FC<ContactAndBookingSectionProps> =
                   </span>
                   <div className="min-w-0 flex-1 text-right">
                     <span className="mb-1 block text-xs text-[#73685d]">{t('البريد الإلكتروني', 'Email')}</span>
-                    <span dir="ltr" className="block break-all text-right font-serif text-sm font-semibold leading-6 text-[#24211e] group-hover:text-[#8c6742]">
+                    <span dir="ltr" className="block break-all text-right text-base font-semibold leading-6 text-[#24211e] group-hover:text-[#8c6742]">
                       {contact.email || 'hello@kallistaphoto.com'}
                     </span>
                   </div>
